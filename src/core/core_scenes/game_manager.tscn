@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bgbw0k1p81eif"]
+
+[ext_resource type="Script" uid="uid://bjuyxayyleldj" path="res://src/core/core_scenes/game_manager.gd" id="1_ha3o5"]
+
+[sub_resource type="Environment" id="Environment_ha3o5"]
+adjustment_enabled = true
+
+[node name="GameManager" type="WorldEnvironment" unique_id=691744354]
+environment = SubResource("Environment_ha3o5")
+script = ExtResource("1_ha3o5")
