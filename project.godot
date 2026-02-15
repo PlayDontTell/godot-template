@@ -8,6 +8,10 @@
 
 config_version=5
 
+[addons]
+
+markdown_book/docs_folder="res://docs"
+
 [application]
 
 config/name="godot-template"
@@ -28,18 +32,25 @@ window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [file_customization]
 
 folder_colors={
 "res://addons/": "gray",
 "res://assets/": "green",
+"res://docs/": "yellow",
 "res://src/": "orange",
+"res://tests/": "pink",
 "res://tools/": "purple"
 }
 
 [internationalization]
 
 locale/translations=PackedStringArray("res://assets/texts/langs.en.translation", "res://assets/texts/langs.fr.translation")
+locale/test="en"
 
 [physics]
 
