@@ -1,5 +1,6 @@
 extends WorldEnvironment
 
+@export var auto_start_game : bool = true
 
 var target_scene_path: String = ""
 var loading_progress: Array = [0.0]
@@ -25,12 +26,20 @@ func _ready() -> void:
 	# Any scene can call G.request_core_scene to change among the G.CoreScenes
 	G.request_core_scene.connect(request_core_scene)
 	
-	# When ready, launch the main menu of the game.
-	request_core_scene(G.CoreScenes.MAIN_MENU)
+	var connected_signals : Dictionary = {
+		G.adjust_brightness: self.environment.set_adjustment_brightness,
+		G.adjust_contrast: self.environment.set_adjustment_contrast,
+		G.adjust_saturation: self.environment.set_adjustment_saturation,
+	}
 	
-	G.adjust_brightness.connect(self.environment.set_adjustment_brightness)
-	G.adjust_contrast.connect(self.environment.set_adjustment_contrast)
-	G.adjust_saturation.connect(self.environment.set_adjustment_saturation)
+	for connection in connected_signals.keys():
+		if not connection.is_connected(connected_signals[connection]):
+			connection.connect(connected_signals[connection])
+	
+	
+	# When ready, launch the main menu of the game.
+	if auto_start_game:
+		request_core_scene(G.CoreScenes.MAIN_MENU)
 
 
 func _process(delta: float) -> void:
@@ -67,7 +76,7 @@ func start_threaded_load() -> void:
 	
 	# If no path is declared, error
 	if target_scene_path == "":
-		push_error("No target scene path set for loading.")
+		#push_error("No target scene path set for loading.")
 		return
 	
 	show_loading_screen()
