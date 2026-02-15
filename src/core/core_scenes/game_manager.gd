@@ -164,9 +164,11 @@ func show_loading_screen() -> void:
 
 
 # Remove every scene under the Game Manager (except if mentionned in EXCEPTIONS)
-const EXCEPTIONS : Array = []
+const EXCEPTIONS : Array = [
+	"DebugLayer",
+]
 func clear_game_scenes() -> void:
 	for child in self.get_children():
-		if child in EXCEPTIONS:
+		if child.name in EXCEPTIONS:
 			continue
 		child.queue_free()

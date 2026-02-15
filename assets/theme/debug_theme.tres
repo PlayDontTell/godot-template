@@ -1,0 +1,7 @@
+[gd_resource type="Theme" format=3 uid="uid://bfnq8633hf72j"]
+
+[ext_resource type="FontFile" uid="uid://co2j024l5bjna" path="res://assets/theme/fonts/open-sans/OpenSans-Semibold.ttf" id="1_fivoe"]
+
+[resource]
+default_font = ExtResource("1_fivoe")
+default_font_size = 10
