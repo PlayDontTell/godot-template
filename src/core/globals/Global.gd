@@ -85,24 +85,29 @@ signal pause_state_changed(is_game_paused)
 ## All objects requesting pause
 var request_pause_objects : Array = []
 
+
+func declare_pause() -> void:
+	var declaring_pause : bool = request_pause_objects.size() > 0
+	if declaring_pause != get_tree().paused:
+		get_tree().paused = request_pause_objects.size() > 0
+		pause_state_changed.emit(declaring_pause)
+	print(get_tree().paused)
+
+
 ## Adds/Removes an object requesting pause, and setting pause accordingly
-func request_pause(object : Object = null, requests_pause : bool = true):
+func request_pause(object : Object = null, requests_pause : bool = true) -> void:
 	if not object == null:
 		if requests_pause and not request_pause_objects.has(object):
 			request_pause_objects.append(object)
 		elif not requests_pause and request_pause_objects.has(object):
 			request_pause_objects.erase(object)
-	
-	var declaring_pause : bool = request_pause_objects.size() > 0
-	if declaring_pause != get_tree().paused:
-		get_tree().paused = request_pause_objects.size() > 0
-		pause_state_changed.emit(declaring_pause)
+	declare_pause()
 
 
 ## Resets game pause (clear all pause requests and reset pause)
-func reset_pause_state():
+func reset_pause_state() -> void:
 	request_pause_objects.clear()
-	request_pause()
+	declare_pause()
 #endregion
 
 
@@ -256,13 +261,6 @@ func round_to_dec(num: float, digit : int) -> float:
 	return round(num * pow(10.0, digit)) / pow(10.0, digit)
 
 
-## Get a color with an applied saturation
-func apply_saturation(color: Color, saturation: float) -> Color:
-	var gray : float = color.r * 0.299 + color.g * 0.587 + color.b * 0.114
-	var grayscale : Color = Color(gray, gray, gray, color.a)
-	return grayscale.lerp(color, clampf(saturation, 0.0, 1.0))
-
-
 ## Generate a list of points in a circle, positioned at center, with points_nbr points and offseted in angle by starting_angle (deg, not rad)
 func generate_points_in_circle(center : Vector2 = Vector2.ZERO, rayon : float = 10., points_nbr : int = 8, starting_angle : float = 0.) -> PackedVector2Array:
 	var points_list : PackedVector2Array = []
@@ -292,7 +290,7 @@ func sanitize_string(string_to_sanitize : String, replacement : String = "") -> 
 			sanitized_string += character
 		elif replacement != "":
 			sanitized_string += replacement
-	
+	print(sanitized_string)
 	return sanitized_string
 
 
@@ -320,10 +318,10 @@ signal data_is_ready
 
 const ENCRYPT_KEY : String = "&Fr4GMt8T!0n.5%eR52:r&/iPJKl3s?,nnr"
 const FILES_EXTENSION : String = ".data"
-const BIN_DIR : String = "user://bin/"
-const SAVE_DIR : String = "user://saves/"
-const ARCHIVE_SAVE_DIR : String = "user://archive_saves/"
-const SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
+var BIN_DIR : String = "user://bin/"
+var SAVE_DIR : String = "user://saves/"
+var ARCHIVE_SAVE_DIR : String = "user://archive_saves/"
+var SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
 const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
 const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
 const TEMP_FILE_SUFFIX : String = ".tmp"
@@ -367,7 +365,7 @@ func save_settings() -> void:
 
 ## Create a new save file with given world name. Returns full file path, or empty string on failure.
 ## If a save with the same name exists, auto-increments with a number suffix.
-func create_save_file(world_name : String) -> String:
+func create_save_file(save_name : String) -> String:
 	is_data_ready = false
 	
 	data = DEFAULT_DATA.duplicate(true)
@@ -379,7 +377,7 @@ func create_save_file(world_name : String) -> String:
 	data.meta.last_play_date = now
 	
 	# Find unique filename if collision occurs
-	var safe_name : String = sanitize_string(world_name)
+	var safe_name : String = sanitize_string(save_name)
 	var file_name : String = safe_name + FILES_EXTENSION
 	var file_path : String = SAVE_DIR + file_name
 	var counter : int = 1
@@ -431,7 +429,7 @@ func load_data(file_path : String, set_as_current : bool = true) -> Array:
 	var file_data : Array = _read_file(file_path, FileMode.ENCRYPTED)
 	
 	if file_data.is_empty():
-		push_error("Failed to load save file: " + file_path)
+		#push_error("Failed to load save file: " + file_path)
 		var fallback := [DEFAULT_DATA.duplicate(true), DEFAULT_SAVE_TEXTURE]
 		if set_as_current:
 			data = fallback[0]
@@ -539,7 +537,7 @@ func _read_file(file_path : String, mode : FileMode = FileMode.ENCRYPTED) -> Arr
 		file = FileAccess.open(file_path, FileAccess.READ)
 	
 	if not file:
-		push_error("Failed to read file: " + file_path)
+		#push_error("Failed to read file: " + file_path)
 		return []
 	
 	var contents : Array = []
