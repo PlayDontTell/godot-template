@@ -4,10 +4,7 @@
 # Godot 4+ specific ignores
 .godot/
 .import/
-addons/
-docs/
-exports/
-wip/
+
 
 # Godot-specific ignores
 *.translation
