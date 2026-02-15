@@ -20,7 +20,7 @@ const DEFAULT_DATA : Dictionary = {
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	set_process(false)
+	set_process(true)
 	
 	# Initialize game folders (saves, settings, etc.)
 	init_folders()
@@ -30,6 +30,15 @@ func _ready() -> void:
 	
 	#If settings are loaded, apply them
 	apply_settings()
+	
+	data = DEFAULT_DATA.duplicate(true)
+
+
+func _process(delta: float) -> void:
+	if G.data.has("meta"):
+		G.data.meta.time_since_start += delta
+		if not get_tree().paused:
+			G.data.meta.time_played += delta
 
 
 #region CORE SCENES SYSTEM : main menu, loading game core scenes
@@ -75,6 +84,10 @@ enum BuildProfiles {
 	EXPO,
 }
 var build_profile : BuildProfiles = BuildProfiles.DEV
+
+## Quickly test if game is run for dev or debugging
+func is_debug() -> bool:
+	return build_profile == BuildProfiles.DEV
 #endregion
 
 
@@ -91,7 +104,6 @@ func declare_pause() -> void:
 	if declaring_pause != get_tree().paused:
 		get_tree().paused = request_pause_objects.size() > 0
 		pause_state_changed.emit(declaring_pause)
-	print(get_tree().paused)
 
 
 ## Adds/Removes an object requesting pause, and setting pause accordingly

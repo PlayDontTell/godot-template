@@ -1,0 +1,421 @@
+[gd_scene format=3 uid="uid://1mdrxoxx3uwp"]
+
+[ext_resource type="Script" uid="uid://qfu7lckgoo2n" path="res://src/core/core_scenes/debug_layer.gd" id="1_r8b2b"]
+[ext_resource type="Texture2D" uid="uid://csfspd6lrbrl8" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/minus.png" id="2_cxs3n"]
+[ext_resource type="Texture2D" uid="uid://dwi38q3spugmy" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/pause.png" id="2_et63i"]
+[ext_resource type="Theme" uid="uid://bfnq8633hf72j" path="res://assets/theme/debug_theme.tres" id="2_pkd3y"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r8b2b"]
+bg_color = Color(0, 0, 0, 0.078431375)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_et63i"]
+bg_color = Color(0, 0, 0, 0.11764706)
+corner_detail = 1
+expand_margin_left = 2.0
+expand_margin_top = 1.0
+expand_margin_right = 2.0
+expand_margin_bottom = 1.0
+
+[node name="DebugLayer" type="CanvasLayer" unique_id=445951642]
+script = ExtResource("1_r8b2b")
+
+[node name="TopLeftPanel" type="Control" parent="." unique_id=1778415829]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme = ExtResource("2_pkd3y")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopLeftPanel" unique_id=1781119874]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="TopLeftPanel/MarginContainer" unique_id=1889651676]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+
+[node name="CollapseExpandBtn" type="Button" parent="TopLeftPanel/MarginContainer/VBoxContainer2" unique_id=1893529145]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("2_pkd3y")
+toggle_mode = true
+button_pressed = true
+icon = ExtResource("2_cxs3n")
+expand_icon = true
+
+[node name="DebugContainer" type="VBoxContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2" unique_id=820919408]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+
+[node name="GeneralInfo" type="MarginContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer" unique_id=1639804594]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("2_pkd3y")
+
+[node name="Panel" type="Panel" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo" unique_id=1568079953]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_styles/panel = SubResource("StyleBoxFlat_r8b2b")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo" unique_id=696599488]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Labels" type="GridContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer" unique_id=1806714242]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/v_separation = 0
+columns = 2
+
+[node name="FPSLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=395828892]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "FPS: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="FPSValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=51849239]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="TimeSinceStartLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1497898193]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Time: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TimeSinceStartValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=235538073]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="TimePlayedLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=860769353]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Time Played: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TimePlayedValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=685228860]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="ProcessDeltaLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=2062369576]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Process Delta: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ProcessDeltaValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1749872431]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="PhysicsDeltaLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=681659806]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Physics Delta: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PhysicsDeltaValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1823269176]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=2025470432]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="HSeparator5" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=746864499]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="MemoryUsageLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=382798055]
+modulate = Color(0, 1, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Memory Usage: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MemoryUsageValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=2064789230]
+unique_name_in_owner = true
+modulate = Color(0, 1, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="NodeCountLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1673518306]
+modulate = Color(0, 1, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Node Count: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="NodeCountValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1636053]
+unique_name_in_owner = true
+modulate = Color(0, 1, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=882083262]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="HSeparator7" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=958714145]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="PauseRequestsLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=362399205]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Pause Requests: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PauseRequestsValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=919287369]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="PauseLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=959144625]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Pause State: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PauseValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=728931293]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1493550246]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="HSeparator6" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1351902321]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="CoreSceneLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=330132545]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Core Scene: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CoreSceneValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1263993329]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="LocaleLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=711552474]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Locale: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="LocaleValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=1724286876]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="VersionLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=413644910]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "Version: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="VersionValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/GeneralInfo/MarginContainer/Labels" unique_id=2061199885]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 5
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="Buttons" type="MarginContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer" unique_id=427013991]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("2_pkd3y")
+
+[node name="Panel" type="Panel" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons" unique_id=1877629446]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_styles/panel = SubResource("StyleBoxFlat_r8b2b")
+
+[node name="MarginContainer" type="MarginContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons" unique_id=605543667]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer" unique_id=769793272]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer" unique_id=1016499595]
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+
+[node name="TimeScaleLabel" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer/HBoxContainer" unique_id=505126161]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+text = "Time Scale :"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimeScaleValue" type="Label" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1927432767]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
+[node name="TimeScaleSlider" type="HSlider" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer" unique_id=490194664]
+unique_name_in_owner = true
+modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+max_value = 2.0
+step = 0.25
+value = 1.0
+tick_count = 5
+ticks_on_borders = true
+
+[node name="HSeparator3" type="HSeparator" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer" unique_id=703968360]
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+theme_override_constants/separation = 12
+theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
+
+[node name="PauseResumeBtn" type="Button" parent="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer" unique_id=816034153]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("2_pkd3y")
+toggle_mode = true
+button_pressed = true
+text = "Pause"
+icon = ExtResource("2_et63i")
+expand_icon = true
+
+[connection signal="toggled" from="TopLeftPanel/MarginContainer/VBoxContainer2/CollapseExpandBtn" to="." method="_on_collapse_expand_btn_toggled"]
+[connection signal="value_changed" from="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer/TimeScaleSlider" to="." method="_on_time_scale_slider_value_changed"]
+[connection signal="toggled" from="TopLeftPanel/MarginContainer/VBoxContainer2/DebugContainer/Buttons/MarginContainer/VBoxContainer/PauseResumeBtn" to="." method="_on_pause_resume_btn_toggled"]
