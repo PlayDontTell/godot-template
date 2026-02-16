@@ -1,6 +1,12 @@
 extends CanvasLayer
 
+@onready var placement: Control = %Placement
+@onready var debug_panel: MarginContainer = %DebugPanel
+@onready var frame_btns: MarginContainer = %FrameBtns
+@onready var debug_window: VBoxContainer = %DebugWindow
+
 @onready var collapse_expand_btn: Button = %CollapseExpandBtn
+@onready var position_btns: GridContainer = %PositionBtns
 
 @onready var debug_container: VBoxContainer = %DebugContainer
 
@@ -23,7 +29,10 @@ extends CanvasLayer
 
 @onready var pause_resume_btn: Button = %PauseResumeBtn
 
-@export var info_refresh_period : float = 1.
+@export var active_on_start: bool = true
+enum StartPositions {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT}
+@export var position_on_start: StartPositions
+@export var info_refresh_period : float = 2.
 var info_refresh_timer : Timer
 
 
@@ -57,6 +66,8 @@ func init() -> void:
 	set_pause_label()
 	
 	_on_pause_resume_btn_toggled(pause_resume_btn.button_pressed)
+	
+	collapse_expand_btn.button_pressed = active_on_start
 	_on_collapse_expand_btn_toggled(collapse_expand_btn.button_pressed)
 	
 	refresh_stats()
@@ -69,6 +80,17 @@ func init() -> void:
 		info_refresh_timer.one_shot = false
 		info_refresh_timer.timeout.connect(refresh_stats)
 		self.add_child(info_refresh_timer)
+	
+	await get_tree().process_frame
+	match position_on_start:
+		StartPositions.TOP_LEFT:
+			_on_nw_pressed()
+		StartPositions.TOP_RIGHT:
+			_on_ne_pressed()
+		StartPositions.BOTTOM_LEFT:
+			_on_sw_pressed()
+		StartPositions.BOTTOM_RIGHT:
+			_on_se_pressed()
 
 
 func set_fps_label(fps : float = Engine.get_frames_per_second()) -> void:
@@ -93,15 +115,15 @@ func set_version_label(version : String = ProjectSettings.get_setting("applicati
 
 func set_time_since_start_label() -> void:
 	if G.data.has("meta"):
-		var time_since_start : float = G.round_to_dec(G.data.meta.time_since_start, 2)
-		var label_text : String = str(time_since_start)
+		var time_since_start : float = G.round_to_dec(G.data.meta.time_since_start, 1)
+		var label_text : String = str(time_since_start) + " s"
 		time_since_start_value.set_text(label_text)
 
 
 func set_time_played_label() -> void:
 	if G.data.has("meta"):
-		var time_played : float = G.round_to_dec(G.data.meta.time_played, 2)
-		var label_text : String = str(time_played)
+		var time_played : float = G.round_to_dec(G.data.meta.time_played, 1)
+		var label_text : String = str(time_played) + " s"
 		time_played_value.set_text(label_text)
 
 
@@ -148,11 +170,13 @@ func _on_collapse_expand_btn_toggled(toggled_on: bool) -> void:
 		#collapse_expand_btn.text = "Collapse"
 		#collapse_expand_btn.expand_icon = true
 		debug_container.visible = true
+		position_btns.visible = true
 	else:
 		collapse_expand_btn.icon = preload("uid://d1cqgv5o7t1if")
 		#collapse_expand_btn.text = "Expand"
 		#collapse_expand_btn.expand_icon = false
 		debug_container.visible = false
+		position_btns.visible = false
 	
 
 
@@ -170,3 +194,39 @@ func refresh_stats() -> void:
 	node_count_value.set_text(
 		str(get_tree().get_node_count())
 	)
+
+
+func _on_nw_pressed() -> void:
+	placement.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_TOP_LEFT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	debug_panel.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_TOP_LEFT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	collapse_expand_btn.set_h_size_flags(Control.SIZE_SHRINK_BEGIN)
+	position_btns.set_h_size_flags(Control.SIZE_SHRINK_END)
+	debug_container.move_to_front()
+	debug_window.set_v_size_flags(Control.SIZE_SHRINK_BEGIN)
+
+
+func _on_ne_pressed() -> void:
+	placement.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_TOP_RIGHT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	debug_panel.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_TOP_RIGHT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	collapse_expand_btn.set_h_size_flags(Control.SIZE_SHRINK_END)
+	position_btns.set_h_size_flags(Control.SIZE_SHRINK_BEGIN)
+	debug_container.move_to_front()
+	debug_window.set_v_size_flags(Control.SIZE_SHRINK_BEGIN)
+
+
+func _on_sw_pressed() -> void:
+	placement.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_BOTTOM_LEFT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	debug_panel.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_BOTTOM_LEFT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	collapse_expand_btn.set_h_size_flags(Control.SIZE_SHRINK_BEGIN)
+	position_btns.set_h_size_flags(Control.SIZE_SHRINK_END)
+	frame_btns.move_to_front()
+	debug_window.set_v_size_flags(Control.SIZE_SHRINK_END)
+
+
+func _on_se_pressed() -> void:
+	placement.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_BOTTOM_RIGHT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	debug_panel.set_anchors_and_offsets_preset(Control.LayoutPreset.PRESET_BOTTOM_RIGHT, Control.LayoutPresetMode.PRESET_MODE_KEEP_SIZE, 0)
+	collapse_expand_btn.set_h_size_flags(Control.SIZE_SHRINK_END)
+	position_btns.set_h_size_flags(Control.SIZE_SHRINK_BEGIN)
+	frame_btns.move_to_front()
+	debug_window.set_v_size_flags(Control.SIZE_SHRINK_END)

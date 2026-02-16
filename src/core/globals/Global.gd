@@ -1,5 +1,7 @@
 extends Node
 
+var build_profile : BuildProfiles = BuildProfiles.DEV
+
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
 		"version": "",
@@ -83,7 +85,7 @@ enum BuildProfiles {
 	RELEASE,
 	EXPO,
 }
-var build_profile : BuildProfiles = BuildProfiles.DEV
+
 
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
