@@ -5,3 +5,4 @@
 [resource]
 default_font = ExtResource("1_fivoe")
 default_font_size = 10
+Label/constants/outline_size = 2
