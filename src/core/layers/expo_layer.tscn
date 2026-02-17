@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://2wd3hiy4v7ep"]
+
+[ext_resource type="Script" uid="uid://cnn504a85woqy" path="res://src/core/layers/expo_layer.gd" id="1_wsobo"]
+
+[node name="ExpoLayer" type="CanvasLayer" unique_id=600995833]
+script = ExtResource("1_wsobo")
+
+[node name="CriticalPanel" type="Control" parent="." unique_id=1873513354]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CriticalPanel" unique_id=1250811280]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="CriticalPanel/VBoxContainer" unique_id=118583587]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TimerLabel" type="Label" parent="CriticalPanel/VBoxContainer/VBoxContainer" unique_id=1030234651]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/outline_size = 2
+text = "99.9"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PressAnyKeyLabel" type="Label" parent="CriticalPanel/VBoxContainer" unique_id=1938725042]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/outline_size = 2
+text = "PRESS ANY KEY"
+horizontal_alignment = 1
+vertical_alignment = 1

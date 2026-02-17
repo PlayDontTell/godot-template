@@ -1,8 +1,12 @@
 [gd_resource type="Theme" format=3 uid="uid://bfnq8633hf72j"]
 
-[ext_resource type="FontFile" uid="uid://co2j024l5bjna" path="res://assets/theme/fonts/open-sans/OpenSans-Semibold.ttf" id="1_fivoe"]
+[ext_resource type="FontFile" uid="uid://b3b6516hmkrxd" path="res://assets/theme/fonts/inconsolata/Inconsolata-Bold.ttf" id="1_fivoe"]
 
 [resource]
 default_font = ExtResource("1_fivoe")
-default_font_size = 10
+default_font_size = 13
+Label/colors/font_shadow_color = Color(0, 0, 0, 1)
 Label/constants/outline_size = 2
+Label/constants/shadow_offset_x = 0
+Label/constants/shadow_offset_y = 0
+Label/constants/shadow_outline_size = 4

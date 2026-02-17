@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : BuildProfiles = BuildProfiles.DEV
+var build_profile : G.BuildProfiles = G.BuildProfiles.EXPO
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
@@ -37,10 +37,29 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if G.data.has("meta"):
-		G.data.meta.time_since_start += delta
+	if data.has("meta"):
+		data.meta.time_since_start += delta
 		if not get_tree().paused:
-			G.data.meta.time_played += delta
+			data.meta.time_played += delta
+	
+	if build_profile == BuildProfiles.EXPO:
+		if is_booth_session_active:
+			expo_timer += delta
+			
+			if expo_timer > EXPO_MAX_IDLE_TIME:
+				request_game_restart.emit()
+			
+			elif expo_timer > EXPO_CRITICAL_TIME and not is_expo_timer_critical:
+				is_expo_timer_critical = true
+				expo_timer_critical.emit(true)
+	
+	if not is_expo_restart_enabled:
+		reset_expo_timer()
+
+
+func reset_variables() -> void:
+	reset_expo_timer()
+	set_booth_active(false)
 
 
 #region CORE SCENES SYSTEM : main menu, loading game core scenes
@@ -86,10 +105,37 @@ enum BuildProfiles {
 	EXPO,
 }
 
-
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
 	return build_profile == BuildProfiles.DEV
+#endregion
+
+
+#region EXPO SYSTEM : convention booth compatible functions
+signal request_game_restart
+signal expo_timer_critical(is_timer_critical: bool)
+
+const EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
+
+## the duration before restarting the game after no input
+const EXPO_MAX_IDLE_TIME : float = 180.
+
+## The duration before showing the critical screen asking for any key to be pressed
+const EXPO_CRITICAL_TIME : float = 150.
+
+var expo_timer : float = 0.
+var is_expo_timer_critical: bool = false
+var is_expo_restart_enabled : bool = true
+var is_booth_session_active: bool = false
+
+func reset_expo_timer() -> void:
+	expo_timer = 0.
+	if is_expo_timer_critical:
+		is_expo_timer_critical = false
+		expo_timer_critical.emit(false)
+
+func set_booth_active(request_active: bool = true) -> void:
+	is_booth_session_active = request_active and is_expo_restart_enabled
 #endregion
 
 
