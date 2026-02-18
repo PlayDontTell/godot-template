@@ -1,3 +1,6 @@
-strings,fr,en
-LANG,français,english
-TEST,test,test
+keys,en,fr,de,es,ja,zh_CN,pt_BR,ru,pl,ar
+,,,,,,,,,,
+LANG,English,Français,Deutsch,Español,日本語,中文(简体),Português (Brasil),Русский,Polski,العربية
+,,,,,,,,,,
+EXPO_TIMER_WARNING,Resetting game in {val} seconds,Réinitialisation du jeu dans {val} secondes,,,,,,,,
+PRESS_ANY_KEY,Press any key,Appuyez sur n'importe quelle touche,,,,,,,,

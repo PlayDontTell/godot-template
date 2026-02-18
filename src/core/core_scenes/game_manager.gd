@@ -15,6 +15,16 @@ func _notification(what: int) -> void:
 
 
 func _ready() -> void:
+	init_game_manager()
+	restart_game()
+
+
+func _process(delta: float) -> void:
+	# Update the loading visual of the loading scene (a ProgresBar node)
+	update_loading(delta)
+
+
+func init_game_manager() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	# By default, process is paused, so that update_loading is only called if needed.
@@ -23,28 +33,41 @@ func _ready() -> void:
 	# Autoquit the game when asked to.
 	get_tree().auto_accept_quit = false
 	
-	# Any scene can call G.request_core_scene to change among the G.CoreScenes
-	G.request_core_scene.connect(request_core_scene)
-	
 	var connected_signals : Dictionary = {
+		# Any scene can call G.request_core_scene to change among the G.CoreScenes
+		G.request_core_scene: self.request_core_scene,
+		
+		# Needed to set environment adjustments
 		G.adjust_brightness: self.environment.set_adjustment_brightness,
 		G.adjust_contrast: self.environment.set_adjustment_contrast,
 		G.adjust_saturation: self.environment.set_adjustment_saturation,
+		
+		# Requests to restart the game
+		G.request_game_restart: self.restart_game,
 	}
 	
 	for connection in connected_signals.keys():
 		if not connection.is_connected(connected_signals[connection]):
 			connection.connect(connected_signals[connection])
-	
+
+
+func restart_game() -> void:
+	# Reset all config variables
+	C.reset_variables()
+	G.reset_variables()
 	
 	# When ready, launch the main menu of the game.
 	if auto_start_game:
-		request_core_scene(G.CoreScenes.MAIN_MENU)
-
-
-func _process(delta: float) -> void:
-	# Update the loading visual of the loading scene (a ProgresBar node)
-	update_loading(delta)
+		
+		match G.build_profile:
+			G.BuildProfiles.DEV:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
+			
+			G.BuildProfiles.RELEASE:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
+			
+			G.BuildProfiles.EXPO:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
 
 
 # Select between main game scenes (main menu, game)
@@ -166,6 +189,7 @@ func show_loading_screen() -> void:
 # Remove every scene under the Game Manager (except if mentionned in EXCEPTIONS)
 const EXCEPTIONS : Array = [
 	"DebugLayer",
+	"ExpoLayer",
 ]
 func clear_game_scenes() -> void:
 	for child in self.get_children():

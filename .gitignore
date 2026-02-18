@@ -8,12 +8,8 @@ addons/
 exports/
 wip/
 
-# Godot-specific ignores
-*.translation
-
-
 # Imported translations (automatically generated from CSV files)
-*.translation
+# *.translation
 
 # Mono-specific ignores (if using C#)
 .mono/

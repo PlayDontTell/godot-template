@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : BuildProfiles = BuildProfiles.DEV
+var build_profile : G.BuildProfiles = G.BuildProfiles.EXPO
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
@@ -37,10 +37,34 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if G.data.has("meta"):
-		G.data.meta.time_since_start += delta
+	if data.has("meta"):
+		data.meta.time_since_start += delta
 		if not get_tree().paused:
-			G.data.meta.time_played += delta
+			data.meta.time_played += delta
+	
+	if build_profile == BuildProfiles.EXPO and is_expo_timer_enabled:
+		if is_booth_session_active:
+			expo_timer += delta
+			
+			if expo_timer > EXPO_MAX_IDLE_TIME:
+				request_game_restart.emit()
+			
+			elif expo_timer > EXPO_CRITICAL_TIME and not is_expo_timer_critical:
+				is_expo_timer_critical = true
+				expo_timer_critical.emit(true)
+
+
+func _input(_event: InputEvent) -> void:
+	if Input.is_action_just_pressed("toggle_Dev_layer"):
+		toggle_dev_layer.emit()
+	
+	if Input.is_action_just_pressed("toggle_Expo_timer"):
+		set_expo_timer_enabled(not is_expo_timer_enabled)
+
+
+func reset_variables() -> void:
+	reset_expo_timer()
+	set_booth_active(false)
 
 
 #region CORE SCENES SYSTEM : main menu, loading game core scenes
@@ -54,6 +78,9 @@ signal new_core_scene_loaded(new_core_scene : CoreScenes)
 
 ## The core game scenes
 enum CoreScenes {
+	INTRO_CREDITS, ## Loading scene scene (between Core Scenes)
+	EXPO_INTRO_VIDEO, ## Loading scene scene (between Core Scenes)
+	
 	LOADING, ## Loading scene scene (between Core Scenes)
 	MAIN_MENU, ## Main menu scene (start of the game)
 	GAME, ## Game scene (gameplay scene)
@@ -65,6 +92,9 @@ enum CoreScenes {
 
 ## Path the Core Scenes
 var CoreScenesPaths : Dictionary = {
+	G.CoreScenes.INTRO_CREDITS : "",
+	G.CoreScenes.EXPO_INTRO_VIDEO : "",
+	
 	G.CoreScenes.LOADING : "uid://5do4yrji1jit",
 	G.CoreScenes.MAIN_MENU : "uid://b25u4t1skkerr",
 	G.CoreScenes.GAME : "",
@@ -80,16 +110,53 @@ var core_scene : CoreScenes
 
 
 #region BUILD PROFILE SYSTEM : what is the project state
+signal toggle_dev_layer
+
 enum BuildProfiles {
 	DEV,
 	RELEASE,
 	EXPO,
 }
 
-
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
 	return build_profile == BuildProfiles.DEV
+#endregion
+
+
+#region EXPO SYSTEM : convention booth compatible functions
+signal request_game_restart
+signal expo_timer_critical(is_timer_critical: bool)
+signal enabled_expo_timer()
+
+const EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
+
+## the duration before restarting the game after no input
+const EXPO_MAX_IDLE_TIME : float = 150.
+
+## The duration before showing the critical screen asking for any key to be pressed
+const EXPO_CRITICAL_TIME : float = 120.
+
+var expo_timer : float = 0.
+var is_expo_timer_critical: bool = false
+var is_expo_timer_enabled : bool = true
+var is_booth_session_active: bool = false
+
+func reset_expo_timer() -> void:
+	expo_timer = 0.
+	if is_expo_timer_critical:
+		is_expo_timer_critical = false
+		expo_timer_critical.emit(false)
+
+func set_booth_active(request_active: bool = true) -> void:
+	is_booth_session_active = request_active and is_expo_timer_enabled
+
+func set_expo_timer_enabled(request_enabled: bool = true) -> void:
+	is_expo_timer_enabled = request_enabled
+	enabled_expo_timer.emit()
+	
+	if not request_enabled:
+		reset_expo_timer()
 #endregion
 
 
