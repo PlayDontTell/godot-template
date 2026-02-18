@@ -3,36 +3,42 @@ extends CanvasLayer
 @onready var critical_panel: Control = %CriticalPanel
 @onready var timer_label: Label = %TimerLabel
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
+@onready var expo_timer_disabled: Control = %ExpoTimerDisabled
+
+@export_category("On Start")
+
+@export var expo_timer_enabled: bool = true
 
 
 func _ready() -> void:
 	init()
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var count_down: float = G.EXPO_MAX_IDLE_TIME - G.expo_timer
 	
 	if count_down <= 9.9:
 		timer_label.set_text(
-			"Restarting in " +
-			str(
-				G.round_to_dec(count_down, 1)
-			) +
-			" seconds"
+			tr("EXPO_TIMER_WARNING").format({"val": G.round_to_dec(count_down, 1)})
 		)
 	else:
 		timer_label.set_text(
-			"Restarting in " +
-			str(
-				int(count_down)
-			) +
-			" seconds"
+			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
 		)
 
 
 func init() -> void:
+	if not G.build_profile == G.BuildProfiles.EXPO:
+		self.queue_free()
+		return
+	
 	display_critical_panel(false)
 	G.expo_timer_critical.connect(display_critical_panel)
+	
+	G.is_expo_timer_enabled = expo_timer_enabled
+	
+	display_expo_timer_disabled(not G.is_expo_timer_enabled)
+	G.enabled_expo_timer.connect(display_expo_timer_disabled)
 
 
 var press_any_key_tween: Tween
@@ -57,6 +63,10 @@ func tween_press_any_key_label() -> void:
 	
 	await press_any_key_tween.finished
 	tween_press_any_key_label()
+
+
+func display_expo_timer_disabled(request_display: bool = not G.is_expo_timer_enabled) -> void:
+	expo_timer_disabled.visible = request_display
 
 
 var critical_panel_tween: Tween

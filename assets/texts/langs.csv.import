@@ -2,14 +2,14 @@
 
 importer="csv_translation"
 type="Translation"
-uid="uid://bmk0xuhxaok2t"
+uid="uid://5gosoocg40h8"
 
 [deps]
 
-files=["res://assets/texts/langs.fr.translation", "res://assets/texts/langs.en.translation"]
+files=["res://assets/texts/langs.en.translation", "res://assets/texts/langs.fr.translation", "res://assets/texts/langs.de.translation", "res://assets/texts/langs.es.translation", "res://assets/texts/langs.ja.translation", "res://assets/texts/langs.zh_CN.translation", "res://assets/texts/langs.pt_BR.translation", "res://assets/texts/langs.ru.translation", "res://assets/texts/langs.pl.translation", "res://assets/texts/langs.ar.translation"]
 
 source_file="res://assets/texts/langs.csv"
-dest_files=["res://assets/texts/langs.fr.translation", "res://assets/texts/langs.en.translation"]
+dest_files=["res://assets/texts/langs.en.translation", "res://assets/texts/langs.fr.translation", "res://assets/texts/langs.de.translation", "res://assets/texts/langs.es.translation", "res://assets/texts/langs.ja.translation", "res://assets/texts/langs.zh_CN.translation", "res://assets/texts/langs.pt_BR.translation", "res://assets/texts/langs.ru.translation", "res://assets/texts/langs.pl.translation", "res://assets/texts/langs.ar.translation"]
 
 [params]
 

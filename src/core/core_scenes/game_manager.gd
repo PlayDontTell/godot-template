@@ -58,7 +58,16 @@ func restart_game() -> void:
 	
 	# When ready, launch the main menu of the game.
 	if auto_start_game:
-		request_core_scene(G.CoreScenes.MAIN_MENU)
+		
+		match G.build_profile:
+			G.BuildProfiles.DEV:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
+			
+			G.BuildProfiles.RELEASE:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
+			
+			G.BuildProfiles.EXPO:
+				request_core_scene(G.CoreScenes.MAIN_MENU)
 
 
 # Select between main game scenes (main menu, game)

@@ -74,10 +74,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if G.is_debug():
-		set_fps_label()
-		set_time_since_start_label()
-		set_time_played_label()
+	set_fps_label()
+	set_time_since_start_label()
+	set_time_played_label()
 	
 	set_process_delta_label(delta)
 
@@ -92,6 +91,13 @@ func _input(event: InputEvent) -> void:
 
 
 func init() -> void:
+	if not G.build_profile in [
+		G.BuildProfiles.DEV,
+		G.BuildProfiles.EXPO,
+	]:
+		self.queue_free()
+		return
+	
 	self.visible = G.is_debug()
 	
 	set_core_scene_label()
@@ -143,6 +149,12 @@ func init() -> void:
 	tab_4.toggle(bool(active_tabs_on_start & Tabs.GAME_STATE))
 	tab_5.toggle(bool(active_tabs_on_start & Tabs.INPUT_OUTPUT))
 	tab_6.toggle(bool(active_tabs_on_start & Tabs.PAUSE))
+	
+	G.toggle_dev_layer.connect(display_debug_layer)
+
+
+func display_debug_layer() -> void:
+	self.visible = not self.visible
 
 
 func set_fps_label(fps : float = Engine.get_frames_per_second()) -> void:
