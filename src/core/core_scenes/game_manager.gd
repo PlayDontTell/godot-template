@@ -2,6 +2,12 @@ extends WorldEnvironment
 
 @export var auto_start_game : bool = true
 
+@export_group("Start Scenes", "")
+@export var DEV_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
+@export var RELEASE_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
+@export var EXPO_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
+@export_group("", "")
+
 var target_scene_path: String = ""
 var loading_progress: Array = [0.0]
 var loading_instance: Control = null
@@ -61,13 +67,13 @@ func restart_game() -> void:
 		
 		match G.build_profile:
 			G.BuildProfiles.DEV:
-				request_core_scene(G.CoreScenes.MAIN_MENU)
+				request_core_scene(DEV_build_profile)
 			
 			G.BuildProfiles.RELEASE:
-				request_core_scene(G.CoreScenes.MAIN_MENU)
+				request_core_scene(RELEASE_build_profile)
 			
 			G.BuildProfiles.EXPO:
-				request_core_scene(G.CoreScenes.MAIN_MENU)
+				request_core_scene(EXPO_build_profile)
 
 
 # Select between main game scenes (main menu, game)

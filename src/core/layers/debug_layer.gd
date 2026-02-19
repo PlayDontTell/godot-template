@@ -32,6 +32,7 @@ extends CanvasLayer
 @onready var machine_value: Label = %MachineValue
 @onready var os_value: Label = %OSValue
 @onready var os_version_value: Label = %OSVersionValue
+@onready var window_scale_value: Label = %WindowScaleValue
 @onready var window_count_value: Label = %WindowCountValue
 @onready var window_size_value: Label = %WindowSizeValue
 @onready var visible_viewport_size_value: Label = %VisibleViewportSizeValue
@@ -48,8 +49,6 @@ extends CanvasLayer
 @onready var pause_value: Label = %PauseValue
 @onready var pause_resume_btn: Button = %PauseResumeBtn
 
-
-@export_category("On Start")
 
 @export var active_on_start: bool = true
 
@@ -277,6 +276,10 @@ func refresh_stats() -> void:
 			get_tree().get_processed_tweens().size()
 		)
 	)
+	window_scale_value.set_text(
+		str(ProjectSettings.get_setting("display/window/stretch/scale"))
+	)
+	
 	window_count_value.set_text(
 		str(DisplayServer.get_screen_count())
 	)

@@ -5,7 +5,6 @@ extends Node
 #BUG → marks a known bug
 #HACK → marks a hacky/temporary solution
 #NOTE → marks an important note
-#assert(enemy_power < 256, "Enemy is too powerful!")
 
 # GIT
 # feat 		Introduce a new feature to the codebase
@@ -17,3 +16,4 @@ extends Node
 # chore 	Regular code maintenance
 
 # Using translated text : tr("STRING_NAME")
+# Test something and return an error if false : assert(enemy_power < 256, "Enemy is too powerful!")
