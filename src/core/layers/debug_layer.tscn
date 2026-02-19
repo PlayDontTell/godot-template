@@ -544,7 +544,7 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Memory Usage: "
+text = " Memory Usage: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -624,7 +624,7 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Machine: "
+text = "Machine Model: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -640,7 +640,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "OS: "
+text = "OS Name: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -656,7 +656,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Distro: "
+text = "OS Version: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -804,7 +804,7 @@ columns = 2
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Cursor: "
+text = "Cursor Coords: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -834,11 +834,27 @@ theme = ExtResource("2_pkd3y")
 theme_override_constants/separation = 10
 theme_override_styles/separator = SubResource("StyleBoxFlat_et63i")
 
+[node name="WindowScaleLabel" type="Label" parent="Placement/DebugPanel/DebugWindow/DebugContainer/Panels/InputOutpuInfo/MarginContainer/Labels" unique_id=361109695]
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("2_pkd3y")
+text = "Window Scale: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="WindowScaleValue" type="Label" parent="Placement/DebugPanel/DebugWindow/DebugContainer/Panels/InputOutpuInfo/MarginContainer/Labels" unique_id=1041911297]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("2_pkd3y")
+text = "..."
+vertical_alignment = 1
+
 [node name="WindowCountLabel" type="Label" parent="Placement/DebugPanel/DebugWindow/DebugContainer/Panels/InputOutpuInfo/MarginContainer/Labels" unique_id=1288444303]
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Windows: "
+text = "Window Count: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -854,7 +870,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Window: "
+text = "Window Size: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -870,7 +886,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Viewport: "
+text = "Viewport Size: "
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -886,7 +902,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 theme = ExtResource("2_pkd3y")
-text = "Visible: "
+text = "Visible Size: "
 horizontal_alignment = 2
 vertical_alignment = 1
 

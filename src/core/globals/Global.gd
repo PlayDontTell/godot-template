@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : G.BuildProfiles = G.BuildProfiles.EXPO
+var build_profile : G.BuildProfiles = G.BuildProfiles.DEV
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
@@ -129,13 +129,13 @@ signal request_game_restart
 signal expo_timer_critical(is_timer_critical: bool)
 signal enabled_expo_timer()
 
-const EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
+var EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
 
 ## the duration before restarting the game after no input
-const EXPO_MAX_IDLE_TIME : float = 150.
+var EXPO_MAX_IDLE_TIME : float = 150.
 
 ## The duration before showing the critical screen asking for any key to be pressed
-const EXPO_CRITICAL_TIME : float = 120.
+var EXPO_CRITICAL_TIME : float = 120.
 
 var expo_timer : float = 0.
 var is_expo_timer_critical: bool = false
@@ -371,7 +371,7 @@ func sanitize_string(string_to_sanitize : String, replacement : String = "") -> 
 			sanitized_string += character
 		elif replacement != "":
 			sanitized_string += replacement
-	print(sanitized_string)
+	
 	return sanitized_string
 
 

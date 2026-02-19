@@ -5,10 +5,18 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
-@export_category("On Start")
 
-@export var expo_timer_enabled: bool = true
+@export var EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
 
+@export_group("Expo Timer", "")
+@export var is_expo_timer_enabled: bool = true
+
+## the duration before restarting the game after no input
+@export var EXPO_MAX_IDLE_TIME : float = 150.
+
+## The duration before showing the critical screen asking for any key to be pressed
+@export var EXPO_CRITICAL_TIME : float = 120.
+@export_group("", "")
 
 func _ready() -> void:
 	init()
@@ -28,14 +36,17 @@ func _physics_process(_delta: float) -> void:
 
 
 func init() -> void:
+	G.EXPO_EVENT_NAME = G.sanitize_string(EXPO_EVENT_NAME)
+	G.EXPO_MAX_IDLE_TIME = EXPO_MAX_IDLE_TIME
+	G.EXPO_CRITICAL_TIME = EXPO_CRITICAL_TIME
+	G.is_expo_timer_enabled = is_expo_timer_enabled
+	
 	if not G.build_profile == G.BuildProfiles.EXPO:
 		self.queue_free()
 		return
 	
 	display_critical_panel(false)
 	G.expo_timer_critical.connect(display_critical_panel)
-	
-	G.is_expo_timer_enabled = expo_timer_enabled
 	
 	display_expo_timer_disabled(not G.is_expo_timer_enabled)
 	G.enabled_expo_timer.connect(display_expo_timer_disabled)
