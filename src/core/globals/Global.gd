@@ -181,88 +181,61 @@ func get_available_locales() -> PackedStringArray:
 
 
 #region SETTINGS SYSTEM : what is the project state
+## To change project defaults, edit res://config/default_settings.tres in the inspector.
 
-enum Setting {
-	MUSIC_VOLUME,		## float : default is 0., muted is -80.
-	SFX_VOLUME,			## float : default is 0., muted is -80.
-	UI_VOLUME,			## float : default is 0., muted is -80.
-	AMBIENT_VOLUME,		## float : default is 0., muted is -80.
-	
-	BRIGHTNESS,			## float : from 0. to 2., default is 1.
-	CONTRAST,			## float : from 0. to 2., default is 1.
-	SATURATION,			## float : from 0. to 2., default is 1.
-	
-	FULLSCREEN_MODE, 	## Bool : fullscreen or windowed mode
-	
-	INPUT_BINDINGS, 	## Dictionary : action name → Array[InputEvent]
-}
+var settings : GameSettings = GameSettings.new()
 
-const DEFAULT_SETTINGS : Dictionary = {
-	Setting.MUSIC_VOLUME: 0,
-	Setting.SFX_VOLUME: 0,
-	Setting.UI_VOLUME: 0,
-	Setting.AMBIENT_VOLUME: 0,
-	
-	Setting.BRIGHTNESS: 1.,
-	Setting.CONTRAST: 1.,
-	Setting.SATURATION: 1.,
-	
-	Setting.FULLSCREEN_MODE: false,
-	
-	Setting.INPUT_BINDINGS: {}, ## Empty dict means "use Input Map project defaults, no overrides."
-}
+signal setting_adjusted(setting : String, value : Variant)
 
-const AUDIO_BUSES_NAMES : Dictionary = {
-	Setting.MUSIC_VOLUME: "music",
-	Setting.SFX_VOLUME: "sfx",
-	Setting.UI_VOLUME: "ui",
-	Setting.AMBIENT_VOLUME: "ambient",
-}
-
-signal setting_adjusted(setting : Setting, value : Variant)
-
-## Signal to tell the WorldEnvironment node what brightness to set
+## Signals to tell the WorldEnvironment node to set itself
 signal adjust_brightness(intensity : float)
-
-## Signal to tell the WorldEnvironment node what contrast to set
 signal adjust_contrast(intensity : float)
-
-## Signal to tell the WorldEnvironment node what saturation to set
 signal adjust_saturation(intensity : float)
 
+const AUDIO_BUSES : Dictionary = {
+	"music_volume"   : "music",
+	"sfx_volume"     : "sfx",
+	"ui_volume"      : "ui",
+	"ambient_volume" : "ambient",
+}
 
-func apply_settings() -> void:
-	if settings.is_empty():
-		push_warning("No Settings file loaded")
-		return
-	
-	for setting in settings.keys():
-		adjust_setting(setting, settings[setting])
+func apply_settings(settings_to_apply : GameSettings = settings) -> void:
+	for property in settings_to_apply.get_property_list():
+		if not property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+			continue
+		
+		if property.name == "input_bindings":
+			continue	# handled separately by InputService
+		
+		adjust_setting(property.name, settings_to_apply.get(property.name))
 
 
-func adjust_setting(setting : Setting, value : Variant) -> void:
+func adjust_setting(setting : String, value : Variant) -> void:
 	match setting:
-		Setting.MUSIC_VOLUME, Setting.SFX_VOLUME, Setting.UI_VOLUME, Setting.AMBIENT_VOLUME:
+		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
 			if value is float or value is int:
 				var new_audio_volume : float = value
 				
-				AudioServer.set_bus_volume_db(AudioServer.get_bus_index(AUDIO_BUSES_NAMES[setting]), new_audio_volume)
+				AudioServer.set_bus_volume_db(
+					AudioServer.get_bus_index(AUDIO_BUSES[setting]),
+					new_audio_volume
+				)
 				
 				save_setting_value(setting, new_audio_volume)
 		
-		Setting.BRIGHTNESS, Setting.CONTRAST, Setting.SATURATION:
+		"brightness", "contrast", "saturation":
 			if value is float or value is int:
 				var intensity : float = clampf(value, 0., 2.)
-				if setting == Setting.BRIGHTNESS:
+				if setting == "brightness":
 					adjust_brightness.emit(intensity)
-				elif setting == Setting.CONTRAST:
+				elif setting == "contrast":
 					adjust_contrast.emit(intensity)
-				elif setting == Setting.SATURATION:
+				elif setting == "saturation":
 					adjust_saturation.emit(intensity)
 				
 				save_setting_value(setting, intensity)
 		
-		Setting.FULLSCREEN_MODE:
+		"fullscreen":
 			if value is bool:
 				var is_fullscreen_mode : bool = value
 				if is_fullscreen_mode:
@@ -273,25 +246,30 @@ func adjust_setting(setting : Setting, value : Variant) -> void:
 				save_setting_value(setting, is_fullscreen_mode)
 
 
-func save_setting_value(setting : Setting, value : Variant) -> void:
-	if settings[setting] != value:
-		settings[setting] = value
+func save_setting_value(setting : String, value : Variant) -> void:
+	if settings.get(setting) != value:
+		settings.set(setting, value)
 		setting_adjusted.emit(setting, value)
 		save_settings()
 
 
-func get_setting_text(setting : Setting) -> String:
+func get_setting_text(setting : String) -> String:
+	var value : Variant = settings.get(setting)
+	if value == null:
+		push_warning("G.get_setting_text : unknown property '%s'" % setting)
+		return ""
+	
 	match setting:
-		Setting.MUSIC_VOLUME, Setting.SFX_VOLUME, Setting.UI_VOLUME, Setting.AMBIENT_VOLUME:
-			return "%3d" % int(settings[setting] * 10 + 20) + "%"
+		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
+			return "%3d" % int(value * 10 + 20) + "%"
 		
-		Setting.BRIGHTNESS, Setting.CONTRAST, Setting.SATURATION:
-			return "%3d" % int(settings[setting] * 10 + 50) + "%"
+		"brightness", "contrast", "saturation":
+			return "%3d" % int(value * 10 + 50) + "%"
 		
-		Setting.FULLSCREEN_MODE:
-			return "Fullscreen Mode" if settings[setting] else "Windowed Mode"
+		"fullscreen":
+			return "Fullscreen" if value else "Windowed"
 		
-		Setting.INPUT_BINDINGS:
+		"input_bindings":
 			push_warning("No Text can be rendered for this setting.")
 	
 	return ""
@@ -377,7 +355,6 @@ enum FileMode { ENCRYPTED, PLAIN }
 
 var is_data_ready : bool = false
 var data : Dictionary = {}
-var settings : Dictionary = {}
 
 
 func init_folders() -> void:
@@ -399,9 +376,16 @@ func log_event(event_data : Variant) -> void:
 
 ## Load settings from file or create defaults. Returns true if settings existed, false if created new.
 func load_settings() -> bool:
-	var existed : bool = FileAccess.file_exists(SETTINGS_PATH)
-	settings = _ensure_settings_file(SETTINGS_PATH, DEFAULT_SETTINGS, FileMode.PLAIN)
-	return existed
+	if not FileAccess.file_exists(SETTINGS_PATH):
+		return false
+	
+	var loaded : Array = _read_file(SETTINGS_PATH, FileMode.PLAIN)
+	if not loaded.is_empty() and loaded[0] is GameSettings:
+		settings = loaded[0]
+	else:
+		push_warning("Settings file invalid, falling back to defaults.")
+	
+	return true
 
 
 ## Save current settings to file
@@ -558,17 +542,6 @@ func update_dict(target : Dictionary, defaults : Dictionary) -> Dictionary:
 		elif target[key] is Dictionary and defaults[key] is Dictionary:
 			update_dict(target[key], defaults[key])
 	return target
-
-
-## Load or create a settings file with defaults
-func _ensure_settings_file(file_path : String, default_settings : Dictionary, mode : FileMode) -> Dictionary:
-	if not FileAccess.file_exists(file_path):
-		var settings_data : Dictionary = default_settings.duplicate(true)
-		_write_file(file_path, [settings_data], mode)
-		return settings_data
-	
-	var loaded : Variant = _read_file(file_path, mode)[0]
-	return update_dict(loaded, default_settings) if loaded is Dictionary else default_settings.duplicate(true)
 
 
 ## Read a file and return its contents as an array
