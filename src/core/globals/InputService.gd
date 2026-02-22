@@ -113,12 +113,12 @@ const CONTEXT_RULES : Dictionary = {
 
 class ContextHandle:
 	var context  : Context
-	var owner    : Node
+	var owner_node    : Node
 	var priority : int
 	
 	func _init(p_context : Context, p_owner : Node, p_priority : int) -> void:
 		context  = p_context
-		owner    = p_owner
+		owner_node    = p_owner
 		priority = p_priority
 
 
@@ -158,7 +158,7 @@ func release_context(handle : ContextHandle) -> void:
 
 func _get_active_context() -> ContextHandle:
 	for i : int in range(_context_stack.size() - 1, -1, -1):
-		if not is_instance_valid(_context_stack[i].owner):
+		if not is_instance_valid(_context_stack[i].owner_node):
 			_context_stack.remove_at(i)
 	return _context_stack[0] if not _context_stack.is_empty() else null
 
@@ -166,10 +166,8 @@ func _get_active_context() -> ContextHandle:
 
 
 #region REBINDING : runtime key remapping, persisted through G.settings
-## Bindings are stored in G.settings[G.Settings.INPUT_BINDINGS] as a Dictionary
+## Bindings are stored in G.settings.input_bindings as a Dictionary
 ## mapping action name (String) → Array[InputEvent].
-## G.DEFAULT_SETTINGS[G.Settings.INPUT_BINDINGS] is an empty Dictionary {},
-## which means "use whatever is currently in the Input Map" — no overrides.
 ##
 ## Example usage from a settings UI node:
 ##
@@ -207,18 +205,17 @@ func get_binding(intent : String) -> InputEvent:
 ## Restores saved bindings from G.settings into the live InputMap.
 ## Call from game_manager.gd on startup, after G.load_settings().
 func load_bindings() -> void:
-	var saved : Dictionary = G.settings.get(G.Setting.INPUT_BINDINGS, {})
-	for action : String in saved:
+	for action : String in G.settings.input_bindings:
 		if InputMap.has_action(action):
 			InputMap.action_erase_events(action)
-			for event : InputEvent in saved[action]:
+			for event : InputEvent in G.settings.input_bindings[action]:
 				InputMap.action_add_event(action, event)
 
 
 ## Clears all custom bindings and resets to Input Map project defaults.
 func reset_bindings() -> void:
 	InputMap.load_from_project_settings()
-	G.settings[G.Settings.INPUT_BINDINGS] = {}
+	G.settings.input_bindings = {}
 	G.save_settings()
 
 
@@ -228,7 +225,7 @@ func _save_bindings() -> void:
 		var action : String = INTENTS[intent][0]
 		if InputMap.has_action(action):
 			bindings[action] = InputMap.action_get_events(action)
-	G.settings[G.Settings.INPUT_BINDINGS] = bindings
+	G.settings.input_bindings = bindings
 	G.save_settings()
 
 #endregion
