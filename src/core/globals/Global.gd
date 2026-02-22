@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : G.BuildProfile = G.BuildProfile.DEV
+var build_profile : G.BuildProfile = G.BuildProfile.EXPO
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
@@ -382,10 +382,9 @@ func load_settings() -> bool:
 	var loaded : Array = _read_file(SETTINGS_PATH, FileMode.PLAIN)
 	if not loaded.is_empty() and loaded[0] is GameSettings:
 		settings = loaded[0]
-	else:
-		push_warning("Settings file invalid, falling back to defaults.")
+		return true
 	
-	return true
+	return false
 
 
 ## Save current settings to file

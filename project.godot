@@ -65,6 +65,7 @@ toggle_Dev_layer={
 
 [internationalization]
 
+locale/translation_remaps={}
 locale/translations=PackedStringArray("res://assets/texts/langs.en.translation", "res://assets/texts/langs.fr.translation")
 locale/test="en"
 
