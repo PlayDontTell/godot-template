@@ -3,18 +3,18 @@ extends Node
 # Time window (in seconds) to consider an input method "currently in use"
 const ACTIVE_WINDOW : float = 0.1
 
-enum InputMethods {
+enum InputMethod {
 	NONE,
 	KEYBOARD_AND_MOUSE,     # Keyboard & mouse (and touch, unless split out)
 	GAMEPAD,
 	TOUCH,
 }
 
-signal method_changed(new_method: InputMethods)
+signal method_changed(new_method: InputMethod)
 signal gamepad_connected(device_id: int)
 signal gamepad_disconnected(device_id: int)
 
-var last_input_method: InputMethods = InputMethods.NONE # sticky; never reset to NONE after first input
+var last_input_method: InputMethod = InputMethod.NONE # sticky; never reset to NONE after first input
 var used_keyboard: bool = false
 var used_gamepad: bool = false
 
@@ -32,45 +32,33 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# GAMEPAD
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		G.reset_expo_timer()
-		G.set_booth_active()
-		
 		_last_gamepad_time = Time.get_unix_time_from_system()
 		used_gamepad = true
-		_set_method_if_changed(InputMethods.GAMEPAD)
+		_set_method_if_changed(InputMethod.GAMEPAD)
 		return
 
 	# KEYBOARD
 	if event is InputEventKey and event.pressed:
-		G.reset_expo_timer()
-		G.set_booth_active()
-		
 		_last_keyboard_time = Time.get_unix_time_from_system()
 		used_keyboard = true
-		_set_method_if_changed(InputMethods.KEYBOARD_AND_MOUSE)
+		_set_method_if_changed(InputMethod.KEYBOARD_AND_MOUSE)
 		return
 
 	# MOUSE (counts as KEYBOARD here)
 	if event is InputEventMouseButton or event is InputEventMouseMotion:
-		G.reset_expo_timer()
-		G.set_booth_active()
-		
 		_last_keyboard_time = Time.get_unix_time_from_system()
 		used_keyboard = true
-		_set_method_if_changed(InputMethods.KEYBOARD_AND_MOUSE)
+		_set_method_if_changed(InputMethod.KEYBOARD_AND_MOUSE)
 		return
 
 	# TOUCH (also counted as KEYBOARD unless you split it out)
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		G.reset_expo_timer()
-		G.set_booth_active()
-		
 		_last_keyboard_time = Time.get_unix_time_from_system()
 		used_keyboard = true
-		_set_method_if_changed(InputMethods.TOUCH)
+		_set_method_if_changed(InputMethod.TOUCH)
 
 
-func _set_method_if_changed(m: InputMethods) -> void:
+func _set_method_if_changed(m: InputMethod) -> void:
 	if m != last_input_method:
 		last_input_method = m
 		method_changed.emit(last_input_method)
@@ -92,7 +80,7 @@ func has_used_both() -> bool:
 	return used_keyboard and used_gamepad
 
 
-func get_current_method() -> InputMethods:
+func get_current_method() -> InputMethod:
 	# Sticky: return last used method; NEVER NONE after first input
 	return last_input_method
 
@@ -112,16 +100,16 @@ func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
 		gamepad_disconnected.emit(device_id)
 
 
-func show_cursor(event_input_method : I.InputMethods):
+func show_cursor(event_input_method : InputMethod):
 	match event_input_method:
-		I.InputMethods.NONE:
+		InputMethod.NONE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
-		I.InputMethods.KEYBOARD_AND_MOUSE:
+		InputMethod.KEYBOARD_AND_MOUSE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
-		I.InputMethods.GAMEPAD:
+		InputMethod.GAMEPAD:
 			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 
-		I.InputMethods.TOUCH:
+		InputMethod.TOUCH:
 			Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)

@@ -16,3 +16,5 @@ unique_name_in_owner = true
 
 [node name="ExpoLayer" parent="." unique_id=600995833 instance=ExtResource("3_i104u")]
 unique_name_in_owner = true
+EXPO_MAX_IDLE_TIME = 4.0
+EXPO_CRITICAL_TIME = 1.0

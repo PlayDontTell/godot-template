@@ -18,12 +18,33 @@ extends CanvasLayer
 @export var EXPO_CRITICAL_TIME : float = 120.
 @export_group("", "")
 
+var expo_timer : float = 0.
+var is_expo_timer_critical: bool = false
+var is_booth_session_active: bool = false
+
+
 func _ready() -> void:
 	init()
 
 
-func _physics_process(_delta: float) -> void:
-	var count_down: float = G.EXPO_MAX_IDLE_TIME - G.expo_timer
+func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("toggle_Expo_timer"):
+		set_expo_timer_enabled(not is_expo_timer_enabled)
+	
+	if     (event is InputEventJoypadButton
+		or  event is InputEventJoypadMotion
+		or (event is InputEventKey and event.pressed)
+		or  event is InputEventMouseButton
+		or  event is InputEventMouseMotion
+		or  event is InputEventScreenTouch
+		or  event is InputEventScreenDrag):
+		
+		reset_expo_timer()
+		set_booth_active()
+
+
+func _physics_process(delta: float) -> void:
+	var count_down: float = EXPO_MAX_IDLE_TIME - expo_timer
 	
 	if count_down <= 9.9:
 		timer_label.set_text(
@@ -33,23 +54,30 @@ func _physics_process(_delta: float) -> void:
 		timer_label.set_text(
 			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
 		)
+	
+	if G.build_profile == G.BuildProfile.EXPO and is_expo_timer_enabled:
+		if is_booth_session_active:
+			expo_timer += delta
+			
+			if expo_timer > EXPO_MAX_IDLE_TIME:
+				G.request_game_restart.emit()
+				reset_expo_timer()
+				set_booth_active(false)
+			
+			elif expo_timer > EXPO_CRITICAL_TIME and not is_expo_timer_critical:
+				is_expo_timer_critical = true
+				display_critical_panel(true)
 
 
 func init() -> void:
-	G.EXPO_EVENT_NAME = G.sanitize_string(EXPO_EVENT_NAME)
-	G.EXPO_MAX_IDLE_TIME = EXPO_MAX_IDLE_TIME
-	G.EXPO_CRITICAL_TIME = EXPO_CRITICAL_TIME
-	G.is_expo_timer_enabled = is_expo_timer_enabled
+	EXPO_EVENT_NAME = G.sanitize_string(EXPO_EVENT_NAME)
 	
-	if not G.build_profile == G.BuildProfiles.EXPO:
+	if not G.build_profile == G.BuildProfile.EXPO:
 		self.queue_free()
 		return
 	
 	display_critical_panel(false)
-	G.expo_timer_critical.connect(display_critical_panel)
-	
-	display_expo_timer_disabled(not G.is_expo_timer_enabled)
-	G.enabled_expo_timer.connect(display_expo_timer_disabled)
+	display_expo_timer_disabled(not is_expo_timer_enabled)
 
 
 var press_any_key_tween: Tween
@@ -76,7 +104,7 @@ func tween_press_any_key_label() -> void:
 	tween_press_any_key_label()
 
 
-func display_expo_timer_disabled(request_display: bool = not G.is_expo_timer_enabled) -> void:
+func display_expo_timer_disabled(request_display: bool = not is_expo_timer_enabled) -> void:
 	expo_timer_disabled.visible = request_display
 
 
@@ -104,16 +132,35 @@ func display_critical_panel(request_display: bool = true) -> void:
 			critical_panel,
 			"scale",
 			Vector2.ONE * 2.,
-			G.EXPO_MAX_IDLE_TIME - G.EXPO_CRITICAL_TIME + 0.5
+			EXPO_MAX_IDLE_TIME - EXPO_CRITICAL_TIME + 0.5
 		).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN).from(Vector2.ONE)
 		
 		critical_panel_tween.tween_property(
 			timer_label,
 			"modulate",
 			Color.TOMATO,
-			G.EXPO_MAX_IDLE_TIME - G.EXPO_CRITICAL_TIME + 0.5
+			EXPO_MAX_IDLE_TIME - EXPO_CRITICAL_TIME + 0.5
 		).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN).from(Color.WHITE)
 	
 	else:
 		if press_any_key_tween != null:
 			press_any_key_tween.stop()
+
+
+func reset_expo_timer() -> void:
+	expo_timer = 0.
+	if is_expo_timer_critical:
+		is_expo_timer_critical = false
+		display_critical_panel(false)
+
+
+func set_booth_active(request_active: bool = true) -> void:
+	is_booth_session_active = request_active and is_expo_timer_enabled
+
+
+func set_expo_timer_enabled(request_enabled: bool = true) -> void:
+	is_expo_timer_enabled = request_enabled
+	display_expo_timer_disabled()
+	
+	if not request_enabled:
+		reset_expo_timer()

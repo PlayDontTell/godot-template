@@ -1,3 +1,4 @@
+## Can be used in DEV and EXPO build profiles
 extends CanvasLayer
 
 @onready var placement: Control = %Placement
@@ -50,14 +51,14 @@ extends CanvasLayer
 @onready var pause_resume_btn: Button = %PauseResumeBtn
 
 
-@export var active_on_start: bool = true
+@export var expanded_on_start: bool = true
 
-enum StartPositions {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT}
-@export var position_on_start: StartPositions
+enum StartPosition {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT}
+@export var position_on_start: StartPosition
 
 @export var info_refresh_period : float = 2.
 
-enum Tabs {TIME=1, COSTS=2, MACHINE=4, GAME_STATE=8, INPUT_OUTPUT=16, PAUSE=32}
+enum Tab {TIME=1, COSTS=2, MACHINE=4, GAME_STATE=8, INPUT_OUTPUT=16, PAUSE=32}
 @export_flags("Time:1", "Costs:2", "Machine:4", "Game State:8", "Input/Output:16", "Pause:32") var active_tabs_on_start = 63
 
 
@@ -87,12 +88,15 @@ func _physics_process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch or event is InputEventScreenDrag or event is InputEventMouseMotion:
 		set_mouse_position_label(event.position)
+	
+	if Input.is_action_just_pressed("toggle_Dev_layer"):
+		display_debug_layer()
 
 
 func init() -> void:
 	if not G.build_profile in [
-		G.BuildProfiles.DEV,
-		G.BuildProfiles.EXPO,
+		G.BuildProfile.DEV,
+		G.BuildProfile.EXPO,
 	]:
 		self.queue_free()
 		return
@@ -105,7 +109,7 @@ func init() -> void:
 	set_build_profile_label()
 	set_pause_label()
 	
-	collapse_expand_btn.button_pressed = active_on_start
+	collapse_expand_btn.button_pressed = expanded_on_start
 	_on_collapse_expand_btn_toggled(collapse_expand_btn.button_pressed)
 	_on_pause_resume_btn_toggled(pause_resume_btn.button_pressed)
 	_on_time_scale_slider_value_changed()
@@ -123,13 +127,13 @@ func init() -> void:
 	
 	await get_tree().process_frame
 	match position_on_start:
-		StartPositions.TOP_LEFT:
+		StartPosition.TOP_LEFT:
 			_on_nw_pressed()
-		StartPositions.TOP_RIGHT:
+		StartPosition.TOP_RIGHT:
 			_on_ne_pressed()
-		StartPositions.BOTTOM_LEFT:
+		StartPosition.BOTTOM_LEFT:
 			_on_sw_pressed()
-		StartPositions.BOTTOM_RIGHT:
+		StartPosition.BOTTOM_RIGHT:
 			_on_se_pressed()
 	
 	machine_value.set_text(
@@ -142,14 +146,12 @@ func init() -> void:
 		str(OS.get_version())
 	)
 	
-	tab_1.toggle(bool(active_tabs_on_start & Tabs.TIME))
-	tab_2.toggle(bool(active_tabs_on_start & Tabs.COSTS))
-	tab_3.toggle(bool(active_tabs_on_start & Tabs.MACHINE))
-	tab_4.toggle(bool(active_tabs_on_start & Tabs.GAME_STATE))
-	tab_5.toggle(bool(active_tabs_on_start & Tabs.INPUT_OUTPUT))
-	tab_6.toggle(bool(active_tabs_on_start & Tabs.PAUSE))
-	
-	G.toggle_dev_layer.connect(display_debug_layer)
+	tab_1.toggle(bool(active_tabs_on_start & Tab.TIME))
+	tab_2.toggle(bool(active_tabs_on_start & Tab.COSTS))
+	tab_3.toggle(bool(active_tabs_on_start & Tab.MACHINE))
+	tab_4.toggle(bool(active_tabs_on_start & Tab.GAME_STATE))
+	tab_5.toggle(bool(active_tabs_on_start & Tab.INPUT_OUTPUT))
+	tab_6.toggle(bool(active_tabs_on_start & Tab.PAUSE))
 
 
 func display_debug_layer() -> void:
@@ -161,8 +163,8 @@ func set_fps_label(fps : float = Engine.get_frames_per_second()) -> void:
 	fps_value.set_text(label_text)
 
 
-func set_core_scene_label(core_scene : G.CoreScenes = G.core_scene) -> void:
-	var label_text : String = str(G.CoreScenes.find_key(core_scene))
+func set_core_scene_label(core_scene : G.CoreScene = G.core_scene) -> void:
+	var label_text : String = str(G.CoreScene.find_key(core_scene))
 	core_scene_value.set_text(label_text)
 
 
@@ -208,8 +210,8 @@ func set_mouse_position_label(mouse_position: Vector2) -> void:
 	mouse_position_value.set_text(label_text)
 
 
-func set_build_profile_label(build_profile: G.BuildProfiles = G.build_profile) -> void:
-	var label_text : String = str(G.BuildProfiles.find_key(build_profile))
+func set_build_profile_label(build_profile: G.BuildProfile = G.build_profile) -> void:
+	var label_text : String = str(G.BuildProfile.find_key(build_profile))
 	build_profile_value.set_text(label_text)
 
 

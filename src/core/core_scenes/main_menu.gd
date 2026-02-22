@@ -1,51 +1,51 @@
 extends Control
 
 
-enum Menus {
+enum Menu {
 	MAIN,
 	CREDITS,
 	SETTINGS,
 	GAME_SELECTION,
 	EXIT,
 }
-var menu : Menus = Menus.MAIN
+var menu : Menu = Menu.MAIN
 
 
 func _ready() -> void:
-	change_menu(Menus.MAIN)
+	change_menu(Menu.MAIN)
 
 
-func change_menu(new_menu : Menus) -> void:
+func change_menu(new_menu : Menu) -> void:
 	#object.hide()
 	
 	match new_menu:
-		Menus.MAIN:
+		Menu.MAIN:
 			pass
 		
-		Menus.CREDITS:
+		Menu.CREDITS:
 			pass
 		
-		Menus.GAME_SELECTION:
+		Menu.GAME_SELECTION:
 			pass
 		
-		Menus.EXIT:
+		Menu.EXIT:
 			pass
 
 
 func _on_play_btn_pressed() -> void:
-	change_menu(Menus.GAME_SELECTION)
+	change_menu(Menu.GAME_SELECTION)
 
 
 func _on_credits_btn_pressed() -> void:
-	change_menu(Menus.CREDITS)
+	change_menu(Menu.CREDITS)
 
  
 func _on_exit_btn_pressed() -> void:
-	change_menu(Menus.EXIT)
+	change_menu(Menu.EXIT)
 
 
 func _on_exit_dialog_canceled() -> void:
-	change_menu(Menus.MAIN)
+	change_menu(Menu.MAIN)
 
 
 func _on_exit_dialog_confirmed() -> void:
@@ -53,8 +53,8 @@ func _on_exit_dialog_confirmed() -> void:
 
 
 func _on_back_btn_pressed() -> void:
-	change_menu(Menus.MAIN)
+	change_menu(Menu.MAIN)
 
 
 func _on_start_game_btn_pressed() -> void:
-	G.request_core_scene.emit(G.CoreScenes.GAME)
+	G.request_core_scene.emit(G.CoreScene.GAME)

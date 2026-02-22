@@ -25,7 +25,8 @@ config/icon="res://icon.svg"
 
 G="*uid://db11cacuq7ret"
 C="*uid://co4s61s08htb6"
-I="*uid://djkk7nb010exe"
+D="*uid://djkk7nb010exe"
+I="*uid://codtkcus5e6wt"
 
 [display]
 

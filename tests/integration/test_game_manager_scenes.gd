@@ -28,7 +28,7 @@ func test_scene_change_resets_pause():
 	assert_true(get_tree().paused)
 	
 	# Act: Request scene change
-	game_manager.request_core_scene(G.CoreScenes.MAIN_MENU)
+	game_manager.request_core_scene(G.CoreScene.MAIN_MENU)
 	await wait_frames(1)
 	
 	# Assert: Pause should be reset
