@@ -1,13 +1,13 @@
-strings,?context,en,fr,de,es,ja,zh_CN,pt_BR,ru,pl,ar
-,,,,,,,,,,,
-LANG,Languages names,English,Français,Deutsch,Español,日本語,中文(简体),Português (Brasil),Русский,Polski,العربية
-,,,,,,,,,,,
-EXPO_TIMER_WARNING,Warning message to the player when the expo timer is critical,Resetting game in {val} seconds,Réinitialisation du jeu dans {val} secondes,,,,,,,,
-PRESS_ANY_KEY,Warning message to the player when the expo timer is critical,Press any key,Appuyez sur n'importe quelle touche,,,,,,,,
-,,,,,,,,,,,
-MAIN_MENU_PLAY,Main menu button that displays start game screen,Play,Jouer,,,,,,,,
-MAIN_MENU_NEW-GAME,Main menu button that displays new game game screen,New Game,Nouvelle Partie,,,,,,,,
-MAIN_MENU_CONTINUE,Main menu button that starts the most recent saved game,Continue,Continuer,,,,,,,,
-MAIN_MENU_SETTINGS,Main menu button that displays settings screen,Settings,Paramètres,,,,,,,,
-MAIN_MENU_CREDITS,Main menu button that displays credits screen,Credits,Crédits,,,,,,,,
-MAIN_MENU_EXIT,Main menu button that displays the exit dialog window,Exit,Quitter,,,,,,,,
+strings,context for localization work,?context,en,fr,de,es,ja,zh_CN,pt_BR,ru,pl,ar
+,,,,,,,,,,,,
+LANG,Languages names,,English,Français,Deutsch,Español,日本語,中文(简体),Português (Brasil),Русский,Polski,العربية
+,,,,,,,,,,,,
+EXPO_TIMER_WARNING,Warning message to the player when the expo timer is critical,,Resetting game in {val} seconds,Réinitialisation du jeu dans {val} secondes,,,,,,,,
+PRESS_ANY_KEY,Warning message to the player when the expo timer is critical,,Press any key,Appuyez sur n'importe quelle touche,,,,,,,,
+,,,,,,,,,,,,
+MAIN_MENU_PLAY,Main menu button that displays start game screen,,Play,Jouer,,,,,,,,
+MAIN_MENU_NEW-GAME,Main menu button that displays new game game screen,,New Game,Nouvelle Partie,,,,,,,,
+MAIN_MENU_CONTINUE,Main menu button that starts the most recent saved game,,Continue,Continuer,,,,,,,,
+MAIN_MENU_SETTINGS,Main menu button that displays settings screen,,Settings,Paramètres,,,,,,,,
+MAIN_MENU_CREDITS,Main menu button that displays credits screen,,Credits,Crédits,,,,,,,,
+MAIN_MENU_EXIT,Main menu button that displays the exit dialog window,,Exit,Quitter,,,,,,,,

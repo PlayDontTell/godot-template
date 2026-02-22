@@ -5,9 +5,9 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
-@export var expo_events : Array[ExpoEventConfig] = [ExpoEventConfig.new()]
+@export var expo_events : Array[ExpoEventConfig] = []
 @export var active_event_index : int = 0
-var current_event : ExpoEventConfig = null
+@onready var current_event : ExpoEventConfig = null
 
 var expo_timer : float = 0.
 var is_expo_timer_critical: bool = false
@@ -15,7 +15,7 @@ var is_booth_session_active: bool = false
 
 
 func _ready() -> void:
-	set_current_event()
+	set_physics_process(false)
 	init()
 
 
@@ -62,26 +62,29 @@ func _physics_process(delta: float) -> void:
 
 
 func init() -> void:
-	var event : ExpoEventConfig = expo_events[active_event_index] if not expo_events.is_empty() else null
-	
-	if event:
-		current_event.city_name = G.sanitize_string(event.city_name)
-		current_event.event_name = G.sanitize_string(event.event_name)
-		current_event.max_idle_time = event.max_idle_time
-		current_event.critical_time = event.critical_time
-		if event.game_settings:
-			G.apply_settings(event.game_settings)
+	if expo_events.is_empty():
+		expo_events.append(ExpoEventConfig.new())
 	
 	if not G.build_profile == G.BuildProfile.EXPO:
 		self.queue_free()
 		return
 	
+	current_event = expo_events[active_event_index] if not expo_events.is_empty() else null
+	
+	if not current_event:
+		push_error("ExpoLayer: no ExpoEventConfig assigned.")
+		self.queue_free()
+		return
+	
+	set_physics_process(true)
+	
+	current_event.city_name = G.sanitize_string(current_event.city_name)
+	current_event.event_name = G.sanitize_string(current_event.event_name)
+	if current_event.game_settings:
+		G.apply_settings(current_event.game_settings)
+	
 	display_critical_panel(false)
 	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
-
-
-func set_current_event() -> void:
-	current_event = expo_events[active_event_index] if not expo_events.is_empty() else null
 
 
 var press_any_key_tween: Tween
@@ -108,7 +111,7 @@ func tween_press_any_key_label() -> void:
 	tween_press_any_key_label()
 
 
-func display_expo_timer_disabled(request_display: bool = not current_event.is_expo_timer_enabled) -> void:
+func display_expo_timer_disabled(request_display: bool) -> void:
 	expo_timer_disabled.visible = request_display
 
 
@@ -164,7 +167,7 @@ func set_booth_active(request_active: bool = true) -> void:
 
 func set_expo_timer_enabled(request_enabled: bool = true) -> void:
 	current_event.is_expo_timer_enabled = request_enabled
-	display_expo_timer_disabled()
+	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
 	
 	if not request_enabled:
 		reset_expo_timer()
