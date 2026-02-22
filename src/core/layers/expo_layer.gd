@@ -5,18 +5,10 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
-
-@export var EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
-
-@export_group("Expo Timer", "")
-@export var is_expo_timer_enabled: bool = true
-
-## the duration before restarting the game after no input
-@export var EXPO_MAX_IDLE_TIME : float = 150.
-
-## The duration before showing the critical screen asking for any key to be pressed
-@export var EXPO_CRITICAL_TIME : float = 120.
-@export_group("", "")
+@export_global_dir var archive_save_files : String = "user://archive_saves/"
+@export var expo_events : Array[ExpoEventConfig] = []
+@export var active_event_index : int = 0
+@onready var current_event : ExpoEventConfig = null
 
 var expo_timer : float = 0.
 var is_expo_timer_critical: bool = false
@@ -24,12 +16,13 @@ var is_booth_session_active: bool = false
 
 
 func _ready() -> void:
+	set_physics_process(false)
 	init()
 
 
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("toggle_Expo_timer"):
-		set_expo_timer_enabled(not is_expo_timer_enabled)
+		set_expo_timer_enabled(not current_event.is_expo_timer_enabled)
 	
 	if     (event is InputEventJoypadButton
 		or  event is InputEventJoypadMotion
@@ -44,7 +37,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var count_down: float = EXPO_MAX_IDLE_TIME - expo_timer
+	var count_down: float = current_event.max_idle_time - expo_timer
 	
 	if count_down <= 9.9:
 		timer_label.set_text(
@@ -55,29 +48,44 @@ func _physics_process(delta: float) -> void:
 			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
 		)
 	
-	if G.build_profile == G.BuildProfile.EXPO and is_expo_timer_enabled:
+	if G.build_profile == G.BuildProfile.EXPO and current_event.is_expo_timer_enabled:
 		if is_booth_session_active:
 			expo_timer += delta
 			
-			if expo_timer > EXPO_MAX_IDLE_TIME:
+			if expo_timer > current_event.max_idle_time:
 				G.request_game_restart.emit()
 				reset_expo_timer()
 				set_booth_active(false)
 			
-			elif expo_timer > EXPO_CRITICAL_TIME and not is_expo_timer_critical:
+			elif expo_timer > current_event.critical_time and not is_expo_timer_critical:
 				is_expo_timer_critical = true
 				display_critical_panel(true)
 
 
 func init() -> void:
-	EXPO_EVENT_NAME = G.sanitize_string(EXPO_EVENT_NAME)
+	if expo_events.is_empty():
+		expo_events.append(ExpoEventConfig.new())
 	
 	if not G.build_profile == G.BuildProfile.EXPO:
 		self.queue_free()
 		return
 	
+	current_event = expo_events[active_event_index] if not expo_events.is_empty() else null
+	
+	if not current_event:
+		push_error("ExpoLayer: no ExpoEventConfig assigned.")
+		self.queue_free()
+		return
+	
+	set_physics_process(true)
+	
+	current_event.city_name = G.sanitize_string(current_event.city_name)
+	current_event.event_name = G.sanitize_string(current_event.event_name)
+	if current_event.game_settings:
+		G.apply_settings(current_event.game_settings)
+	
 	display_critical_panel(false)
-	display_expo_timer_disabled(not is_expo_timer_enabled)
+	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
 
 
 var press_any_key_tween: Tween
@@ -104,7 +112,7 @@ func tween_press_any_key_label() -> void:
 	tween_press_any_key_label()
 
 
-func display_expo_timer_disabled(request_display: bool = not is_expo_timer_enabled) -> void:
+func display_expo_timer_disabled(request_display: bool) -> void:
 	expo_timer_disabled.visible = request_display
 
 
@@ -132,14 +140,14 @@ func display_critical_panel(request_display: bool = true) -> void:
 			critical_panel,
 			"scale",
 			Vector2.ONE * 2.,
-			EXPO_MAX_IDLE_TIME - EXPO_CRITICAL_TIME + 0.5
+			current_event.max_idle_time - current_event.critical_time + 0.5
 		).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN).from(Vector2.ONE)
 		
 		critical_panel_tween.tween_property(
 			timer_label,
 			"modulate",
 			Color.TOMATO,
-			EXPO_MAX_IDLE_TIME - EXPO_CRITICAL_TIME + 0.5
+			current_event.max_idle_time - current_event.critical_time + 0.5
 		).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN).from(Color.WHITE)
 	
 	else:
@@ -155,12 +163,12 @@ func reset_expo_timer() -> void:
 
 
 func set_booth_active(request_active: bool = true) -> void:
-	is_booth_session_active = request_active and is_expo_timer_enabled
+	is_booth_session_active = request_active and current_event.is_expo_timer_enabled
 
 
 func set_expo_timer_enabled(request_enabled: bool = true) -> void:
-	is_expo_timer_enabled = request_enabled
-	display_expo_timer_disabled()
+	current_event.is_expo_timer_enabled = request_enabled
+	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
 	
 	if not request_enabled:
 		reset_expo_timer()

@@ -37,17 +37,21 @@ layout_mode = 2
 alignment = 1
 
 [node name="PlayBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1803015625]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MAIN_MENU_PLAY"
 
 [node name="SettingsBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=755038655]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MAIN_MENU_SETTINGS"
 
 [node name="CreditsBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1794858106]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MAIN_MENU_CREDITS"
 
 [node name="ExitBtn" type="Button" parent="MarginContainer/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1588680649]
+unique_name_in_owner = true
 layout_mode = 2
 text = "MAIN_MENU_EXIT"
