@@ -1,5 +1,9 @@
 extends Control
 
+@onready var play_btn: Button = %PlayBtn
+@onready var settings_btn: Button = %SettingsBtn
+@onready var credits_btn: Button = %CreditsBtn
+@onready var exit_btn: Button = %ExitBtn
 
 enum Menu {
 	MAIN,
@@ -12,6 +16,13 @@ var menu : Menu = Menu.MAIN
 
 
 func _ready() -> void:
+	init()
+
+
+func init() -> void:
+	if G.is_expo():
+		settings_btn.hide()
+	
 	change_menu(Menu.MAIN)
 
 

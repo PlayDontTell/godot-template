@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
+@export_global_dir var archive_save_files : String = "user://archive_saves/"
 @export var expo_events : Array[ExpoEventConfig] = []
 @export var active_event_index : int = 0
 @onready var current_event : ExpoEventConfig = null

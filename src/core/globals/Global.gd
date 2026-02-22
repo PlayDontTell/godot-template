@@ -110,6 +110,10 @@ enum BuildProfile {
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
 	return build_profile == BuildProfile.DEV
+
+## Quickly test if game is run for an expo event
+func is_expo() -> bool:
+	return build_profile == BuildProfile.EXPO
 #endregion
 
 
@@ -250,6 +254,9 @@ func save_setting_value(setting : String, value : Variant) -> void:
 	if settings.get(setting) != value:
 		settings.set(setting, value)
 		setting_adjusted.emit(setting, value)
+	
+	# don't save settings if in expo mode, because we don't need to save settings between games
+	if not is_expo():
 		save_settings()
 
 

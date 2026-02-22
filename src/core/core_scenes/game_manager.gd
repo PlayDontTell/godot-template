@@ -1,5 +1,9 @@
 extends WorldEnvironment
 
+@onready var debug_layer: CanvasLayer = %DebugLayer
+@onready var expo_layer: CanvasLayer = %ExpoLayer
+
+
 @export var auto_start_game : bool = true
 
 @export_group("Start Scenes", "")
@@ -61,6 +65,9 @@ func restart_game() -> void:
 	# Reset all config variables
 	C.reset_variables()
 	G.reset_variables()
+	
+	if expo_layer:
+		expo_layer.init()
 	
 	# When ready, launch the main menu of the game.
 	if auto_start_game:
