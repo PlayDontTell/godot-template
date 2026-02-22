@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : G.BuildProfiles = G.BuildProfiles.DEV
+var build_profile : G.BuildProfile = G.BuildProfile.DEV
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {
@@ -21,8 +21,10 @@ const DEFAULT_DATA : Dictionary = {
 
 
 func _ready() -> void:
+	set_process(false)
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	set_process(true)
+	
+	reset_variables()
 	
 	# Initialize game folders (saves, settings, etc.)
 	init_folders()
@@ -30,54 +32,43 @@ func _ready() -> void:
 	# Load pre-existing settings file, and apply settings
 	load_settings()
 	
+	# Load custom player bindings if there are any in settings file
+	I.load_bindings()
+	
 	#If settings are loaded, apply them
 	apply_settings()
 	
 	data = DEFAULT_DATA.duplicate(true)
+	
+	# Process should only start when data has been initialized, so that data.meta exists.
+	set_process(true)
 
 
 func _process(delta: float) -> void:
-	if data.has("meta"):
-		data.meta.time_since_start += delta
-		if not get_tree().paused:
-			data.meta.time_played += delta
-	
-	if build_profile == BuildProfiles.EXPO and is_expo_timer_enabled:
-		if is_booth_session_active:
-			expo_timer += delta
-			
-			if expo_timer > EXPO_MAX_IDLE_TIME:
-				request_game_restart.emit()
-			
-			elif expo_timer > EXPO_CRITICAL_TIME and not is_expo_timer_critical:
-				is_expo_timer_critical = true
-				expo_timer_critical.emit(true)
-
-
-func _input(_event: InputEvent) -> void:
-	if Input.is_action_just_pressed("toggle_Dev_layer"):
-		toggle_dev_layer.emit()
-	
-	if Input.is_action_just_pressed("toggle_Expo_timer"):
-		set_expo_timer_enabled(not is_expo_timer_enabled)
+	data.meta.time_since_start += delta
+	if not get_tree().paused:
+		data.meta.time_played += delta
 
 
 func reset_variables() -> void:
-	reset_expo_timer()
-	set_booth_active(false)
+	pass
 
 
 #region CORE SCENES SYSTEM : main menu, loading game core scenes
+## Emmited to request a game restart
+@warning_ignore("unused_signal")
+signal request_game_restart
+
 ## Emmited to request a scene change
 @warning_ignore("unused_signal")
-signal request_core_scene(requested_core_scene : CoreScenes)
+signal request_core_scene(requested_core_scene : CoreScene)
 
 ## Emmited when Core Scene changed and is loaded
 @warning_ignore("unused_signal")
-signal new_core_scene_loaded(new_core_scene : CoreScenes)
+signal new_core_scene_loaded(new_core_scene : CoreScene)
 
 ## The core game scenes
-enum CoreScenes {
+enum CoreScene {
 	INTRO_CREDITS, ## Loading scene scene (between Core Scenes)
 	EXPO_INTRO_VIDEO, ## Loading scene scene (between Core Scenes)
 	
@@ -91,28 +82,26 @@ enum CoreScenes {
 }
 
 ## Path the Core Scenes
-var CoreScenesPaths : Dictionary = {
-	G.CoreScenes.INTRO_CREDITS : "",
-	G.CoreScenes.EXPO_INTRO_VIDEO : "",
+var CoreScenePath : Dictionary = {
+	G.CoreScene.INTRO_CREDITS : "",
+	G.CoreScene.EXPO_INTRO_VIDEO : "",
 	
-	G.CoreScenes.LOADING : "uid://5do4yrji1jit",
-	G.CoreScenes.MAIN_MENU : "uid://b25u4t1skkerr",
-	G.CoreScenes.GAME : "",
+	G.CoreScene.LOADING : "uid://5do4yrji1jit",
+	G.CoreScene.MAIN_MENU : "uid://b25u4t1skkerr",
+	G.CoreScene.GAME : "",
 	
-	G.CoreScenes.CUSTOM_CORE_SCENE_1 : "",
-	G.CoreScenes.CUSTOM_CORE_SCENE_2 : "",
-	G.CoreScenes.CUSTOM_CORE_SCENE_3 : "",
+	G.CoreScene.CUSTOM_CORE_SCENE_1 : "",
+	G.CoreScene.CUSTOM_CORE_SCENE_2 : "",
+	G.CoreScene.CUSTOM_CORE_SCENE_3 : "",
 }
 
 ## Current Core Scene
-var core_scene : CoreScenes
+var core_scene : CoreScene
 #endregion
 
 
 #region BUILD PROFILE SYSTEM : what is the project state
-signal toggle_dev_layer
-
-enum BuildProfiles {
+enum BuildProfile {
 	DEV,
 	RELEASE,
 	EXPO,
@@ -120,43 +109,7 @@ enum BuildProfiles {
 
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
-	return build_profile == BuildProfiles.DEV
-#endregion
-
-
-#region EXPO SYSTEM : convention booth compatible functions
-signal request_game_restart
-signal expo_timer_critical(is_timer_critical: bool)
-signal enabled_expo_timer()
-
-var EXPO_EVENT_NAME : String = "CITY-EVENT-YEAR"
-
-## the duration before restarting the game after no input
-var EXPO_MAX_IDLE_TIME : float = 150.
-
-## The duration before showing the critical screen asking for any key to be pressed
-var EXPO_CRITICAL_TIME : float = 120.
-
-var expo_timer : float = 0.
-var is_expo_timer_critical: bool = false
-var is_expo_timer_enabled : bool = true
-var is_booth_session_active: bool = false
-
-func reset_expo_timer() -> void:
-	expo_timer = 0.
-	if is_expo_timer_critical:
-		is_expo_timer_critical = false
-		expo_timer_critical.emit(false)
-
-func set_booth_active(request_active: bool = true) -> void:
-	is_booth_session_active = request_active and is_expo_timer_enabled
-
-func set_expo_timer_enabled(request_enabled: bool = true) -> void:
-	is_expo_timer_enabled = request_enabled
-	enabled_expo_timer.emit()
-	
-	if not request_enabled:
-		reset_expo_timer()
+	return build_profile == BuildProfile.DEV
 #endregion
 
 
@@ -171,13 +124,13 @@ var request_pause_objects : Array = []
 func declare_pause() -> void:
 	var declaring_pause : bool = request_pause_objects.size() > 0
 	if declaring_pause != get_tree().paused:
-		get_tree().paused = request_pause_objects.size() > 0
+		get_tree().paused = declaring_pause
 		pause_state_changed.emit(declaring_pause)
 
 
 ## Adds/Removes an object requesting pause, and setting pause accordingly
 func request_pause(object : Object = null, requests_pause : bool = true) -> void:
-	if not object == null:
+	if object != null:
 		if requests_pause and not request_pause_objects.has(object):
 			request_pause_objects.append(object)
 		elif not requests_pause and request_pause_objects.has(object):
@@ -229,33 +182,44 @@ func get_available_locales() -> PackedStringArray:
 
 #region SETTINGS SYSTEM : what is the project state
 
-enum Settings {
-	MUSIC_VOLUME,
-	SFX_VOLUME,
-	UI_VOLUME,
-	AMBIENT_VOLUME,
+enum Setting {
+	MUSIC_VOLUME,		## float : default is 0., muted is -80.
+	SFX_VOLUME,			## float : default is 0., muted is -80.
+	UI_VOLUME,			## float : default is 0., muted is -80.
+	AMBIENT_VOLUME,		## float : default is 0., muted is -80.
 	
-	BRIGHTNESS,
-	CONTRAST,
-	SATURATION,
+	BRIGHTNESS,			## float : from 0. to 2., default is 1.
+	CONTRAST,			## float : from 0. to 2., default is 1.
+	SATURATION,			## float : from 0. to 2., default is 1.
 	
-	FULLSCREEN_MODE,
+	FULLSCREEN_MODE, 	## Bool : fullscreen or windowed mode
+	
+	INPUT_BINDINGS, 	## Dictionary : action name → Array[InputEvent]
 }
 
 const DEFAULT_SETTINGS : Dictionary = {
-	Settings.MUSIC_VOLUME: 0,
-	Settings.SFX_VOLUME: 0,
-	Settings.UI_VOLUME: 0,
-	Settings.AMBIENT_VOLUME: 0,
+	Setting.MUSIC_VOLUME: 0,
+	Setting.SFX_VOLUME: 0,
+	Setting.UI_VOLUME: 0,
+	Setting.AMBIENT_VOLUME: 0,
 	
-	Settings.BRIGHTNESS: 1.,
-	Settings.CONTRAST: 1.,
-	Settings.SATURATION: 1.,
+	Setting.BRIGHTNESS: 1.,
+	Setting.CONTRAST: 1.,
+	Setting.SATURATION: 1.,
 	
-	Settings.FULLSCREEN_MODE:false,
+	Setting.FULLSCREEN_MODE: false,
+	
+	Setting.INPUT_BINDINGS: {}, ## Empty dict means "use Input Map project defaults, no overrides."
 }
 
-signal setting_adjusted(setting : Settings, value : Variant)
+const AUDIO_BUSES_NAMES : Dictionary = {
+	Setting.MUSIC_VOLUME: "music",
+	Setting.SFX_VOLUME: "sfx",
+	Setting.UI_VOLUME: "ui",
+	Setting.AMBIENT_VOLUME: "ambient",
+}
+
+signal setting_adjusted(setting : Setting, value : Variant)
 
 ## Signal to tell the WorldEnvironment node what brightness to set
 signal adjust_brightness(intensity : float)
@@ -276,34 +240,29 @@ func apply_settings() -> void:
 		adjust_setting(setting, settings[setting])
 
 
-func adjust_setting(setting : Settings, value : Variant) -> void:
+func adjust_setting(setting : Setting, value : Variant) -> void:
 	match setting:
-		Settings.MUSIC_VOLUME, Settings.SFX_VOLUME, Settings.UI_VOLUME, Settings.AMBIENT_VOLUME:
+		Setting.MUSIC_VOLUME, Setting.SFX_VOLUME, Setting.UI_VOLUME, Setting.AMBIENT_VOLUME:
 			if value is float or value is int:
 				var new_audio_volume : float = value
-				var audio_buses_names : Dictionary = {
-					Settings.MUSIC_VOLUME: "music",
-					Settings.SFX_VOLUME: "sfx",
-					Settings.UI_VOLUME: "ui",
-					Settings.AMBIENT_VOLUME: "ambient",
-				}
-				AudioServer.set_bus_volume_db(AudioServer.get_bus_index(audio_buses_names[setting]), new_audio_volume)
+				
+				AudioServer.set_bus_volume_db(AudioServer.get_bus_index(AUDIO_BUSES_NAMES[setting]), new_audio_volume)
 				
 				save_setting_value(setting, new_audio_volume)
 		
-		Settings.BRIGHTNESS, Settings.CONTRAST, Settings.SATURATION:
+		Setting.BRIGHTNESS, Setting.CONTRAST, Setting.SATURATION:
 			if value is float or value is int:
 				var intensity : float = clampf(value, 0., 2.)
-				if setting == Settings.BRIGHTNESS:
+				if setting == Setting.BRIGHTNESS:
 					adjust_brightness.emit(intensity)
-				elif setting == Settings.CONTRAST:
+				elif setting == Setting.CONTRAST:
 					adjust_contrast.emit(intensity)
-				elif setting == Settings.SATURATION:
+				elif setting == Setting.SATURATION:
 					adjust_saturation.emit(intensity)
 				
 				save_setting_value(setting, intensity)
 		
-		Settings.FULLSCREEN_MODE:
+		Setting.FULLSCREEN_MODE:
 			if value is bool:
 				var is_fullscreen_mode : bool = value
 				if is_fullscreen_mode:
@@ -314,23 +273,26 @@ func adjust_setting(setting : Settings, value : Variant) -> void:
 				save_setting_value(setting, is_fullscreen_mode)
 
 
-func save_setting_value(setting : Settings, value : Variant) -> void:
-	if not settings[setting] == value:
+func save_setting_value(setting : Setting, value : Variant) -> void:
+	if settings[setting] != value:
 		settings[setting] = value
 		setting_adjusted.emit(setting, value)
 		save_settings()
 
 
-func get_setting_text(setting : Settings) -> String:
+func get_setting_text(setting : Setting) -> String:
 	match setting:
-		Settings.MUSIC_VOLUME, Settings.SFX_VOLUME, Settings.UI_VOLUME, Settings.AMBIENT_VOLUME:
+		Setting.MUSIC_VOLUME, Setting.SFX_VOLUME, Setting.UI_VOLUME, Setting.AMBIENT_VOLUME:
 			return "%3d" % int(settings[setting] * 10 + 20) + "%"
 		
-		Settings.BRIGHTNESS, Settings.CONTRAST, Settings.SATURATION:
+		Setting.BRIGHTNESS, Setting.CONTRAST, Setting.SATURATION:
 			return "%3d" % int(settings[setting] * 10 + 50) + "%"
 		
-		Settings.FULLSCREEN_MODE:
+		Setting.FULLSCREEN_MODE:
 			return "Fullscreen Mode" if settings[setting] else "Windowed Mode"
+		
+		Setting.INPUT_BINDINGS:
+			push_warning("No Text can be rendered for this setting.")
 	
 	return ""
 #endregion
@@ -384,11 +346,12 @@ func is_input_string_valid(string_to_test : String, default_string : String = ""
 	for character : String in string_to_test:
 		if not character in AUTHORIZED_CHARACTERS:
 			has_forbidden_characters = true
+			break
 
 	return not (is_default_name or is_empty_name or has_forbidden_characters)
 
 
-## Test if a player text input is valid
+## Test if a character is valid
 func is_input_character_valid(character : String) -> bool:
 	return character in AUTHORIZED_CHARACTERS
 #endregion
@@ -399,15 +362,16 @@ signal data_is_ready
 
 const ENCRYPT_KEY : String = "&Fr4GMt8T!0n.5%eR52:r&/iPJKl3s?,nnr"
 const FILES_EXTENSION : String = ".data"
-var BIN_DIR : String = "user://bin/"
-var SAVE_DIR : String = "user://saves/"
-var ARCHIVE_SAVE_DIR : String = "user://archive_saves/"
-var SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
+const BIN_DIR : String = "user://bin/"
+const SAVE_DIR : String = "user://saves/"
+const ARCHIVE_SAVE_DIR : String = "user://archive_saves/"
+const SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
 const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
 const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
 const TEMP_FILE_SUFFIX : String = ".tmp"
 
-var SCREENSHOT_DIR : String = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES) + "/Mosaic/"
+# Cannot be a cosnt since its needs parse time to initialize
+var SCREENSHOT_DIR : String = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES)
 
 enum FileMode { ENCRYPTED, PLAIN }
 
@@ -417,6 +381,7 @@ var settings : Dictionary = {}
 
 
 func init_folders() -> void:
+	SCREENSHOT_DIR = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES) + "/" + sanitize_string(ProjectSettings.get_setting("application/config/name")) + "/"
 	for dir_path in [SAVE_DIR, BIN_DIR, SCREENSHOT_DIR, ARCHIVE_SAVE_DIR]:
 		if not DirAccess.dir_exists_absolute(dir_path):
 			DirAccess.make_dir_recursive_absolute(dir_path)
@@ -594,8 +559,6 @@ func update_dict(target : Dictionary, defaults : Dictionary) -> Dictionary:
 			update_dict(target[key], defaults[key])
 	return target
 
-
-# PRIVATE HELPER FUNCTIONS
 
 ## Load or create a settings file with defaults
 func _ensure_settings_file(file_path : String, default_settings : Dictionary, mode : FileMode) -> Dictionary:

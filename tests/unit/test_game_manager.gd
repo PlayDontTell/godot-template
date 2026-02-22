@@ -12,7 +12,7 @@ func test_overlapping_load_prevention():
 	gm.target_scene_path = "test://path"
 	
 	# Should do nothing when already loading
-	gm.request_core_scene(G.CoreScenes.GAME)
+	gm.request_core_scene(G.CoreScene.GAME)
 	
 	# Path should remain unchanged
 	assert_eq(gm.target_scene_path, "test://path")

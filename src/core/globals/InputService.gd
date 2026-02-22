@@ -2,83 +2,112 @@ extends Node
 
 
 #region INTENTS : semantic input layer
-## Maps intent names to their Input Map actions.
-## Contexts filter intents — gameplay code only ever reads intents.
+## Maps intent names to their Godot Input Map action names.
+## Gameplay code only ever reads intents — never raw action names.
+## To support a second keyboard player, define p2_* actions in the Input Map
+## and add them here. Two players on one keyboard is the practical limit.
 
 const INTENTS : Dictionary = {
-	# Movement
+	# Movement — player 1
 	"move_up":    ["move_up",    "ui_up"],
 	"move_down":  ["move_down",  "ui_down"],
 	"move_left":  ["move_left",  "ui_left"],
 	"move_right": ["move_right", "ui_right"],
 	
+	# Movement — player 2 (keyboard split, define in Input Map)
+	
 	# Actions
-	"confirm":    ["ui_accept"],
-	"cancel":     ["ui_cancel"],
-	"pause":      ["pause"],
+	"confirm": ["ui_accept"],
+	"cancel":  ["ui_cancel"],
+	"pause":   ["pause"],
 }
 
+
 ## Returns true if the intent was just pressed this frame.
-func just_pressed(intent : String) -> bool:
-	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
-	
-	if not _is_intent_allowed(intent):
-		return false
-	
-	for action : String in INTENTS[intent]:
-		if Input.is_action_just_pressed(action):
-			return true
-	
-	return false
+## Pass device_id for gamepad players (from ID.gamepad_connected signal).
+## Keyboard players use default (-1). Touch: use InputDetector directly.
+func just_pressed(intent : String, device_id : int = -1) -> bool:
+	return _check_intent(intent, device_id, Input.is_action_just_pressed)
 
 
 ## Returns true if the intent is currently held.
-func pressed(intent : String) -> bool:
-	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
-	
-	if not _is_intent_allowed(intent):
-		return false
-	
-	for action : String in INTENTS[intent]:
-		if Input.is_action_pressed(action):
-			return true
-	
-	return false
+func pressed(intent : String, device_id : int = -1) -> bool:
+	return _check_intent(intent, device_id, Input.is_action_pressed)
 
 
-## Returns a normalized movement vector from movement intents.
-func get_move_vector() -> Vector2:
-	if not _is_input_globally_allowed():
+## Returns true if the intent is currently held.
+func just_released(intent : String, device_id : int = -1) -> bool:
+	return _check_intent(intent, device_id, Input.is_action_just_released)
+
+
+## Returns a normalized movement vector, filtered by the active context.
+## Uses "move_up" as a proxy — if movement intents are blocked, returns ZERO.
+## Pass device_id for gamepad — reads left stick directly.
+## For touch, handle movement in InputDetector and pass the vector to your node.
+func get_move_vector(device_id : int = -1) -> Vector2:
+	if not _is_intent_allowed("move_up"):
 		return Vector2.ZERO
+	
+	if device_id >= 0:
+		return Vector2(
+			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X),
+			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
+		).normalized()
 	
 	return Vector2(
 		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
 		Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
 	).normalized()
 
+
+func _check_intent(intent : String, device_id : int, check_func : Callable) -> bool:
+	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
+	
+	if not _is_intent_allowed(intent):
+		return false
+	
+	for action : String in INTENTS[intent]:
+		if device_id >= 0:
+			for event : InputEvent in InputMap.action_get_events(action):
+				if (event is InputEventJoypadButton or event is InputEventJoypadMotion) \
+				and event.device == device_id \
+				and check_func.call(action):
+					return true
+		else:
+			if check_func.call(action):
+				return true
+	
+	return false
+
+
+func _is_intent_allowed(intent : String) -> bool:
+	# TODO : restrict to relevant CoreScenes once gameplay scenes are defined.
+	var active := _get_active_context()
+	if active == null:
+		return true
+	var allowed : Array = CONTEXT_RULES[active.context]
+	return allowed.is_empty() or intent in allowed
+
 #endregion
 
 
 #region CONTEXTS : modal input filtering
-## A context is acquired by a node to restrict what intents are available.
-## Contexts are automatically cleaned up when their owner is freed.
-## Priority determines which context is active when multiple are held.
+## A context is acquired by a node to restrict which intents are active.
+## Automatically cleaned up when the owner node is freed.
+## Priority determines which context wins — only the highest is consulted.
+## Lower contexts are not checked — there is no intent passthrough.
 
 enum Context {
 	GAMEPLAY,  ## Default — all intents allowed
-	PAUSE,     ## Only ui_confirm / ui_cancel
-	DIALOGUE,  ## Only confirm
-	DEBUG,     ## All intents allowed (bypasses everything)
+	PAUSE,     ## Navigation and confirm/cancel only
+	DIALOGUE,  ## Confirm only
 }
 
-## Defines which intent groups are allowed per context.
-## Intents not listed in a context's allowed set are blocked.
-## Empty allows all
+## Which intents are allowed per context. Empty array means allow all.
 const CONTEXT_RULES : Dictionary = {
-	Context.GAMEPLAY:  [],              # empty = allow all
-	Context.PAUSE:     ["confirm", "cancel", "move_up", "move_down"],
-	Context.DIALOGUE:  ["confirm"],
-	Context.DEBUG:     [],              # empty = allow all
+	Context.GAMEPLAY : [],
+	Context.PAUSE    : ["confirm", "cancel", "move_up", "move_down"],
+	Context.DIALOGUE : ["confirm"],
 }
 
 
@@ -97,17 +126,16 @@ var _context_stack : Array[ContextHandle] = []
 
 
 ## Acquires an input context tied to a node's lifetime.
-## If the owner already holds this context, returns the existing handle.
-func acquire_context(context : Context, owner : Node, priority : int = 0) -> ContextHandle:
-	assert(is_instance_valid(owner), "InputService : Context owner must be a valid Node.")
+## Returns an existing handle if this owner already holds this context.
+func acquire_context(context : Context, owner_node : Node, priority : int = 0) -> ContextHandle:
+	assert(is_instance_valid(owner_node), "InputService : Context owner must be a valid Node.")
 	
 	for existing : ContextHandle in _context_stack:
-		if existing.owner == owner and existing.context == context:
+		if existing.owner_node == owner_node and existing.context == context:
 			return existing
 	
-	var handle := ContextHandle.new(context, owner, priority)
+	var handle := ContextHandle.new(context, owner_node, priority)
 	
-	# Insert at the right position to keep stack sorted by priority (highest first)
 	var inserted := false
 	for i : int in range(_context_stack.size()):
 		if priority > _context_stack[i].priority:
@@ -120,51 +148,87 @@ func acquire_context(context : Context, owner : Node, priority : int = 0) -> Con
 	return handle
 
 
-## Manually releases a context. Not required if the owner will be freed naturally.
+## Manually releases a context.
+## Optional — the owner being freed cleans it up automatically on the next query.
 func release_context(handle : ContextHandle) -> void:
 	if handle == null:
 		return
 	_context_stack.erase(handle)
 
-#endregion
-
-
-#region PRIVATE HELPERS
-
-func _is_input_globally_allowed() -> bool:
-	# Macro-level gate : only allow input when a game scene is active.
-	return G.core_scene == G.CoreScenes.GAME
-
-
-func _is_intent_allowed(intent : String) -> bool:
-	if not _is_input_globally_allowed():
-		return false
-	
-	var active := _get_active_context()
-	if active == null:
-		return true
-	
-	# DEBUG context bypasses all rules
-	if active.context == Context.DEBUG:
-		return true
-	
-	var allowed_intents : Array = CONTEXT_RULES[active.context]
-	
-	# Empty array means "allow all"
-	if allowed_intents.is_empty():
-		return true
-	
-	return intent in allowed_intents
-
 
 func _get_active_context() -> ContextHandle:
-	_cleanup_dead_contexts()
-	return _context_stack[0] if not _context_stack.is_empty() else null
-
-
-func _cleanup_dead_contexts() -> void:
 	for i : int in range(_context_stack.size() - 1, -1, -1):
 		if not is_instance_valid(_context_stack[i].owner):
 			_context_stack.remove_at(i)
+	return _context_stack[0] if not _context_stack.is_empty() else null
+
+#endregion
+
+
+#region REBINDING : runtime key remapping, persisted through G.settings
+## Bindings are stored in G.settings[G.Settings.INPUT_BINDINGS] as a Dictionary
+## mapping action name (String) → Array[InputEvent].
+## G.DEFAULT_SETTINGS[G.Settings.INPUT_BINDINGS] is an empty Dictionary {},
+## which means "use whatever is currently in the Input Map" — no overrides.
+##
+## Example usage from a settings UI node:
+##
+##   # Show current binding in a label:
+##   var ev : InputEvent = I.get_binding("move_up")
+##   label.text = ev.as_text() if ev else "Unbound"
+##
+##   # Wait for the player to press a new key, then apply it:
+##   func _input(event : InputEvent) -> void:
+##       if event is InputEventKey or event is InputEventJoypadButton:
+##           I.rebind("move_up", event)
+##           set_process_input(false)
+##
+##   # Reset all bindings to Input Map defaults:
+##   I.reset_bindings()
+
+
+## Rebinds an intent's primary action to a new input event and saves to G.settings.
+## Only replaces the first action — secondary fallbacks (ui_up etc.) are preserved.
+func rebind(intent : String, new_event : InputEvent) -> void:
+	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
+	var action : String = INTENTS[intent][0]
+	InputMap.action_erase_events(action)
+	InputMap.action_add_event(action, new_event)
+	_save_bindings()
+
+
+## Returns the current primary InputEvent bound to an intent, or null if unbound.
+func get_binding(intent : String) -> InputEvent:
+	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
+	var events := InputMap.action_get_events(INTENTS[intent][0])
+	return events[0] if not events.is_empty() else null
+
+
+## Restores saved bindings from G.settings into the live InputMap.
+## Call from game_manager.gd on startup, after G.load_settings().
+func load_bindings() -> void:
+	var saved : Dictionary = G.settings.get(G.Setting.INPUT_BINDINGS, {})
+	for action : String in saved:
+		if InputMap.has_action(action):
+			InputMap.action_erase_events(action)
+			for event : InputEvent in saved[action]:
+				InputMap.action_add_event(action, event)
+
+
+## Clears all custom bindings and resets to Input Map project defaults.
+func reset_bindings() -> void:
+	InputMap.load_from_project_settings()
+	G.settings[G.Settings.INPUT_BINDINGS] = {}
+	G.save_settings()
+
+
+func _save_bindings() -> void:
+	var bindings : Dictionary = {}
+	for intent : String in INTENTS:
+		var action : String = INTENTS[intent][0]
+		if InputMap.has_action(action):
+			bindings[action] = InputMap.action_get_events(action)
+	G.settings[G.Settings.INPUT_BINDINGS] = bindings
+	G.save_settings()
 
 #endregion

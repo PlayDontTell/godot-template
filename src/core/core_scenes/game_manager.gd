@@ -3,9 +3,9 @@ extends WorldEnvironment
 @export var auto_start_game : bool = true
 
 @export_group("Start Scenes", "")
-@export var DEV_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
-@export var RELEASE_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
-@export var EXPO_build_profile : G.CoreScenes = G.CoreScenes.MAIN_MENU
+@export var DEV_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
+@export var RELEASE_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
+@export var EXPO_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
 @export_group("", "")
 
 var target_scene_path: String = ""
@@ -40,7 +40,7 @@ func init_game_manager() -> void:
 	get_tree().auto_accept_quit = false
 	
 	var connected_signals : Dictionary = {
-		# Any scene can call G.request_core_scene to change among the G.CoreScenes
+		# Any scene can call G.request_core_scene to change among the G.CoreScene
 		G.request_core_scene: self.request_core_scene,
 		
 		# Needed to set environment adjustments
@@ -66,18 +66,18 @@ func restart_game() -> void:
 	if auto_start_game:
 		
 		match G.build_profile:
-			G.BuildProfiles.DEV:
+			G.BuildProfile.DEV:
 				request_core_scene(DEV_build_profile)
 			
-			G.BuildProfiles.RELEASE:
+			G.BuildProfile.RELEASE:
 				request_core_scene(RELEASE_build_profile)
 			
-			G.BuildProfiles.EXPO:
+			G.BuildProfile.EXPO:
 				request_core_scene(EXPO_build_profile)
 
 
 # Select between main game scenes (main menu, game)
-func request_core_scene(new_core_scene: G.CoreScenes) -> void:
+func request_core_scene(new_core_scene: G.CoreScene) -> void:
 	# Avoid overlapping loads
 	if is_loading:
 		push_warning("select_game_scene called while a load is already in progress; ignoring.")
@@ -94,7 +94,7 @@ func request_core_scene(new_core_scene: G.CoreScenes) -> void:
 	G.core_scene = new_core_scene
 	
 	# Memorizing the path of the current loading game_scene
-	target_scene_path = G.CoreScenesPaths[G.core_scene]
+	target_scene_path = G.CoreScenePath[G.core_scene]
 	
 	# Start loading the scene, before displaying it
 	start_threaded_load()
@@ -163,7 +163,7 @@ func finish_game_scene_change(packed: PackedScene) -> void:
 	
 	# Notify the rest of the game that the scene really changed.
 	G.new_core_scene_loaded.emit(G.core_scene)
-	print("Loaded " + G.CoreScenes.keys()[G.core_scene])
+	print("Loaded " + G.CoreScene.keys()[G.core_scene])
 	
 	clear_loading_state()
 
@@ -184,7 +184,7 @@ func clear_loading_state() -> void:
 
 # Add the loading scene
 func show_loading_screen() -> void:
-	var path: String = G.CoreScenesPaths[G.CoreScenes.LOADING]
+	var path: String = G.CoreScenePath[G.CoreScene.LOADING]
 	var packed: PackedScene = load(path) as PackedScene
 	
 	loading_instance = packed.instantiate()
