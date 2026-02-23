@@ -48,7 +48,8 @@ func _physics_process(delta: float) -> void:
 			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
 		)
 	
-	if G.build_profile == G.BuildProfile.EXPO and current_event.is_expo_timer_enabled:
+	var is_current_core_scene_an_exception : bool = G.core_scene in current_event.core_scene_exceptions
+	if current_event.is_expo_timer_enabled and not is_current_core_scene_an_exception:
 		if is_booth_session_active:
 			expo_timer += delta
 			
@@ -66,7 +67,7 @@ func init() -> void:
 	if expo_events.is_empty():
 		expo_events.append(ExpoEventConfig.new())
 	
-	if not G.build_profile == G.BuildProfile.EXPO:
+	if not G.is_expo():
 		self.queue_free()
 		return
 	

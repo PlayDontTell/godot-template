@@ -24,9 +24,14 @@ extends Resource
 ## Timer system used to restart the game after max_idle_time has passed.
 ## A warning appears after critical_time to inform player that a key must be pressed for the timer to be reset
 @export_group("Expo Timer", "")
-@export var is_expo_timer_enabled	: bool			= false
-@export var max_idle_time			: float			= 150.0	## Seconds before game restarts
-@export var critical_time			: float			= 120.0	## Seconds before warning panel appears
+@export var is_expo_timer_enabled: bool = false
+@export var max_idle_time: float = 150.0	## Seconds before game restarts
+@export var critical_time: float = 120.0	## Seconds before warning panel appears
+@export var core_scene_exceptions: Array[G.CoreScene] = [ ## Core Scenes that do not trigger expo timer
+	G.CoreScene.INTRO_CREDITS,
+	G.CoreScene.EXPO_INTRO_VIDEO,
+	G.CoreScene.LOADING,
+] 
 
 @export_group("Game Settings", "")
 ## Leave null to use G.default_settings unchanged.
