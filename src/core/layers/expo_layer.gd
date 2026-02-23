@@ -5,8 +5,14 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
-@export var expo_events : Array[ExpoEventConfig] = []
+## The index of the current expo event, from the list below (expo_events)
 @export var active_event_index : int = 0
+
+## The list of expo events the game is prepared to be presented at.
+## Each Item contains all the info the game needs about the event and its configuration
+## Including Game settings.
+@export var expo_events : Array[ExpoEventConfig] = []
+
 @onready var current_event : ExpoEventConfig = null
 
 var expo_timer : float = 0.
