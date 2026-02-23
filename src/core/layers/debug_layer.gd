@@ -73,6 +73,12 @@ func _ready() -> void:
 	init()
 
 
+func _exit_tree() -> void:
+	G.new_core_scene_loaded.disconnect(set_core_scene_label)
+	G.locale_changed.disconnect(set_locale_label)
+	G.pause_state_changed.disconnect(set_pause_label)
+
+
 func _process(delta: float) -> void:
 	set_fps_label()
 	set_time_since_start_label()

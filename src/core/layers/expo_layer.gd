@@ -100,7 +100,7 @@ func get_archive_folder() -> String:
 
 var press_any_key_tween: Tween
 func tween_press_any_key_label() -> void:
-	if press_any_key_tween != null:
+	if is_instance_valid(press_any_key_tween):
 		press_any_key_tween.stop()
 	press_any_key_tween = create_tween()
 	
@@ -133,7 +133,7 @@ func display_critical_panel(request_display: bool = true) -> void:
 	if request_display:
 		tween_press_any_key_label()
 		
-		if critical_panel_tween != null:
+		if is_instance_valid(critical_panel_tween):
 			critical_panel_tween.stop()
 		critical_panel_tween = create_tween()
 		

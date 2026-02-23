@@ -1,18 +1,18 @@
 ## BaseMenu.gd
 ## Base class for all menu screens.
 ##
-## Assumes the following Autoloads are registered:
-##   - D  (DeviceTracker.gd)
+## Autoloads required:
 ##   - I  (InputService.gd)
+##   - D  (DeviceTracker.gd)
 ##
-## What this class handles automatically:
+## What this handles automatically:
 ##   - Acquires an I context on open, releases it on close
 ##   - Grabs / releases UI focus based on the active input device
 ##   - Routes the "cancel" intent to _on_back_pressed()
 ##   - Restores focus to the previously focused node when closed
-##   - Forwards device changes to _on_device_changed() for icon swapping, etc.
+##   - Forwards device changes to _on_device_changed()
 ##
-## Minimal usage — override only what you need:
+## Minimal usage:
 ##
 ##   extends BaseMenu
 ##
@@ -31,105 +31,81 @@ extends Control
 
 # ─── Exports ─────────────────────────────────────────────────────────────────
 
-## Which I context to acquire while this menu is open.
-## Override per menu type: a pause menu uses PAUSE, a sub-dialog could use DIALOGUE.
+## Context acquired while this menu is open. Set in _ready() by subclass,
+## or leave as MENU for standard full-screen menus.
 @export var input_context: I.Context = I.Context.MENU
 
-## Whether pressing the "cancel" intent triggers _on_back_pressed().
-@export var handle_back_input: bool = true
-
-## If set in the inspector, this node gets focus on open.
-## You can also override _get_default_focus() in code instead.
-@export var default_focus_node: NodePath = ""
+## Node to focus when this menu opens. If null, falls back to _get_default_focus().
+@export var default_focus: Control = null
 
 
 # ─── Private state ────────────────────────────────────────────────────────────
 
-var _context_handle: I.ContextHandle = null
 var _previous_focus: Control = null
 
 
 # ─── Lifecycle ────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
-	# Snapshot whatever had focus before this menu stole the stage
 	_previous_focus = get_viewport().gui_get_focus_owner()
-
-	# Register with I — blocks lower-priority contexts (e.g. gameplay)
-	_context_handle = I.acquire_context(input_context, self)
-
-	# React to device changes
+	I.acquire_context(self, input_context)
 	D.method_changed.connect(_on_method_changed)
-
-	# Apply current device state immediately (don't wait for the next input event)
 	_on_method_changed(D.get_current_method())
 
 
 func _exit_tree() -> void:
-	# Release the input context so lower contexts (gameplay etc.) resume
-	I.release_context(_context_handle)
-	_context_handle = null
-
-	if D.method_changed.is_connected(_on_method_changed):
-		D.method_changed.disconnect(_on_method_changed)
+	I.release_context(self, input_context)
+	D.method_changed.disconnect(_on_method_changed)
 
 
-func _process(_delta: float) -> void:
-	if not handle_back_input:
-		return
-	# Use I so "cancel" respects context rules and rebinding
-	if I.just_pressed("cancel"):
+func _input(event: InputEvent) -> void:
+	if I.is_action_pressed_in_event(event, "cancel"):
+		get_viewport().set_input_as_handled()
 		_on_back_pressed()
 
 
 # ─── Public API ───────────────────────────────────────────────────────────────
 
 ## Restores previous focus and frees this menu.
-## Call this from _on_back_pressed() or a close button.
 func close() -> void:
 	_restore_previous_focus()
 	queue_free()
 
 
-## Use this instead of close() when you hide/show the menu rather than free it.
-## Re-acquires the context and restores focus when shown again.
-func reopen() -> void:
-	show()
-	if _context_handle == null:
-		_context_handle = I.acquire_context(input_context, self)
-	_on_method_changed(D.get_current_method())
-
-
-## Hides the menu without freeing it, and releases the input context.
-## Pair with reopen().
+## Suspends this menu without freeing it. Pair with reopen().
 func suspend() -> void:
-	I.release_context(_context_handle)
-	_context_handle = null
+	I.release_context(self, input_context)
+	D.method_changed.disconnect(_on_method_changed)
 	_restore_previous_focus()
 	hide()
 
 
+## Resumes a suspended menu.
+func reopen() -> void:
+	_previous_focus = get_viewport().gui_get_focus_owner()
+	show()
+	I.acquire_context(self, input_context)
+	D.method_changed.connect(_on_method_changed)
+	_on_method_changed(D.get_current_method())
+
+
 # ─── Overridable hooks ────────────────────────────────────────────────────────
 
-## Return the Control that should receive focus when this menu opens (controller/KB).
-## Override this, or set default_focus_node in the inspector.
+## Return the Control that should receive focus on open.
+## Only override if the default_focus export is not sufficient.
 func _get_default_focus() -> Control:
-	if default_focus_node != NodePath(""):
-		var node := get_node_or_null(default_focus_node)
-		if node is Control:
-			return node as Control
+	if is_instance_valid(default_focus):
+		return default_focus
 	return _find_first_focusable(self)
 
 
-## Called when the player presses the "cancel" intent.
-## Override to define what "back" means: close a dialog, go to previous scene, etc.
-## Default is a no-op so menus that don't need back handling are safe to leave empty.
+## Called when "cancel" is pressed. Define what back means for this menu.
 func _on_back_pressed() -> void:
 	pass
 
 
-## Called whenever D detects an input method change.
-## Override to swap button prompt icons, toggle touch-specific UI, etc.
+## Called when the active input device changes.
+## Override to swap button prompt icons, toggle touch UI, etc.
 func _on_device_changed(_method: D.InputMethod) -> void:
 	pass
 
@@ -138,22 +114,24 @@ func _on_device_changed(_method: D.InputMethod) -> void:
 
 func _on_method_changed(method: D.InputMethod) -> void:
 	match method:
-		D.InputMethod.GAMEPAD, \
-		D.InputMethod.KEYBOARD_AND_MOUSE:
+		D.InputMethod.GAMEPAD, D.InputMethod.KEYBOARD_AND_MOUSE:
 			_try_grab_focus()
-
 		D.InputMethod.TOUCH:
-			# No focus ring needed on touch — release if we currently own it
 			var focused := get_viewport().gui_get_focus_owner()
 			if focused and is_ancestor_of(focused):
 				focused.release_focus()
-
 	_on_device_changed(method)
 
 
 func _try_grab_focus() -> void:
-	if not is_inside_tree() or not is_visible_in_tree():
+	if not is_visible_in_tree():
 		return
+	
+	# Only grab if nothing in this menu already has focus
+	var current := get_viewport().gui_get_focus_owner()
+	if current and is_ancestor_of(current):
+		return
+	
 	var target := _get_default_focus()
 	if target and target.focus_mode == Control.FOCUS_ALL:
 		target.grab_focus()
@@ -165,14 +143,8 @@ func _restore_previous_focus() -> void:
 
 
 func _find_first_focusable(node: Node) -> Control:
-	for child in node.get_children():
-		if not child.is_inside_tree():
-			continue
-		if child is Control:
-			var c := child as Control
-			if c.focus_mode == Control.FOCUS_ALL and c.visible and not c.is_queued_for_deletion():
-				return c
-		var found := _find_first_focusable(child)
-		if found:
-			return found
+	for child in node.find_children("*", "Control", true, false):
+		var c := child as Control
+		if c.focus_mode == Control.FOCUS_ALL and c.visible:
+			return c
 	return null

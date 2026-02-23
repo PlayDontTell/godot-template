@@ -12,13 +12,13 @@ extends Resource
 ## The city the vent is happening in.
 @export var city_name : String = "Vernier" :
 	set(v):
-		city_name = v
+		city_name = v.validate_filename()
 		resource_name = get_event_label()
 
 ## The name of the event.
 @export var event_name : String = "Vernier Ludique" :
 	set(v):
-		event_name = v
+		event_name = v.validate_filename()
 		resource_name = get_event_label()
 
 ## The year during which the event starts.
@@ -53,7 +53,7 @@ extends Resource
 @export_group("Game Settings", "")
 ## Leave null to use G.default_settings unchanged.
 ## Assign a GameSettings .tres to override any values for this event.
-@export var game_settings			: GameSettings	= null
+@export var game_settings: GameSettings = null
 
 @export_group("", "")
 
@@ -65,4 +65,4 @@ func _init():
 
 
 func get_event_label() -> String:
-	return str(event_year) + "-" + str(event_month).lpad(2, "0") + " " + event_name.replace(" ", "-") + " [" + city_name + "]"
+	return str(event_year) + "-" + str(event_month).lpad(2, "0") + " " + event_name.replace(" ", "-").validate_filename() + " [" + city_name.validate_filename() + "]"

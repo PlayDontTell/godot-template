@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 var build_profile : G.BuildProfile = G.BuildProfile.DEV
@@ -134,7 +135,7 @@ func declare_pause() -> void:
 
 ## Adds/Removes an object requesting pause, and setting pause accordingly
 func request_pause(object : Object = null, requests_pause : bool = true) -> void:
-	if object != null:
+	if is_instance_valid(object):
 		if requests_pause and not request_pause_objects.has(object):
 			request_pause_objects.append(object)
 		elif not requests_pause and request_pause_objects.has(object):
