@@ -11,7 +11,7 @@ extends Resource
 		city_name = v
 		resource_name = get_event_label()
 
-@export var event_name : String = "Vernier-Ludique" :
+@export var event_name : String = "Vernier Ludique" :
 	set(v):
 		event_name = v
 		resource_name = get_event_label()
@@ -19,6 +19,11 @@ extends Resource
 @export var event_year : int = Time.get_datetime_dict_from_system().year :
 	set(v):
 		event_year = v
+		resource_name = get_event_label()
+
+@export_range(1, 12, 1) var event_month : int = Time.get_datetime_dict_from_system().month :
+	set(v):
+		event_month = v
 		resource_name = get_event_label()
 
 ## Timer system used to restart the game after max_idle_time has passed.
@@ -43,8 +48,9 @@ extends Resource
 
 func _init():
 	event_year = Time.get_datetime_dict_from_system().year
+	event_month = Time.get_datetime_dict_from_system().month
 	resource_name = get_event_label()
 
 
 func get_event_label() -> String:
-	return str(event_year) + "_" + event_name + "_" + city_name
+	return str(event_year) + "-" + str(event_month).lpad(2, "0") + " " + event_name.replace(" ", "-") + " [" + city_name + "]"
