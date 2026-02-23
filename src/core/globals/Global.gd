@@ -349,7 +349,7 @@ const ENCRYPT_KEY : String = "&Fr4GMt8T!0n.5%eR52:r&/iPJKl3s?,nnr"
 const FILES_EXTENSION : String = ".data"
 const BIN_DIR : String = "user://bin/"
 const SAVE_DIR : String = "user://saves/"
-const ARCHIVE_SAVE_DIR : String = "user://archive_saves/"
+var ARCHIVE_SAVE_DIR : String = "user://archive/"
 const SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
 const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
 const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
@@ -364,9 +364,13 @@ var is_data_ready : bool = false
 var data : Dictionary = {}
 
 
-func init_folders() -> void:
+func init_folders(additional_folders : PackedStringArray = []) -> void:
 	SCREENSHOT_DIR = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES) + "/" + sanitize_string(ProjectSettings.get_setting("application/config/name")) + "/"
-	for dir_path in [SAVE_DIR, BIN_DIR, SCREENSHOT_DIR, ARCHIVE_SAVE_DIR]:
+	
+	var directories_init : Array = [SAVE_DIR, BIN_DIR, SCREENSHOT_DIR, ARCHIVE_SAVE_DIR]
+	directories_init.append_array(additional_folders)
+	
+	for dir_path in directories_init:
 		if not DirAccess.dir_exists_absolute(dir_path):
 			DirAccess.make_dir_recursive_absolute(dir_path)
 
@@ -502,15 +506,18 @@ func list_save_files() -> Array:
 	return files
 
 
+
 ## Move all save files to archive directory. Returns number of files successfully moved.
 func move_files_to_archive() -> int:
+	init_folders([ARCHIVE_SAVE_DIR])
+	
 	var moved_count : int = 0
 	
 	for file_path in list_save_files():
 		var file_name : String = file_path.get_file()
-		var dest : String = ARCHIVE_SAVE_DIR + file_name
+		var destination : String = ARCHIVE_SAVE_DIR + file_name
 		
-		var copy_error : Error = DirAccess.copy_absolute(file_path, dest)
+		var copy_error : Error = DirAccess.copy_absolute(file_path, destination)
 		if copy_error != OK:
 			push_error("Failed to copy file to archive: " + file_path)
 			continue

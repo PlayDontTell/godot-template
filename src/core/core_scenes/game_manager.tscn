@@ -3,16 +3,9 @@
 [ext_resource type="Script" uid="uid://bjuyxayyleldj" path="res://src/core/core_scenes/game_manager.gd" id="1_ha3o5"]
 [ext_resource type="PackedScene" uid="uid://1mdrxoxx3uwp" path="res://src/core/layers/debug_layer.tscn" id="2_6r8ub"]
 [ext_resource type="PackedScene" uid="uid://2wd3hiy4v7ep" path="res://src/core/layers/expo_layer.tscn" id="3_i104u"]
-[ext_resource type="Script" uid="uid://bestq71s6ukfh" path="res://src/classes/expo_event_config.gd" id="4_y2chk"]
 
 [sub_resource type="Environment" id="Environment_ha3o5"]
 adjustment_enabled = true
-
-[sub_resource type="Resource" id="Resource_ghkxf"]
-resource_name = "2026_Vernier-Ludique_Vernier"
-script = ExtResource("4_y2chk")
-event_year = 2026
-metadata/_custom_type_script = "uid://bestq71s6ukfh"
 
 [node name="GameManager" type="WorldEnvironment" unique_id=691744354]
 environment = SubResource("Environment_ha3o5")
@@ -23,4 +16,3 @@ unique_name_in_owner = true
 
 [node name="ExpoLayer" parent="." unique_id=600995833 instance=ExtResource("3_i104u")]
 unique_name_in_owner = true
-expo_events = Array[ExtResource("4_y2chk")]([SubResource("Resource_ghkxf")])

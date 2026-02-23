@@ -89,6 +89,10 @@ func init() -> void:
 	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
 
 
+func get_archive_folder() -> String:
+	return current_event.get_event_label()
+
+
 var press_any_key_tween: Tween
 func tween_press_any_key_label() -> void:
 	if press_any_key_tween != null:
