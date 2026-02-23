@@ -80,6 +80,9 @@ func restart_game() -> void:
 				request_core_scene(RELEASE_build_profile)
 			
 			G.BuildProfile.EXPO:
+				G.create_save_file("default_name")
+				G.ARCHIVE_SAVE_DIR = "user://archive/" + expo_layer.get_archive_folder() + "/"
+				G.move_files_to_archive()
 				request_core_scene(EXPO_build_profile)
 
 

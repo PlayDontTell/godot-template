@@ -5,9 +5,14 @@ extends CanvasLayer
 @onready var press_any_key_label: Label = %PressAnyKeyLabel
 @onready var expo_timer_disabled: Control = %ExpoTimerDisabled
 
-@export_global_dir var archive_save_files : String = "user://archive_saves/"
-@export var expo_events : Array[ExpoEventConfig] = []
+## The index of the current expo event, from the list below (expo_events)
 @export var active_event_index : int = 0
+
+## The list of expo events the game is prepared to be presented at.
+## Each Item contains all the info the game needs about the event and its configuration
+## Including Game settings.
+@export var expo_events : Array[ExpoEventConfig] = []
+
 @onready var current_event : ExpoEventConfig = null
 
 var expo_timer : float = 0.
@@ -48,7 +53,8 @@ func _physics_process(delta: float) -> void:
 			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
 		)
 	
-	if G.build_profile == G.BuildProfile.EXPO and current_event.is_expo_timer_enabled:
+	var is_current_core_scene_an_exception : bool = G.core_scene in current_event.core_scene_exceptions
+	if current_event.is_expo_timer_enabled and not is_current_core_scene_an_exception:
 		if is_booth_session_active:
 			expo_timer += delta
 			
@@ -66,7 +72,7 @@ func init() -> void:
 	if expo_events.is_empty():
 		expo_events.append(ExpoEventConfig.new())
 	
-	if not G.build_profile == G.BuildProfile.EXPO:
+	if not G.is_expo():
 		self.queue_free()
 		return
 	
@@ -86,6 +92,10 @@ func init() -> void:
 	
 	display_critical_panel(false)
 	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
+
+
+func get_archive_folder() -> String:
+	return current_event.get_event_label()
 
 
 var press_any_key_tween: Tween
