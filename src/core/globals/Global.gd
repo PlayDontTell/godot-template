@@ -1,6 +1,6 @@
 extends Node
 
-var build_profile : G.BuildProfile = G.BuildProfile.EXPO
+var build_profile : G.BuildProfile = G.BuildProfile.DEV
 
 const DEFAULT_DATA : Dictionary = {
 	"meta": {

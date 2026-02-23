@@ -1,18 +1,22 @@
 extends Control
 
+@onready var title_screen: MarginContainer = %TitleScreen
+
+@onready var title_label: Label = %TitleLabel
+
 @onready var play_btn: Button = %PlayBtn
 @onready var settings_btn: Button = %SettingsBtn
 @onready var credits_btn: Button = %CreditsBtn
 @onready var exit_btn: Button = %ExitBtn
 
 enum Menu {
-	MAIN,
+	TITLE,
 	CREDITS,
 	SETTINGS,
 	GAME_SELECTION,
 	EXIT,
 }
-var menu : Menu = Menu.MAIN
+var menu : Menu = Menu.TITLE
 
 
 func _ready() -> void:
@@ -20,18 +24,20 @@ func _ready() -> void:
 
 
 func init() -> void:
+	title_label.set_text(ProjectSettings.get_setting("application/config/name"))
+	
 	if G.is_expo():
 		settings_btn.hide()
 	
-	change_menu(Menu.MAIN)
+	change_menu(Menu.TITLE)
 
 
 func change_menu(new_menu : Menu) -> void:
-	#object.hide()
+	title_screen.hide()
 	
 	match new_menu:
-		Menu.MAIN:
-			pass
+		Menu.TITLE:
+			title_screen.show()
 		
 		Menu.CREDITS:
 			pass
@@ -56,7 +62,7 @@ func _on_exit_btn_pressed() -> void:
 
 
 func _on_exit_dialog_canceled() -> void:
-	change_menu(Menu.MAIN)
+	change_menu(Menu.TITLE)
 
 
 func _on_exit_dialog_confirmed() -> void:
@@ -64,7 +70,7 @@ func _on_exit_dialog_confirmed() -> void:
 
 
 func _on_back_btn_pressed() -> void:
-	change_menu(Menu.MAIN)
+	change_menu(Menu.TITLE)
 
 
 func _on_start_game_btn_pressed() -> void:

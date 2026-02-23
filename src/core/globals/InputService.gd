@@ -8,18 +8,20 @@ extends Node
 ## and add them here. Two players on one keyboard is the practical limit.
 
 const INTENTS : Dictionary = {
-	# Movement — player 1
+	# ── Movement — player 1 ───────────────────────────────────────────────────
 	"move_up":    ["move_up",    "ui_up"],
 	"move_down":  ["move_down",  "ui_down"],
 	"move_left":  ["move_left",  "ui_left"],
 	"move_right": ["move_right", "ui_right"],
-	
-	# Movement — player 2 (keyboard split, define in Input Map)
-	
-	# Actions
-	"confirm": ["ui_accept"],
-	"cancel":  ["ui_cancel"],
-	"pause":   ["pause"],
+
+	# ── Movement — player 2 (keyboard split, define in Input Map) ─────────────
+
+	# ── Actions ───────────────────────────────────────────────────────────────
+	"confirm":   ["ui_accept"],
+	"cancel":    ["ui_cancel"],
+	"pause":     ["pause"],
+	"prev_tab":  ["ui_page_up"],
+	"next_tab":  ["ui_page_down"],
 }
 
 
@@ -98,28 +100,28 @@ func _is_intent_allowed(intent : String) -> bool:
 ## Lower contexts are not checked — there is no intent passthrough.
 
 enum Context {
-	GAMEPLAY,  ## Default — all intents allowed
-	PAUSE,     ## Navigation and confirm/cancel only
-	DIALOGUE,  ## Confirm only
+	GAMEPLAY,  ## Default — all intents allowed (empty = unrestricted)
+	MENU,      ## Full-screen menus (main menu, options, etc.)
+	PAUSE,     ## In-game pause overlay
+	CUTSCENE,  ## Skip only
 }
 
 ## Which intents are allowed per context. Empty array means allow all.
 const CONTEXT_RULES : Dictionary = {
 	Context.GAMEPLAY : [],
-	Context.PAUSE    : ["confirm", "cancel", "move_up", "move_down"],
-	Context.DIALOGUE : ["confirm"],
+	Context.MENU     : ["confirm", "cancel", "move_up", "move_down", "move_left", "move_right", "prev_tab", "next_tab"],
+	Context.PAUSE    : ["confirm", "cancel", "move_up", "move_down", "move_left", "move_right", "prev_tab", "next_tab"],
+	Context.CUTSCENE : ["cancel"],
 }
 
 
 class ContextHandle:
-	var context  : Context
-	var owner_node    : Node
-	var priority : int
-	
-	func _init(p_context : Context, p_owner : Node, p_priority : int) -> void:
-		context  = p_context
-		owner_node    = p_owner
-		priority = p_priority
+	var context:    Context
+	var owner_node: Node
+
+	func _init(p_context: Context, p_owner: Node) -> void:
+		context    = p_context
+		owner_node = p_owner
 
 
 var _context_stack : Array[ContextHandle] = []
@@ -127,24 +129,23 @@ var _context_stack : Array[ContextHandle] = []
 
 ## Acquires an input context tied to a node's lifetime.
 ## Returns an existing handle if this owner already holds this context.
-func acquire_context(context : Context, owner_node : Node, priority : int = 0) -> ContextHandle:
-	assert(is_instance_valid(owner_node), "InputService : Context owner must be a valid Node.")
-	
-	for existing : ContextHandle in _context_stack:
+func acquire_context(context: Context, owner_node: Node) -> ContextHandle:
+	assert(is_instance_valid(owner_node), "I : Context owner must be a valid Node.")
+
+	for existing: ContextHandle in _context_stack:
 		if existing.owner_node == owner_node and existing.context == context:
 			return existing
-	
-	var handle := ContextHandle.new(context, owner_node, priority)
-	
+
+	var handle := ContextHandle.new(context, owner_node)
 	var inserted := false
-	for i : int in range(_context_stack.size()):
-		if priority > _context_stack[i].priority:
+	for i in range(_context_stack.size()):
+		if context > _context_stack[i].context:
 			_context_stack.insert(i, handle)
 			inserted = true
 			break
 	if not inserted:
 		_context_stack.append(handle)
-	
+
 	return handle
 
 

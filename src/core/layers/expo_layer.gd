@@ -173,7 +173,10 @@ func reset_expo_timer() -> void:
 
 
 func set_booth_active(request_active: bool = true) -> void:
-	is_booth_session_active = request_active and current_event.is_expo_timer_enabled
+	if G.is_expo():
+		is_booth_session_active = request_active and current_event.is_expo_timer_enabled
+	else:
+		is_booth_session_active = false
 
 
 func set_expo_timer_enabled(request_enabled: bool = true) -> void:
