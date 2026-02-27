@@ -1,23 +1,7 @@
+@tool
 extends Node
 
-var build_profile : G.BuildProfile = G.BuildProfile.EXPO
-
-const DEFAULT_DATA : Dictionary = {
-	"meta": {
-		"version": "",
-		"creation_date": "",
-		"last_play_date": "",
-		"time_since_start": 0.0,
-		"time_played": 0.0,
-		"save_date": 0.0,
-		"event_log": [],
-	},
-	"world": {},
-	"player": {
-		"position": Vector2i(0, 0),
-		"level": Vector2i(0, 0),
-	}
-}
+var config: ProjectConfig = preload("res://project_config.tres")
 
 
 func _ready() -> void:
@@ -29,25 +13,14 @@ func _ready() -> void:
 	# Initialize game folders (saves, settings, etc.)
 	init_folders()
 	
-	# Load pre-existing settings file, and apply settings
-	load_settings()
-	
-	# Load custom player bindings if there are any in settings file
-	I.load_bindings()
-	
-	#If settings are loaded, apply them
-	apply_settings()
-	
-	data = DEFAULT_DATA.duplicate(true)
-	
-	# Process should only start when data has been initialized, so that data.meta exists.
+	# Process should only start when save_data has been initialized, so that save_data.meta exists.
 	set_process(true)
 
 
 func _process(delta: float) -> void:
-	data.meta.time_since_start += delta
+	save_data.time_since_start += delta
 	if not get_tree().paused:
-		data.meta.time_played += delta
+		save_data.time_played += delta
 
 
 func reset_variables() -> void:
@@ -75,24 +48,6 @@ enum CoreScene {
 	LOADING, ## Loading scene scene (between Core Scenes)
 	MAIN_MENU, ## Main menu scene (start of the game)
 	GAME, ## Game scene (gameplay scene)
-	
-	CUSTOM_CORE_SCENE_1,
-	CUSTOM_CORE_SCENE_2,
-	CUSTOM_CORE_SCENE_3,
-}
-
-## Path the Core Scenes
-var CoreScenePath : Dictionary = {
-	G.CoreScene.INTRO_CREDITS : "",
-	G.CoreScene.EXPO_INTRO_VIDEO : "",
-	
-	G.CoreScene.LOADING : "uid://5do4yrji1jit",
-	G.CoreScene.MAIN_MENU : "uid://b25u4t1skkerr",
-	G.CoreScene.GAME : "",
-	
-	G.CoreScene.CUSTOM_CORE_SCENE_1 : "",
-	G.CoreScene.CUSTOM_CORE_SCENE_2 : "",
-	G.CoreScene.CUSTOM_CORE_SCENE_3 : "",
 }
 
 ## Current Core Scene
@@ -102,18 +57,18 @@ var core_scene : CoreScene
 
 #region BUILD PROFILE SYSTEM : what is the project state
 enum BuildProfile {
-	DEV,
-	RELEASE,
-	EXPO,
+	DEV, ## For game development, testing, debugging
+	RELEASE, ## For public releases
+	EXPO, ## For game presentation booths at conventions and events
 }
 
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
-	return build_profile == BuildProfile.DEV
+	return config != null and config.build_profile == BuildProfile.DEV
 
 ## Quickly test if game is run for an expo event
 func is_expo() -> bool:
-	return build_profile == BuildProfile.EXPO
+	return config != null and config.build_profile == BuildProfile.EXPO
 #endregion
 
 
@@ -134,7 +89,7 @@ func declare_pause() -> void:
 
 ## Adds/Removes an object requesting pause, and setting pause accordingly
 func request_pause(object : Object = null, requests_pause : bool = true) -> void:
-	if object != null:
+	if is_instance_valid(object):
 		if requests_pause and not request_pause_objects.has(object):
 			request_pause_objects.append(object)
 		elif not requests_pause and request_pause_objects.has(object):
@@ -187,6 +142,7 @@ func get_available_locales() -> PackedStringArray:
 #region SETTINGS SYSTEM : what is the project state
 ## To change project defaults, edit res://config/default_settings.tres in the inspector.
 
+var default_settings : GameSettings = GameSettings.new()
 var settings : GameSettings = GameSettings.new()
 
 signal setting_adjusted(setting : String, value : Variant)
@@ -218,7 +174,7 @@ func adjust_setting(setting : String, value : Variant) -> void:
 	match setting:
 		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
 			if value is float or value is int:
-				var new_audio_volume : float = value
+				var new_audio_volume : float = value # TODO use hint_range of GameSettings
 				
 				AudioServer.set_bus_volume_db(
 					AudioServer.get_bus_index(AUDIO_BUSES[setting]),
@@ -229,7 +185,7 @@ func adjust_setting(setting : String, value : Variant) -> void:
 		
 		"brightness", "contrast", "saturation":
 			if value is float or value is int:
-				var intensity : float = clampf(value, 0., 2.)
+				var intensity : float = clampf(value, 0., 2.) # TODO use hint_range of GameSettings
 				if setting == "brightness":
 					adjust_brightness.emit(intensity)
 				elif setting == "contrast":
@@ -238,6 +194,24 @@ func adjust_setting(setting : String, value : Variant) -> void:
 					adjust_saturation.emit(intensity)
 				
 				save_setting_value(setting, intensity)
+		
+		"screen_resolution":
+			if value is String:
+				if G.settings.RESOLUTIONS.keys().has(value):
+					var screen_resolution : Vector2i = G.settings.RESOLUTIONS[value]
+					# HACK substracting Vector2i(1, 1) so that window does not go fullscreen
+					# automatically if window size is set to the screen max resolution (on
+					# Linux Mint, maybe other OS too).
+					DisplayServer.window_set_size(screen_resolution - Vector2i(1, 1))
+					
+					@warning_ignore("integer_division")
+					var screen_center: Vector2i = DisplayServer.screen_get_position() + DisplayServer.screen_get_size() / 2
+					var window_size: Vector2i = get_window().get_size_with_decorations()
+					@warning_ignore("integer_division")
+					DisplayServer.window_set_position(screen_center - window_size / 2)
+					get_tree().root.call_deferred("propagate_notification", NOTIFICATION_WM_SIZE_CHANGED)
+					
+					save_setting_value(setting, value)
 		
 		"fullscreen":
 			if value is bool:
@@ -248,6 +222,13 @@ func adjust_setting(setting : String, value : Variant) -> void:
 					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 				
 				save_setting_value(setting, is_fullscreen_mode)
+		
+		"ui_scale":
+			if value is float:
+				var scale : float = clampf(value, 0.5, 2.) # TODO use hint_range of GameSettings
+				get_window().call_deferred("set_content_scale_factor", scale)
+				
+				save_setting_value(setting, scale)
 
 
 func save_setting_value(setting : String, value : Variant) -> void:
@@ -268,16 +249,22 @@ func get_setting_text(setting : String) -> String:
 	
 	match setting:
 		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
-			return "%3d" % int(value * 10 + 20) + "%"
+			return "%3d" % int(value * (100. / 80.) + 100.) + "%"
 		
 		"brightness", "contrast", "saturation":
-			return "%3d" % int(value * 10 + 50) + "%"
+			return "%3d" % int(value * 100.) + "%"
+		
+		"screen_resolution":
+			return value
 		
 		"fullscreen":
 			return "Fullscreen" if value else "Windowed"
 		
 		"input_bindings":
 			push_warning("No Text can be rendered for this setting.")
+		
+		"ui_scale":
+			return str(value)
 	
 	return ""
 #endregion
@@ -342,15 +329,21 @@ func is_input_character_valid(character : String) -> bool:
 #endregion
 
 
-#region SAVE SYSTEM : data, saves, settings save, loading, listing files
+#region SAVE SYSTEM : save_data, saves, settings save, loading, listing files
 signal data_is_ready
 
-const ENCRYPT_KEY : String = "&Fr4GMt8T!0n.5%eR52:r&/iPJKl3s?,nnr"
-const FILES_EXTENSION : String = ".data"
-const BIN_DIR : String = "user://bin/"
-const SAVE_DIR : String = "user://saves/"
-var ARCHIVE_SAVE_DIR : String = "user://archive/"
-const SETTINGS_PATH : String = BIN_DIR + "game_settings" + FILES_EXTENSION
+func get_encrypt_key() -> String:
+	return config.SAVE_ENCRYPT_KEY if config else ""
+
+func get_save_dir() -> String:
+	return config.SAVE_DIR if config else "user://saves/"
+
+func get_bin_dir() -> String:
+	return config.BIN_DIR if config else "user://bin/"
+
+func get_files_extension() -> String:
+	return config.FILES_EXTENSION if config else ".data"
+
 const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
 const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
 const TEMP_FILE_SUFFIX : String = ".tmp"
@@ -361,13 +354,13 @@ var SCREENSHOT_DIR : String = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES)
 enum FileMode { ENCRYPTED, PLAIN }
 
 var is_data_ready : bool = false
-var data : Dictionary = {}
+var save_data : SaveData = SaveData.new()
 
 
 func init_folders(additional_folders : PackedStringArray = []) -> void:
 	SCREENSHOT_DIR = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES) + "/" + sanitize_string(ProjectSettings.get_setting("application/config/name")) + "/"
 	
-	var directories_init : Array = [SAVE_DIR, BIN_DIR, SCREENSHOT_DIR, ARCHIVE_SAVE_DIR]
+	var directories_init : Array = [config.SAVE_DIR, config.BIN_DIR, SCREENSHOT_DIR, config.ARCHIVE_SAVE_DIR]
 	directories_init.append_array(additional_folders)
 	
 	for dir_path in directories_init:
@@ -377,20 +370,21 @@ func init_folders(additional_folders : PackedStringArray = []) -> void:
 
 ## Log an event to the event log (avoids duplicates)
 func log_event(event_data : Variant) -> void:
-	if data.is_empty() or not data.has("meta"):
-		push_warning("Cannot log event - data not initialized")
+	if not is_instance_valid(save_data):
+		push_warning("Cannot log event - save_data not initialized")
 		return
 	
-	if event_data not in data.meta.event_log:
-		data.meta.event_log.append(event_data)
+	if event_data not in save_data.event_log:
+		save_data.event_log.append(event_data)
 
 
 ## Load settings from file or create defaults. Returns true if settings existed, false if created new.
 func load_settings() -> bool:
-	if not FileAccess.file_exists(SETTINGS_PATH):
+	var settings_path: String = config.BIN_DIR + "game_settings" + config.FILES_EXTENSION
+	if not FileAccess.file_exists(settings_path):
 		return false
 	
-	var loaded : Array = _read_file(SETTINGS_PATH, FileMode.PLAIN)
+	var loaded : Array = _read_file(settings_path, FileMode.PLAIN)
 	if not loaded.is_empty() and loaded[0] is GameSettings:
 		settings = loaded[0]
 		return true
@@ -400,7 +394,8 @@ func load_settings() -> bool:
 
 ## Save current settings to file
 func save_settings() -> void:
-	_write_file(SETTINGS_PATH, [settings], FileMode.PLAIN)
+	var settings_path: String = config.BIN_DIR + "game_settings" + config.FILES_EXTENSION
+	_write_file(settings_path, [settings], FileMode.PLAIN)
 
 
 ## Create a new save file with given world name. Returns full file path, or empty string on failure.
@@ -408,27 +403,27 @@ func save_settings() -> void:
 func create_save_file(save_name : String) -> String:
 	is_data_ready = false
 	
-	data = DEFAULT_DATA.duplicate(true)
+	save_data = SaveData.new()
 	
-	var now : String = Time.get_datetime_string_from_system()
-	data.meta.version = ProjectSettings.get_setting("application/config/version")
-	data.meta.save_date = Time.get_unix_time_from_system()
-	data.meta.creation_date = now
-	data.meta.last_play_date = now
+	#var now : String = Time.get_datetime_string_from_system()
+	#save_data.meta.version = ProjectSettings.get_setting("application/config/version")
+	#save_data.meta.save_date = Time.get_unix_time_from_system()
+	#save_data.meta.creation_date = now
+	#save_data.meta.last_play_date = now
 	
 	# Find unique filename if collision occurs
 	var safe_name : String = sanitize_string(save_name)
-	var file_name : String = safe_name + FILES_EXTENSION
-	var file_path : String = SAVE_DIR + file_name
+	var file_name : String = safe_name + config.FILES_EXTENSION
+	var file_path : String = config.SAVE_DIR + file_name
 	var counter : int = 1
 	
 	while FileAccess.file_exists(file_path):
 		push_warning("Save file already exists, auto-incrementing: " + file_path)
-		file_name = safe_name + "_" + str(counter) + FILES_EXTENSION
-		file_path = SAVE_DIR + file_name
+		file_name = safe_name + "_" + str(counter) + config.FILES_EXTENSION
+		file_path = config.SAVE_DIR + file_name
 		counter += 1
 	
-	if not _write_file(file_path, [data, DEFAULT_SAVE_TEXTURE], FileMode.ENCRYPTED):
+	if not _write_file(file_path, [save_data, DEFAULT_SAVE_TEXTURE], FileMode.ENCRYPTED):
 		push_error("Failed to create save file")
 		return ""
 	
@@ -438,18 +433,18 @@ func create_save_file(save_name : String) -> String:
 	return file_path
 
 
-## Save current game data with screenshot (async - must await)
+## Save current game save_data with screenshot (async - must await)
 ## Uses temporary file for transaction safety to prevent corruption on crash.
 ## Returns true on success, false on failure.
-func save_data(file_path : String) -> bool:
-	data.meta.version = ProjectSettings.get_setting("application/config/version")
-	data.meta.last_play_date = Time.get_datetime_string_from_system()
+func _save_data(file_path : String) -> bool:
+	save_data.version = ProjectSettings.get_setting("application/config/version")
+	save_data.last_play_date = Time.get_datetime_string_from_system()
 	
 	var save_img : Image = await _capture_screenshot()
 	
 	# Write to temporary file first to prevent corruption if crash occurs during save
 	var temp_path : String = file_path + TEMP_FILE_SUFFIX
-	if not _write_file(temp_path, [data, save_img], FileMode.ENCRYPTED):
+	if not _write_file(temp_path, [save_data, save_img], FileMode.ENCRYPTED):
 		push_error("Failed to write temp save file")
 		delete_file(temp_path)  # Clean up failed temp file
 		return false
@@ -464,15 +459,15 @@ func save_data(file_path : String) -> bool:
 	return true
 
 
-## Load data from a save file, optionally without setting it as current
-func load_data(file_path : String, set_as_current : bool = true) -> Array:
+## Load save_data from a save file, optionally without setting it as current
+func _load_data(file_path : String, set_as_current : bool = true) -> Array:
 	var file_data : Array = _read_file(file_path, FileMode.ENCRYPTED)
 	
 	if file_data.is_empty():
 		#push_error("Failed to load save file: " + file_path)
-		var fallback := [DEFAULT_DATA.duplicate(true), DEFAULT_SAVE_TEXTURE]
+		var fallback := [SaveData.new(), DEFAULT_SAVE_TEXTURE]
 		if set_as_current:
-			data = fallback[0]
+			save_data = fallback[0]
 			is_data_ready = true
 			data_is_ready.emit()
 		return fallback
@@ -480,10 +475,10 @@ func load_data(file_path : String, set_as_current : bool = true) -> Array:
 	if file_data.size() < 2:
 		file_data.append(DEFAULT_SAVE_TEXTURE)
 	
-	file_data[0] = update_dict(file_data[0], DEFAULT_DATA)
+	file_data[0] = update_save_data(file_data[0])
 	
 	if set_as_current:
-		data = file_data[0]
+		save_data = file_data[0]
 		is_data_ready = true
 		data_is_ready.emit()
 	
@@ -493,15 +488,15 @@ func load_data(file_path : String, set_as_current : bool = true) -> Array:
 ## List all save files in the save directory (returns full paths)
 func list_save_files() -> Array:
 	var files : Array = []
-	var dir : DirAccess = DirAccess.open(SAVE_DIR)
+	var dir : DirAccess = DirAccess.open(config.SAVE_DIR)
 	
 	if not dir:
 		push_error("Failed to access save directory")
 		return []
 	
 	for file_name in dir.get_files():
-		if file_name.ends_with(FILES_EXTENSION):
-			files.append(SAVE_DIR + file_name)
+		if file_name.ends_with(config.FILES_EXTENSION):
+			files.append(config.SAVE_DIR + file_name)
 	
 	return files
 
@@ -509,13 +504,13 @@ func list_save_files() -> Array:
 
 ## Move all save files to archive directory. Returns number of files successfully moved.
 func move_files_to_archive() -> int:
-	init_folders([ARCHIVE_SAVE_DIR])
+	init_folders([config.ARCHIVE_SAVE_DIR])
 	
 	var moved_count : int = 0
 	
 	for file_path in list_save_files():
 		var file_name : String = file_path.get_file()
-		var destination : String = ARCHIVE_SAVE_DIR + file_name
+		var destination : String = config.ARCHIVE_SAVE_DIR + file_name
 		
 		var copy_error : Error = DirAccess.copy_absolute(file_path, destination)
 		if copy_error != OK:
@@ -547,14 +542,15 @@ func delete_file(file_path : String) -> bool:
 	return true
 
 
-## Update dictionary with missing keys from default (recursive, preserves existing values)
-func update_dict(target : Dictionary, defaults : Dictionary) -> Dictionary:
-	for key in defaults:
-		if key not in target:
-			target[key] = defaults[key].duplicate(true) if defaults[key] is Dictionary else defaults[key]
-		elif target[key] is Dictionary and defaults[key] is Dictionary:
-			update_dict(target[key], defaults[key])
-	return target
+## Update SaveData Resource with missing variables from default
+func update_save_data(loaded : SaveData) -> SaveData:
+	var defaults := SaveData.new()
+	for p in defaults.get_property_list():
+		if not p.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+			continue
+		if loaded.get(p.name) == null:
+			loaded.set(p.name, defaults.get(p.name))
+	return loaded
 
 
 ## Read a file and return its contents as an array
@@ -562,7 +558,7 @@ func _read_file(file_path : String, mode : FileMode = FileMode.ENCRYPTED) -> Arr
 	var file : FileAccess
 	
 	if mode == FileMode.ENCRYPTED:
-		file = FileAccess.open_encrypted_with_pass(file_path, FileAccess.READ, ENCRYPT_KEY)
+		file = FileAccess.open_encrypted_with_pass(file_path, FileAccess.READ, config.SAVE_ENCRYPT_KEY)
 	else:
 		file = FileAccess.open(file_path, FileAccess.READ)
 	
@@ -577,12 +573,12 @@ func _read_file(file_path : String, mode : FileMode = FileMode.ENCRYPTED) -> Arr
 	return contents
 
 
-## Write data to a file. Returns true on success.
+## Write save_data to a file. Returns true on success.
 func _write_file(file_path : String, data_array : Array, mode : FileMode = FileMode.ENCRYPTED) -> bool:
 	var file : FileAccess
 	
 	if mode == FileMode.ENCRYPTED:
-		file = FileAccess.open_encrypted_with_pass(file_path, FileAccess.WRITE, ENCRYPT_KEY)
+		file = FileAccess.open_encrypted_with_pass(file_path, FileAccess.WRITE, config.SAVE_ENCRYPT_KEY)
 	else:
 		file = FileAccess.open(file_path, FileAccess.WRITE)
 	

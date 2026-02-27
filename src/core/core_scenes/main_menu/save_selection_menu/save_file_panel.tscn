@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://dotpmhbkow5vm"]
+
+[ext_resource type="Script" uid="uid://b1bw41qnjeauv" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_panel.gd" id="1_3le2h"]
+[ext_resource type="Script" uid="uid://bc6oexgxco7u0" path="res://src/classes/base_classes/save_data.gd" id="2_5pxjs"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrawn"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.2123048, 0.21230483, 0.21230477, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_size = 10
+
+[sub_resource type="Resource" id="Resource_5pxjs"]
+script = ExtResource("2_5pxjs")
+game_version = "0.0.0"
+creation_date = "2026-02-27T11:19:04"
+date_saved = "2026-02-27T11:19:04"
+metadata/_custom_type_script = "uid://bc6oexgxco7u0"
+
+[node name="SaveFilePanel" type="PanelContainer" unique_id=730897214]
+theme_override_styles/panel = SubResource("StyleBoxFlat_lrawn")
+script = ExtResource("1_3le2h")
+save_data = SubResource("Resource_5pxjs")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=929316291]
+layout_mode = 2
+
+[node name="ContinueBtn" type="Button" parent="HBoxContainer" unique_id=306300792]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SAVE_FILE_CONTINUE_BUTTON"
+
+[node name="CreateSaveBtn" type="Button" parent="HBoxContainer" unique_id=918050211]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SAVE_FILE_CREATE_BUTTON"
+
+[node name="SaveNameValue" type="Label" parent="HBoxContainer" unique_id=12344892]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"HeaderMedium"
+text = "test title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SaveInfo" type="GridContainer" parent="HBoxContainer" unique_id=1718743116]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 3
+
+[node name="DateSavedLabel" type="Label" parent="HBoxContainer/SaveInfo" unique_id=9533902]
+layout_mode = 2
+text = "SAVE_FILE_DATE_SAVED_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1496327423]
+layout_mode = 2
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DateSavedValue" type="Label" parent="HBoxContainer/SaveInfo" unique_id=782432487]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="TimePlayedLabel" type="Label" parent="HBoxContainer/SaveInfo" unique_id=2043108183]
+layout_mode = 2
+text = "SAVE_FILE_TIME_PLAYED_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation2" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1683633836]
+layout_mode = 2
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimePlayedValue" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1598411579]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="SaveTypeLabel" type="Label" parent="HBoxContainer/SaveInfo" unique_id=211808405]
+layout_mode = 2
+text = "SAVE_FILE_SAVE_TYPE_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation3" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1791047931]
+layout_mode = 2
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SaveTypeValue" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1812413767]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="GameVersionLabel" type="Label" parent="HBoxContainer/SaveInfo" unique_id=1444877173]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "SAVE_FILE_GAME_VERSION_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation4" type="Label" parent="HBoxContainer/SaveInfo" unique_id=897575627]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameVersionValue" type="Label" parent="HBoxContainer/SaveInfo" unique_id=2057013638]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+vertical_alignment = 1
+
+[node name="DeleteBtn" type="Button" parent="HBoxContainer" unique_id=1539529945]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 8
+text = "SAVE_FILE_DELETE_BUTTON"
+
+[connection signal="pressed" from="HBoxContainer/CreateSaveBtn" to="." method="_on_create_save_btn_pressed"]
+[connection signal="pressed" from="HBoxContainer/DeleteBtn" to="." method="_on_delete_btn_pressed"]

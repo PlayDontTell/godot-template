@@ -124,22 +124,22 @@ func test_update_dict_preserves_all_existing():
 
 func test_update_dict_recursive_nested():
 	var target = {"nested": {"existing": "value"}}
-	var defaults = {"nested": {"existing": "default", "new": "data"}}
+	var defaults = {"nested": {"existing": "default", "new": "save_data"}}
 	
 	var result = g_instance.update_dict(target, defaults)
 	
 	assert_eq(result.nested.existing, "value", "Should preserve nested existing value")
-	assert_eq(result.nested.new, "data", "Should add nested new value")
+	assert_eq(result.nested.new, "save_data", "Should add nested new value")
 
 
 func test_update_dict_deep_recursion():
 	var target = {"level1": {"level2": {"existing": "value"}}}
-	var defaults = {"level1": {"level2": {"existing": "default", "new": "data"}, "new2": "data2"}}
+	var defaults = {"level1": {"level2": {"existing": "default", "new": "save_data"}, "new2": "data2"}}
 	
 	var result = g_instance.update_dict(target, defaults)
 	
 	assert_eq(result.level1.level2.existing, "value", "Should preserve deep nested value")
-	assert_eq(result.level1.level2.new, "data", "Should add deep nested value")
+	assert_eq(result.level1.level2.new, "save_data", "Should add deep nested value")
 	assert_eq(result.level1.new2, "data2", "Should add intermediate nested value")
 
 
@@ -176,13 +176,13 @@ func test_update_dict_mixed_types():
 
 
 func test_update_dict_nested_dict_vs_non_dict():
-	var target = {"data": "string_value"}
-	var defaults = {"data": {"nested": "value"}}
+	var target = {"save_data": "string_value"}
+	var defaults = {"save_data": {"nested": "value"}}
 	
 	var result = g_instance.update_dict(target, defaults)
 	
 	# Non-dict in target stays as-is, doesn't get replaced by dict from defaults
-	assert_eq(result["data"], "string_value", "Should keep non-dict value")
+	assert_eq(result["save_data"], "string_value", "Should keep non-dict value")
 
 #endregion
 

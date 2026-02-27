@@ -8,24 +8,26 @@ extends Node
 ## and add them here. Two players on one keyboard is the practical limit.
 
 const INTENTS : Dictionary = {
-	# Movement — player 1
+	# ── Movement — player 1 ───────────────────────────────────────────────────
 	"move_up":    ["move_up",    "ui_up"],
 	"move_down":  ["move_down",  "ui_down"],
 	"move_left":  ["move_left",  "ui_left"],
 	"move_right": ["move_right", "ui_right"],
-	
-	# Movement — player 2 (keyboard split, define in Input Map)
-	
-	# Actions
-	"confirm": ["ui_accept"],
-	"cancel":  ["ui_cancel"],
-	"pause":   ["pause"],
+
+	# ── Movement — player 2 (keyboard split, define in Input Map) ─────────────
+
+	# ── Actions ───────────────────────────────────────────────────────────────
+	"confirm":   ["ui_accept"],
+	"cancel":    ["ui_cancel"],
+	"pause":     ["pause"],
+	"prev_tab":  ["ui_page_up"],
+	"next_tab":  ["ui_page_down"],
 }
 
 
 ## Returns true if the intent was just pressed this frame.
-## Pass device_id for gamepad players (from ID.gamepad_connected signal).
-## Keyboard players use default (-1). Touch: use InputDetector directly.
+## Pass device_id for gamepad players (from D.gamepad_connected signal).
+## Keyboard players use default (-1). Touch: use D directly.
 func just_pressed(intent : String, device_id : int = -1) -> bool:
 	return _check_intent(intent, device_id, Input.is_action_just_pressed)
 
@@ -35,25 +37,38 @@ func pressed(intent : String, device_id : int = -1) -> bool:
 	return _check_intent(intent, device_id, Input.is_action_pressed)
 
 
-## Returns true if the intent is currently held.
+## Returns true if the intent was just released this frame.
 func just_released(intent : String, device_id : int = -1) -> bool:
 	return _check_intent(intent, device_id, Input.is_action_just_released)
+
+
+## Returns true if this specific input event triggers the intent.
+## Use this in _input(event) handlers — genuinely event-driven, unlike just_pressed().
+## Respects context filtering and rebinding.
+func is_action_pressed_in_event(event: InputEvent, intent: String) -> bool:
+	assert(INTENTS.has(intent), "I : Unknown intent '%s'" % intent)
+	if not _is_intent_allowed(intent):
+		return false
+	for action: String in INTENTS[intent]:
+		if event.is_action_pressed(action):
+			return true
+	return false
 
 
 ## Returns a normalized movement vector, filtered by the active context.
 ## Uses "move_up" as a proxy — if movement intents are blocked, returns ZERO.
 ## Pass device_id for gamepad — reads left stick directly.
-## For touch, handle movement in InputDetector and pass the vector to your node.
+## For touch, handle movement in D and pass the vector to your node.
 func get_move_vector(device_id : int = -1) -> Vector2:
 	if not _is_intent_allowed("move_up"):
 		return Vector2.ZERO
-	
+
 	if device_id >= 0:
 		return Vector2(
 			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X),
 			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 		).normalized()
-	
+
 	return Vector2(
 		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
 		Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
@@ -61,27 +76,28 @@ func get_move_vector(device_id : int = -1) -> Vector2:
 
 
 func _check_intent(intent : String, device_id : int, check_func : Callable) -> bool:
-	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
-	
+	assert(INTENTS.has(intent), "I : Unknown intent '%s'" % intent)
+
 	if not _is_intent_allowed(intent):
 		return false
-	
+
 	for action : String in INTENTS[intent]:
 		if device_id >= 0:
-			for event : InputEvent in InputMap.action_get_events(action):
-				if (event is InputEventJoypadButton or event is InputEventJoypadMotion) \
-				and event.device == device_id \
-				and check_func.call(action):
-					return true
+			# Godot 4's Input.is_action_* has no device_id parameter.
+			# For reliable per-device intent detection, use _input(event) +
+			# is_action_pressed_in_event(), filtering on event.device yourself.
+			# This path is best-effort: it checks if the action is active at all,
+			# trusting that only one gamepad fires the same action simultaneously.
+			if check_func.call(action):
+				return true
 		else:
 			if check_func.call(action):
 				return true
-	
+
 	return false
 
 
 func _is_intent_allowed(intent : String) -> bool:
-	# TODO : restrict to relevant CoreScenes once gameplay scenes are defined.
 	var active := _get_active_context()
 	if active == null:
 		return true
@@ -94,72 +110,119 @@ func _is_intent_allowed(intent : String) -> bool:
 #region CONTEXTS : modal input filtering
 ## A context is acquired by a node to restrict which intents are active.
 ## Automatically cleaned up when the owner node is freed.
-## Priority determines which context wins — only the highest is consulted.
-## Lower contexts are not checked — there is no intent passthrough.
+## Priority is derived from the Context enum order — higher value wins.
+## Only the highest active context is consulted; there is no intent passthrough.
 
 enum Context {
-	GAMEPLAY,  ## Default — all intents allowed
-	PAUSE,     ## Navigation and confirm/cancel only
-	DIALOGUE,  ## Confirm only
+	GAMEPLAY,  ## Default — all intents allowed (empty = unrestricted)
+	MENU,      ## Full-screen menus (main menu, options, etc.)
+	PAUSE,     ## In-game pause overlay
+	DIALOGUE,  ## Confirm and cancel only
+	CUTSCENE,  ## Skip only
+	BASE_DIALOG,
+	EXIT_DIALOG,
 }
 
 ## Which intents are allowed per context. Empty array means allow all.
 const CONTEXT_RULES : Dictionary = {
-	Context.GAMEPLAY : [],
-	Context.PAUSE    : ["confirm", "cancel", "move_up", "move_down"],
-	Context.DIALOGUE : ["confirm"],
+	Context.GAMEPLAY: [
+		
+	],
+	Context.MENU: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
+	],
+	Context.PAUSE: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
+	],
+	Context.DIALOGUE: [
+		"confirm",
+		"cancel",
+	],
+	Context.CUTSCENE: [
+		"cancel",
+	],
+	Context.BASE_DIALOG: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
+	],
+	Context.EXIT_DIALOG: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
+	],
 }
 
 
 class ContextHandle:
-	var context  : Context
-	var owner_node    : Node
-	var priority : int
-	
-	func _init(p_context : Context, p_owner : Node, p_priority : int) -> void:
-		context  = p_context
-		owner_node    = p_owner
-		priority = p_priority
+	var owner_node : Node
+	var context    : int  # stored as int to avoid inner-class enum resolution issues
+
+	func _init(p_owner: Node, p_context: int) -> void:
+		owner_node = p_owner
+		context    = p_context
 
 
 var _context_stack : Array[ContextHandle] = []
 
 
 ## Acquires an input context tied to a node's lifetime.
-## Returns an existing handle if this owner already holds this context.
-func acquire_context(context : Context, owner_node : Node, priority : int = 0) -> ContextHandle:
-	assert(is_instance_valid(owner_node), "InputService : Context owner must be a valid Node.")
-	
-	for existing : ContextHandle in _context_stack:
+## Returns early if this owner already holds this context.
+## Priority is implicit: higher Context enum value always wins.
+func acquire_context(owner_node: Node, context: Context) -> void:
+	assert(is_instance_valid(owner_node), "I : Context owner must be a valid Node.")
+
+	for existing: ContextHandle in _context_stack:
 		if existing.owner_node == owner_node and existing.context == context:
-			return existing
-	
-	var handle := ContextHandle.new(context, owner_node, priority)
-	
+			return
+
+	var handle := ContextHandle.new(owner_node, context)
 	var inserted := false
-	for i : int in range(_context_stack.size()):
-		if priority > _context_stack[i].priority:
+	for i in range(_context_stack.size()):
+		if context > _context_stack[i].context:
 			_context_stack.insert(i, handle)
 			inserted = true
 			break
 	if not inserted:
 		_context_stack.append(handle)
-	
-	return handle
 
 
-## Manually releases a context.
-## Optional — the owner being freed cleans it up automatically on the next query.
-func release_context(handle : ContextHandle) -> void:
-	if handle == null:
-		return
-	_context_stack.erase(handle)
+## Manually releases a context. Optional — freed nodes are cleaned up automatically.
+func release_context(owner_node: Node, context: Context) -> void:
+	for i in range(_context_stack.size() - 1, -1, -1):
+		if _context_stack[i].owner_node == owner_node and _context_stack[i].context == context:
+			_context_stack.remove_at(i)
+			return
 
 
 func _get_active_context() -> ContextHandle:
-	for i : int in range(_context_stack.size() - 1, -1, -1):
-		if not is_instance_valid(_context_stack[i].owner_node):
-			_context_stack.remove_at(i)
+	_context_stack = _context_stack.filter(
+		func(h: ContextHandle) -> bool: return is_instance_valid(h.owner_node)
+	)
 	return _context_stack[0] if not _context_stack.is_empty() else null
 
 #endregion
@@ -188,7 +251,7 @@ func _get_active_context() -> ContextHandle:
 ## Rebinds an intent's primary action to a new input event and saves to G.settings.
 ## Only replaces the first action — secondary fallbacks (ui_up etc.) are preserved.
 func rebind(intent : String, new_event : InputEvent) -> void:
-	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
+	assert(INTENTS.has(intent), "I : Unknown intent '%s'" % intent)
 	var action : String = INTENTS[intent][0]
 	InputMap.action_erase_events(action)
 	InputMap.action_add_event(action, new_event)
@@ -197,7 +260,7 @@ func rebind(intent : String, new_event : InputEvent) -> void:
 
 ## Returns the current primary InputEvent bound to an intent, or null if unbound.
 func get_binding(intent : String) -> InputEvent:
-	assert(INTENTS.has(intent), "InputService : Unknown intent '%s'" % intent)
+	assert(INTENTS.has(intent), "I : Unknown intent '%s'" % intent)
 	var events := InputMap.action_get_events(INTENTS[intent][0])
 	return events[0] if not events.is_empty() else null
 

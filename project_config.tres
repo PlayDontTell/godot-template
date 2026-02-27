@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ProjectConfig" format=3 uid="uid://c16vb00e8ki3j"]
+
+[ext_resource type="Script" uid="uid://b0l3ym7olemuc" path="res://src/classes/base_classes/project_config.gd" id="1_0gjgq"]
+[ext_resource type="Script" uid="uid://dlpxr43lgmnkl" path="res://src/classes/base_classes/core_scene_entry.gd" id="1_2kkxf"]
+[ext_resource type="PackedScene" uid="uid://b25u4t1skkerr" path="res://src/core/core_scenes/main_menu/main_menu.tscn" id="2_8l1bw"]
+[ext_resource type="PackedScene" uid="uid://5do4yrji1jit" path="res://src/core/core_scenes/loading/loading_screen.tscn" id="3_q2ua5"]
+
+[sub_resource type="Resource" id="Resource_ghgqd"]
+script = ExtResource("1_2kkxf")
+scene = ExtResource("2_8l1bw")
+metadata/_custom_type_script = "uid://dlpxr43lgmnkl"
+
+[sub_resource type="Resource" id="Resource_kt44v"]
+script = ExtResource("1_2kkxf")
+id = 2
+scene = ExtResource("3_q2ua5")
+metadata/_custom_type_script = "uid://dlpxr43lgmnkl"
+
+[resource]
+script = ExtResource("1_0gjgq")
+core_scenes = Array[ExtResource("1_2kkxf")]([SubResource("Resource_ghgqd"), SubResource("Resource_kt44v")])
+metadata/_custom_type_script = "uid://b0l3ym7olemuc"

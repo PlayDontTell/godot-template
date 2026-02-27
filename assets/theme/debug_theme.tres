@@ -2,6 +2,23 @@
 
 [ext_resource type="FontFile" uid="uid://b3b6516hmkrxd" path="res://assets/theme/fonts/inconsolata/Inconsolata-Bold.ttf" id="1_fivoe"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fivoe"]
+bg_color = Color(0.53, 0.53, 0.53, 0.16470589)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 0.5137255)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 1
+expand_margin_top = 1.0
+shadow_color = Color(0.48, 0.48, 0.48, 0.078431375)
+shadow_size = 1
+anti_aliasing = false
+
 [resource]
 default_font = ExtResource("1_fivoe")
 default_font_size = 13
@@ -10,3 +27,4 @@ Label/constants/outline_size = 2
 Label/constants/shadow_offset_x = 0
 Label/constants/shadow_offset_y = 0
 Label/constants/shadow_outline_size = 4
+Panel/styles/panel = SubResource("StyleBoxFlat_fivoe")
