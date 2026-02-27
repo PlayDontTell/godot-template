@@ -2,6 +2,7 @@
 ## Configuration resource for a single expo event.
 ## Create one .tres file per event — duplicate default_settings.tres as a starting point.
 ## Leave settings null to use project defaults (G.default_settings).
+@icon("res://assets/art/ui/temp/board-game-icons/PNG/Double (128px)/campfire.png")
 class_name ExpoEventConfig
 extends Resource
 
@@ -53,7 +54,8 @@ extends Resource
 @export_group("Game Settings", "")
 ## Leave null to use G.default_settings unchanged.
 ## Assign a GameSettings .tres to override any values for this event.
-@export var game_settings: GameSettings = null
+@export var game_settings: GameSettings = GameSettings.new()
+@export var save_data: SaveData = SaveData.new()
 
 @export_group("", "")
 

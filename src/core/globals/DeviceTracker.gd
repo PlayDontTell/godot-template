@@ -5,7 +5,8 @@ const ACTIVE_WINDOW : float = 0.1
 
 enum InputMethod {
 	NONE,
-	KEYBOARD_AND_MOUSE,     # Keyboard & mouse (and touch, unless split out)
+	MOUSE,
+	KEYBOARD,
 	GAMEPAD,
 	TOUCH,
 }
@@ -41,14 +42,14 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		_last_keyboard_time = Time.get_unix_time_from_system()
 		used_keyboard = true
-		_set_method_if_changed(InputMethod.KEYBOARD_AND_MOUSE)
+		_set_method_if_changed(InputMethod.KEYBOARD)
 		return
 
 	# MOUSE (counts as KEYBOARD here)
 	if event is InputEventMouseButton or event is InputEventMouseMotion:
 		_last_keyboard_time = Time.get_unix_time_from_system()
 		used_keyboard = true
-		_set_method_if_changed(InputMethod.KEYBOARD_AND_MOUSE)
+		_set_method_if_changed(InputMethod.MOUSE)
 		return
 
 	# TOUCH (also counted as KEYBOARD unless you split it out)
@@ -105,7 +106,10 @@ func show_cursor(event_input_method : InputMethod):
 		InputMethod.NONE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
-		InputMethod.KEYBOARD_AND_MOUSE:
+		InputMethod.MOUSE:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+		InputMethod.KEYBOARD:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
 		InputMethod.GAMEPAD:

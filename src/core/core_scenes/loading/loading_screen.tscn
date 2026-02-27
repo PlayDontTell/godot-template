@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://5do4yrji1jit"]
 
-[ext_resource type="Script" uid="uid://dufbv7hf17q4d" path="res://src/core/core_scenes/loading_screen.gd" id="1_7d6ao"]
+[ext_resource type="Script" uid="uid://dufbv7hf17q4d" path="res://src/core/core_scenes/loading/loading_screen.gd" id="1_7d6ao"]
 
 [node name="LoadingScreen" type="Control" unique_id=1568145222]
 layout_mode = 3

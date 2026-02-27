@@ -119,6 +119,8 @@ enum Context {
 	PAUSE,     ## In-game pause overlay
 	DIALOGUE,  ## Confirm and cancel only
 	CUTSCENE,  ## Skip only
+	BASE_DIALOG,
+	EXIT_DIALOG,
 }
 
 ## Which intents are allowed per context. Empty array means allow all.
@@ -152,6 +154,26 @@ const CONTEXT_RULES : Dictionary = {
 	],
 	Context.CUTSCENE: [
 		"cancel",
+	],
+	Context.BASE_DIALOG: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
+	],
+	Context.EXIT_DIALOG: [
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
 	],
 }
 

@@ -1,0 +1,221 @@
+[gd_scene format=3 uid="uid://u5o8o134h8nt"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/theme/default_game_theme.tres" id="1_udi7s"]
+[ext_resource type="Script" uid="uid://m8tx7gh2ba0i" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.gd" id="2_nfavj"]
+[ext_resource type="PackedScene" uid="uid://ddpsqwc7hq0fx" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.tscn" id="3_ij1rj"]
+[ext_resource type="PackedScene" uid="uid://bui28rnd2v567" path="res://src/core/core_scenes/main_menu/settings_menu/setting_option_button.tscn" id="4_nayg6"]
+[ext_resource type="PackedScene" uid="uid://budao5y6u8bsd" path="res://src/core/core_scenes/main_menu/settings_menu/setting_toggle.tscn" id="4_u4k1i"]
+
+[node name="SettingsScreen" type="Control" unique_id=1106432147 node_paths=PackedStringArray("default_focus")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme = ExtResource("1_udi7s")
+script = ExtResource("2_nfavj")
+default_focus = NodePath("MarginContainer/VBoxContainer/BackBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1859053213]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1102515148]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SettingsTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=468993022]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "SETTINGS_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer" unique_id=734884192]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+tab_alignment = 1
+current_tab = 0
+clip_tabs = false
+tab_0/title = "SETTINGS_VIDEO_TAB"
+tab_1/title = "SETTINGS_AUDIO_TAB"
+tab_2/title = "SETTINGS_GAMEPLAY_TAB"
+tab_3/title = "SETTINGS_KEYBOARD_CONTROLS_TAB"
+tab_4/title = "SETTINGS_GAMEPAD_CONTROLS_TAB"
+
+[node name="VideoPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1712374163]
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+metadata/_tab_name = "SETTINGS_VIDEO_TAB"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel" unique_id=1732144927]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="VideoTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1081745378]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "SETTINGS_VIDEO_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=507150737]
+layout_mode = 2
+
+[node name="FullscreenToggle" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1223217776 instance=ExtResource("4_u4k1i")]
+layout_mode = 2
+setting_name = "fullscreen"
+label_text = "SETTINGS_FULLSCREEN_LABEL"
+
+[node name="ScreenResolutionOptionButton" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1664044786 instance=ExtResource("4_nayg6")]
+layout_mode = 2
+setting_name = "screen_resolution"
+label_text = "SETTINGS_SCREEN_RESOLUTION_LABEL"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1985525787]
+layout_mode = 2
+
+[node name="ContrastSlider" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1873842072 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "contrast"
+label_text = "SETTINGS_CONTRAST_LABEL"
+
+[node name="BrightnessSlider" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1092515923 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "brightness"
+label_text = "SETTINGS_BRIGHTNESS_LABEL"
+
+[node name="SaturationSlider" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1902147723 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "saturation"
+label_text = "SETTINGS_SATURATION_LABEL"
+
+[node name="AudioPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1160286676]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+metadata/_tab_name = "SETTINGS_AUDIO_TAB"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel" unique_id=1660019677]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="AudioTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=456325643]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "SETTINGS_AUDIO_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=1081974650]
+layout_mode = 2
+
+[node name="MusicVolumeSlider" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=271336110 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "music_volume"
+label_text = "SETTINGS_MUSIC_VOLUME_LABEL"
+
+[node name="SFXVolumeSlider2" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=1675937554 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "sfx_volume"
+label_text = "SETTINGS_SFX_VOLUME_LABEL"
+
+[node name="UIVolumeSlider3" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=951166705 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "ui_volume"
+label_text = "SETTINGS_UI_VOLUME_LABEL"
+
+[node name="AmbientVolumeSlider" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=357306709 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "ambient_volume"
+label_text = "SETTINGS_AMBIENT_VOLUME_LABEL"
+
+[node name="GameplayPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=830660294]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 2
+metadata/_tab_name = "SETTINGS_GAMEPLAY_TAB"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/GameplayPanel" unique_id=828052426]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="GameplayTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/GameplayPanel/VBoxContainer" unique_id=417192431]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "SETTINGS_GAMEPLAY_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/GameplayPanel/VBoxContainer" unique_id=734183568]
+layout_mode = 2
+
+[node name="UIScaleSlider" parent="MarginContainer/VBoxContainer/TabContainer/GameplayPanel/VBoxContainer" unique_id=934137071 instance=ExtResource("3_ij1rj")]
+layout_mode = 2
+setting_name = "ui_scale"
+label_text = "SETTINGS_UI_SCALE_LABEL"
+
+[node name="KeyboardControlsPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=2081868848]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 3
+metadata/_tab_name = "SETTINGS_KEYBOARD_CONTROLS_TAB"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel" unique_id=2032776957]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="ControlsTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer" unique_id=74294722]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "SETTINGS_KEYBOARD_CONTROLS_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GamepadControlsPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1749038602]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 4
+metadata/_tab_name = "SETTINGS_GAMEPAD_CONTROLS_TAB"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/GamepadControlsPanel" unique_id=150951095]
+layout_mode = 2
+size_flags_horizontal = 6
+alignment = 1
+
+[node name="ControlsTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/GamepadControlsPanel/VBoxContainer" unique_id=1994287268]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "SETTINGS_GAMEPAD_CONTROLS_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1344084415]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MAIN_MENU_BACK"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]

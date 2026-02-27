@@ -3,14 +3,7 @@ extends WorldEnvironment
 @onready var debug_layer: CanvasLayer = %DebugLayer
 @onready var expo_layer: CanvasLayer = %ExpoLayer
 
-
-@export var auto_start_game : bool = true
-
-@export_group("Start Scenes", "")
-@export var DEV_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
-@export var RELEASE_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
-@export var EXPO_build_profile : G.CoreScene = G.CoreScene.MAIN_MENU
-@export_group("", "")
+@export var config : ProjectConfig = preload("res://project_config.tres")
 
 var target_scene_path: String = ""
 var loading_progress: Array = [0.0]
@@ -26,6 +19,16 @@ func _notification(what: int) -> void:
 
 func _ready() -> void:
 	init_game_manager()
+	
+	 #Load pre-existing settings file, and apply settings
+	G.load_settings()
+	
+	 #Load custom player bindings if there are any in settings file
+	I.load_bindings()
+	
+	#If settings are loaded, apply them
+	G.apply_settings()
+	
 	restart_game()
 
 
@@ -43,47 +46,33 @@ func init_game_manager() -> void:
 	# Autoquit the game when asked to.
 	get_tree().auto_accept_quit = false
 	
-	var connected_signals : Dictionary = {
-		# Any scene can call G.request_core_scene to change among the G.CoreScene
-		G.request_core_scene: self.request_core_scene,
-		
-		# Needed to set environment adjustments
-		G.adjust_brightness: self.environment.set_adjustment_brightness,
-		G.adjust_contrast: self.environment.set_adjustment_contrast,
-		G.adjust_saturation: self.environment.set_adjustment_saturation,
-		
-		# Requests to restart the game
-		G.request_game_restart: self.restart_game,
-	}
+	# Any scene can call G.request_core_scene to change among the G.CoreScene
+	G.request_core_scene.connect(request_core_scene)
 	
-	for connection in connected_signals.keys():
-		if not connection.is_connected(connected_signals[connection]):
-			connection.connect(connected_signals[connection])
+	# Needed to set environment adjustments
+	G.adjust_brightness.connect(self.environment.set_adjustment_brightness)
+	G.adjust_contrast.connect(self.environment.set_adjustment_contrast)
+	G.adjust_saturation.connect(self.environment.set_adjustment_saturation)
+	
+	# Requests to restart the game
+	G.request_game_restart.connect(restart_game)
 
 
 func restart_game() -> void:
-	# Reset all config variables
-	C.reset_variables()
 	G.reset_variables()
 	
-	if expo_layer:
-		expo_layer.init()
-	
-	# When ready, launch the main menu of the game.
-	if auto_start_game:
-		
-		match G.build_profile:
+	if G.config.auto_start_game:
+		match G.config.build_profile:
 			G.BuildProfile.DEV:
-				request_core_scene(DEV_build_profile)
-			
+				request_core_scene(G.config.dev_start_scene)
 			G.BuildProfile.RELEASE:
-				request_core_scene(RELEASE_build_profile)
-			
+				request_core_scene(G.config.release_start_scene)
 			G.BuildProfile.EXPO:
 				G.create_save_file("default_name")
-				G.ARCHIVE_SAVE_DIR = "user://archive/" + expo_layer.get_archive_folder() + "/"
+				G.save_data = expo_layer.get_default_save_data()
+				G.config.ARCHIVE_SAVE_DIR = "user://archive/" + expo_layer.get_archive_folder() + "/"
 				G.move_files_to_archive()
-				request_core_scene(EXPO_build_profile)
+				request_core_scene(G.config.expo_start_scene)
 
 
 # Select between main game scenes (main menu, game)
@@ -104,8 +93,7 @@ func request_core_scene(new_core_scene: G.CoreScene) -> void:
 	G.core_scene = new_core_scene
 	
 	# Memorizing the path of the current loading game_scene
-	target_scene_path = G.CoreScenePath[G.core_scene]
-	
+	target_scene_path = G.config.get_scene(G.core_scene).resource_path
 	# Start loading the scene, before displaying it
 	start_threaded_load()
 
@@ -194,11 +182,11 @@ func clear_loading_state() -> void:
 
 # Add the loading scene
 func show_loading_screen() -> void:
-	var path: String = G.CoreScenePath[G.CoreScene.LOADING]
-	var packed: PackedScene = load(path) as PackedScene
-	
-	loading_instance = packed.instantiate()
-	
+	var scene : PackedScene = G.config.get_scene(G.CoreScene.LOADING)
+	if not scene:
+		push_error("GameManager: no scene registered for LOADING.")
+		return
+	loading_instance = scene.instantiate()
 	self.add_child(loading_instance)
 
 

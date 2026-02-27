@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://2wd3hiy4v7ep"]
 
-[ext_resource type="Script" uid="uid://cnn504a85woqy" path="res://src/core/layers/expo_layer.gd" id="1_wsobo"]
+[ext_resource type="Script" uid="uid://cnn504a85woqy" path="res://src/core/layers/expo/expo_layer.gd" id="1_wsobo"]
 [ext_resource type="Theme" uid="uid://bfnq8633hf72j" path="res://assets/theme/debug_theme.tres" id="2_mvhgb"]
 
 [node name="ExpoLayer" type="CanvasLayer" unique_id=600995833]

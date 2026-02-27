@@ -22,6 +22,7 @@ var is_booth_session_active: bool = false
 
 func _ready() -> void:
 	set_physics_process(false)
+	
 	init()
 
 
@@ -46,11 +47,11 @@ func _physics_process(delta: float) -> void:
 	
 	if count_down <= 9.9:
 		timer_label.set_text(
-			tr("EXPO_TIMER_WARNING").format({"val": G.round_to_dec(count_down, 1)})
+			tr("EXPO_TIMER_WARNING").format({"duration": G.round_to_dec(count_down, 1)})
 		)
 	else:
 		timer_label.set_text(
-			tr("EXPO_TIMER_WARNING").format({"val": int(count_down)})
+			tr("EXPO_TIMER_WARNING").format({"duration": int(count_down)})
 		)
 	
 	var is_current_core_scene_an_exception : bool = G.core_scene in current_event.core_scene_exceptions
@@ -92,6 +93,10 @@ func init() -> void:
 	
 	display_critical_panel(false)
 	display_expo_timer_disabled(not current_event.is_expo_timer_enabled)
+
+
+func get_default_save_data() -> SaveData:
+	return current_event.save_data
 
 
 func get_archive_folder() -> String:

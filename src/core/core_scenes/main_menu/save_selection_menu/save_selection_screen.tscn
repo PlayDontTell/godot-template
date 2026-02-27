@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://clojvl4yjj8bt"]
+
+[ext_resource type="Script" uid="uid://41e6io2tp4ku" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_selection_screen.gd" id="1_48uyx"]
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/theme/default_game_theme.tres" id="1_lrawn"]
+[ext_resource type="PackedScene" uid="uid://dotpmhbkow5vm" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_panel.tscn" id="3_7mpxm"]
+
+[node name="SaveSelectionScreen" type="Control" unique_id=1047122757]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_lrawn")
+script = ExtResource("1_48uyx")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1683460454]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1898584645]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SaveSelectionTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1114231958]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "SAVE_SELECTION_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=301318377]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VideoPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/PanelContainer" unique_id=529817794]
+clip_contents = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/PanelContainer/VideoPanel" unique_id=349353407]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="SaveFilePanel" parent="MarginContainer/VBoxContainer/PanelContainer/VideoPanel/VBoxContainer" unique_id=730897214 instance=ExtResource("3_7mpxm")]
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=424496292]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MAIN_MENU_BACK"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]

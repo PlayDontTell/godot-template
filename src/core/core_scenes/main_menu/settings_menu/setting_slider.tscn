@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://ddpsqwc7hq0fx"]
+
+[ext_resource type="Texture2D" uid="uid://cpgckynw7ja6" path="res://assets/art/ui/temp/board-game-icons/PNG/Default (64px)/arrow_counterclockwise.png" id="1_4gm8n"]
+[ext_resource type="Script" uid="uid://biiubgs1ydnfg" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.gd" id="1_h62tr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lpdbe"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.8, 0.8, 0.20784314)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lpdbe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h62tr"]
+bg_color = Color(1, 1, 1, 0.09803922)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v1x68"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rkna8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kbj7d"]
+
+[node name="SettingSlider" type="HBoxContainer" unique_id=1664044786]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -229.0
+offset_top = -20.0
+offset_right = 229.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_h62tr")
+
+[node name="SettingLabel" type="Label" parent="." unique_id=594740195]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_type_variation = &"TooltipLabel"
+text = "..."
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="." unique_id=1288364317]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_vertical = 3
+max_value = 2.0
+step = 0.2
+value = 1.0
+tick_count = 11
+ticks_position = 3
+
+[node name="ValueLabel" type="Label" parent="." unique_id=1388778106]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+
+[node name="ResetBtn" type="Button" parent="." unique_id=1042399394]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_lpdbe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_lpdbe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h62tr")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_v1x68")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_rkna8")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_kbj7d")
+icon = ExtResource("1_4gm8n")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Container" type="Container" parent="." unique_id=1356250886]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[connection signal="value_changed" from="Slider" to="." method="_on_slider_value_changed"]
+[connection signal="pressed" from="ResetBtn" to="." method="_on_reset_btn_pressed"]

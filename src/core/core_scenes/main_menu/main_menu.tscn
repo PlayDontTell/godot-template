@@ -1,0 +1,250 @@
+[gd_scene format=3 uid="uid://b25u4t1skkerr"]
+
+[ext_resource type="Script" uid="uid://bec7h41a4n0x" path="res://src/core/core_scenes/main_menu/main_menu.gd" id="1_4fk6y"]
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/theme/default_game_theme.tres" id="1_vhdsm"]
+[ext_resource type="Texture2D" uid="uid://bog6yef3p2lcm" path="res://assets/art/ui/temp/game-icons/PNG/White/2x/right.png" id="2_biems"]
+[ext_resource type="Script" uid="uid://brdw3m4mycdt8" path="res://src/core/core_scenes/main_menu/title_screen/title_screen.gd" id="2_reoha"]
+[ext_resource type="Texture2D" uid="uid://cim5krxvie3sd" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/gear.png" id="3_v30x4"]
+[ext_resource type="Texture2D" uid="uid://7ff2e4ywplwf" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/massiveMultiplayer.png" id="4_w4enx"]
+[ext_resource type="Texture2D" uid="uid://dvnklpvnqilhn" path="res://assets/art/ui/temp/game-icons/PNG/White/2x/exit.png" id="5_6nqc7"]
+[ext_resource type="Script" uid="uid://dc6rlbabq36ay" path="res://src/core/core_scenes/main_menu/credits_screen/credits_screen.gd" id="8_o3e0e"]
+[ext_resource type="PackedScene" uid="uid://u5o8o134h8nt" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.tscn" id="8_vhdsm"]
+[ext_resource type="Script" uid="uid://b1llden7w5mln" path="res://src/core/core_scenes/main_menu/exit_dialog/exit_dialog.gd" id="9_gnsu4"]
+[ext_resource type="PackedScene" uid="uid://clojvl4yjj8bt" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_selection_screen.tscn" id="11_o3e0e"]
+
+[node name="MainMenu" type="Node2D" unique_id=557838657]
+metadata/_edit_lock_ = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1237763675]
+
+[node name="MainMenuController" type="Control" parent="CanvasLayer" unique_id=1430880039]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_vhdsm")
+script = ExtResource("1_4fk6y")
+metadata/_custom_type_script = "uid://ctxwyoqy5g335"
+metadata/_edit_lock_ = true
+
+[node name="TitleScreen" type="Control" parent="CanvasLayer/MainMenuController" unique_id=1135753377 node_paths=PackedStringArray("default_focus")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_vhdsm")
+script = ExtResource("2_reoha")
+default_focus = NodePath("VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/TitleScreen" unique_id=1962882568]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="TitleContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer" unique_id=2103757920]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/TitleContainer" unique_id=1436467657]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="ButtonsContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer" unique_id=1774342676]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer" unique_id=2046587694]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="PlayBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1803015625]
+layout_mode = 2
+text = "MAIN_MENU_PLAY"
+icon = ExtResource("2_biems")
+expand_icon = true
+
+[node name="SettingsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=755038655]
+layout_mode = 2
+text = "MAIN_MENU_SETTINGS"
+icon = ExtResource("3_v30x4")
+expand_icon = true
+
+[node name="CreditsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1794858106]
+layout_mode = 2
+text = "MAIN_MENU_CREDITS"
+icon = ExtResource("4_w4enx")
+expand_icon = true
+
+[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1588680649]
+layout_mode = 2
+text = "MAIN_MENU_EXIT"
+icon = ExtResource("5_6nqc7")
+expand_icon = true
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer" unique_id=1809673721]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SettingsScreen" parent="CanvasLayer/MainMenuController" unique_id=1106432147 instance=ExtResource("8_vhdsm")]
+visible = false
+layout_mode = 1
+
+[node name="CreditsScreen" type="Control" parent="CanvasLayer/MainMenuController" unique_id=960999722 node_paths=PackedStringArray("default_focus")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_vhdsm")
+script = ExtResource("8_o3e0e")
+default_focus = NodePath("VBoxContainer/BackBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/CreditsScreen" unique_id=385296112]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="ButtonsContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer" unique_id=933756171]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer/ButtonsContainer" unique_id=175317141]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="CreditsTitle" type="Label" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1634491654]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "CREDITS_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="BackBtn" type="Button" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer" unique_id=1172861249]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "MAIN_MENU_BACK"
+
+[node name="ExitDialog" type="Control" parent="CanvasLayer/MainMenuController" unique_id=629494935 node_paths=PackedStringArray("default_focus")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_vhdsm")
+script = ExtResource("9_gnsu4")
+input_context = 6
+default_focus = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/MainMenuController/ExitDialog" unique_id=1960332894]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer" unique_id=1474140978]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer" unique_id=810413614]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="ExitStatementLabel" type="Label" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=503311047]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=333388530]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="CancelBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1464007670]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../ExitBtn")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath("../ExitBtn")
+focus_previous = NodePath(".")
+text = "EXIT_DIALOG_CANCEL_BUTTON"
+
+[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=238410152]
+layout_mode = 2
+focus_neighbor_left = NodePath("../CancelBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath(".")
+focus_previous = NodePath("../CancelBtn")
+text = "EXIT_DIALOG_EXIT_BUTTON"
+
+[node name="SaveSelectionScreen" parent="CanvasLayer/MainMenuController" unique_id=194129050 instance=ExtResource("11_o3e0e")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_play_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/SettingsBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_settings_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/CreditsBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_credits_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/ExitBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_exit_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer/BackBtn" to="CanvasLayer/MainMenuController/CreditsScreen" method="_on_back_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn" to="CanvasLayer/MainMenuController/ExitDialog" method="_on_cancel_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ExitBtn" to="CanvasLayer/MainMenuController/ExitDialog" method="_on_exit_btn_pressed"]
