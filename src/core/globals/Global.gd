@@ -58,19 +58,36 @@ var core_scene : CoreScene
 #region BUILD PROFILE SYSTEM : what is the project state
 enum BuildProfile {
 	DEV, ## For game development, testing, debugging
-	RELEASE, ## For public releases
+	QA, ## bug tracking, beta testers
+	PLAYTEST, ## controlled playtesting sessions
 	EXPO, ## For game presentation booths at conventions and events
+	RELEASE, ## For public releases
 }
 
 ## Quickly test if game is run for dev or debugging
-func is_debug() -> bool:
+func is_dev() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
 	return config.build_profile == BuildProfile.DEV
+
+## Quickly test if game is run for QA testing, bug tracking, beta programs
+func is_qa() -> bool:
+	assert(config != null, "Missing Project config file (project_config.tres).")
+	return config.build_profile == BuildProfile.QA
+
+## Quickly test if game is run for a UX/Design playtest
+func is_playtest() -> bool:
+	assert(config != null, "Missing Project config file (project_config.tres).")
+	return config.build_profile == BuildProfile.PLAYTEST
 
 ## Quickly test if game is run for an expo event
 func is_expo() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
 	return config.build_profile == BuildProfile.EXPO
+
+## Quickly test if game is run as release version
+func is_release() -> bool:
+	assert(config != null, "Missing Project config file (project_config.tres).")
+	return config.build_profile == BuildProfile.RELEASE
 #endregion
 
 

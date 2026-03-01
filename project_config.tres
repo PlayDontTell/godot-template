@@ -18,6 +18,5 @@ metadata/_custom_type_script = "uid://dlpxr43lgmnkl"
 
 [resource]
 script = ExtResource("1_0gjgq")
-build_profile = 2
 core_scenes = Array[ExtResource("1_2kkxf")]([SubResource("Resource_ghgqd"), SubResource("Resource_kt44v")])
 metadata/_custom_type_script = "uid://b0l3ym7olemuc"
