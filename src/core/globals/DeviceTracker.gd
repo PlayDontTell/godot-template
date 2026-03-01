@@ -11,6 +11,7 @@ enum InputMethod {
 	TOUCH,
 }
 
+signal new_input
 signal method_changed(new_method: InputMethod)
 signal gamepad_connected(device_id: int)
 signal gamepad_disconnected(device_id: int)
@@ -60,6 +61,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _set_method_if_changed(m: InputMethod) -> void:
+	new_input.emit()
+	
 	if m != last_input_method:
 		last_input_method = m
 		method_changed.emit(last_input_method)

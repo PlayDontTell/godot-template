@@ -28,15 +28,15 @@ func reset_variables() -> void:
 
 
 #region CORE SCENES SYSTEM : main menu, loading game core scenes
-## Emmited to request a game restart
+## Emited to request a game restart
 @warning_ignore("unused_signal")
 signal request_game_restart
 
-## Emmited to request a scene change
+## Emited to request a scene change
 @warning_ignore("unused_signal")
 signal request_core_scene(requested_core_scene : CoreScene)
 
-## Emmited when Core Scene changed and is loaded
+## Emited when Core Scene changed and is loaded
 @warning_ignore("unused_signal")
 signal new_core_scene_loaded(new_core_scene : CoreScene)
 
@@ -64,16 +64,18 @@ enum BuildProfile {
 
 ## Quickly test if game is run for dev or debugging
 func is_debug() -> bool:
-	return config != null and config.build_profile == BuildProfile.DEV
+	assert(config != null, "Missing Project config file (project_config.tres).")
+	return config.build_profile == BuildProfile.DEV
 
 ## Quickly test if game is run for an expo event
 func is_expo() -> bool:
-	return config != null and config.build_profile == BuildProfile.EXPO
+	assert(config != null, "Missing Project config file (project_config.tres).")
+	return config.build_profile == BuildProfile.EXPO
 #endregion
 
 
 #region PAUSE SYSTEM : pause requests
-## Emmited when pause state changes
+## Emited when pause state changes
 signal pause_state_changed(is_game_paused)
 
 ## All objects requesting pause
@@ -107,7 +109,7 @@ func reset_pause_state() -> void:
 #region LOCALIZATION SYSTEM : locales, texts
 # Using translated text : tr("STRING_NAME")
 
-## Emmited when game locale has been changed
+## Emited when game locale has been changed
 signal locale_changed
 
 ## The game currently used locale
@@ -349,7 +351,8 @@ const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
 const TEMP_FILE_SUFFIX : String = ".tmp"
 
 # Cannot be a cosnt since its needs parse time to initialize
-var SCREENSHOT_DIR : String = OS.get_system_dir(OS.SYSTEM_DIR_PICTURES)
+# Initialized in init_folders() method
+var SCREENSHOT_DIR : String
 
 enum FileMode { ENCRYPTED, PLAIN }
 
@@ -405,12 +408,6 @@ func create_save_file(save_name : String) -> String:
 	
 	save_data = SaveData.new()
 	
-	#var now : String = Time.get_datetime_string_from_system()
-	#save_data.meta.version = ProjectSettings.get_setting("application/config/version")
-	#save_data.meta.save_date = Time.get_unix_time_from_system()
-	#save_data.meta.creation_date = now
-	#save_data.meta.last_play_date = now
-	
 	# Find unique filename if collision occurs
 	var safe_name : String = sanitize_string(save_name)
 	var file_name : String = safe_name + config.FILES_EXTENSION
@@ -438,7 +435,7 @@ func create_save_file(save_name : String) -> String:
 ## Returns true on success, false on failure.
 func _save_data(file_path : String) -> bool:
 	save_data.version = ProjectSettings.get_setting("application/config/version")
-	save_data.last_play_date = Time.get_datetime_string_from_system()
+	save_data.date_saved = Time.get_datetime_string_from_system()
 	
 	var save_img : Image = await _capture_screenshot()
 	
@@ -542,15 +539,37 @@ func delete_file(file_path : String) -> bool:
 	return true
 
 
-## Update SaveData Resource with missing variables from default
-func update_save_data(loaded : SaveData) -> SaveData:
+## Migrates a loaded SaveData to the current schema:
+## - fills missing scalar properties with current defaults
+## - fills missing dictionary keys with defaults (recursive)
+## Call after loading any save file.
+func update_save_data(loaded: SaveData) -> SaveData:
 	var defaults := SaveData.new()
 	for p in defaults.get_property_list():
 		if not p.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
 			continue
-		if loaded.get(p.name) == null:
-			loaded.set(p.name, defaults.get(p.name))
+		var default_val: Variant = defaults.get(p.name)
+		var loaded_val: Variant = loaded.get(p.name)
+
+		if loaded_val == null:
+			# Property missing entirely — add it.
+			loaded.set(p.name, default_val)
+		elif loaded_val is Dictionary and default_val is Dictionary:
+			# Fill missing keys inside dictionaries.
+			loaded.set(p.name, _fill_missing_dict_keys(loaded_val, default_val))
+
 	return loaded
+
+
+## Recursively copies keys from [default] that are absent in [target].
+## Does not overwrite existing keys — preserves player data.
+func _fill_missing_dict_keys(target: Dictionary, default: Dictionary) -> Dictionary:
+	for key in default:
+		if not target.has(key):
+			target[key] = default[key]
+		elif target[key] is Dictionary and default[key] is Dictionary:
+			target[key] = _fill_missing_dict_keys(target[key], default[key])
+	return target
 
 
 ## Read a file and return its contents as an array
