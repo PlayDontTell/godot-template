@@ -2,38 +2,12 @@
 
 [ext_resource type="Script" uid="uid://bjuyxayyleldj" path="res://src/core/game_manager.gd" id="1_g4x3p"]
 [ext_resource type="PackedScene" uid="uid://1mdrxoxx3uwp" path="res://src/core/layers/debug/debug_layer.tscn" id="3_oaxmt"]
-[ext_resource type="Script" uid="uid://bestq71s6ukfh" path="res://src/classes/base_classes/expo_event_config.gd" id="4_km052"]
 [ext_resource type="PackedScene" uid="uid://2wd3hiy4v7ep" path="res://src/core/layers/expo/expo_layer.tscn" id="4_kplx8"]
-[ext_resource type="Script" uid="uid://btyfyvvdd1ksb" path="res://src/classes/base_classes/input_binding_entry.gd" id="5_7y20v"]
-[ext_resource type="Script" uid="uid://cuxymsyj2n8ov" path="res://src/classes/base_classes/game_settings.gd" id="6_ebxag"]
-[ext_resource type="Script" uid="uid://bc6oexgxco7u0" path="res://src/classes/base_classes/save_data.gd" id="7_va1an"]
 
 [sub_resource type="Environment" id="Environment_i104u"]
 background_mode = 3
 background_canvas_max_layer = 1000
 adjustment_enabled = true
-
-[sub_resource type="Resource" id="Resource_km052"]
-script = ExtResource("6_ebxag")
-screen_resolution = "1920x1200 (16:10)"
-
-[sub_resource type="Resource" id="Resource_7y20v"]
-script = ExtResource("7_va1an")
-game_version = "0.0.0"
-creation_date = "2026-03-01T13:03:27"
-date_saved = "2026-03-01T13:03:27"
-
-[sub_resource type="Resource" id="Resource_ebxag"]
-resource_name = "2026-03 Vernier-Ludique [Vernier]"
-script = ExtResource("4_km052")
-event_year = 2026
-event_month = 3
-is_expo_timer_enabled = true
-max_idle_time = 4.0
-critical_time = 1.0
-game_settings = SubResource("Resource_km052")
-save_data = SubResource("Resource_7y20v")
-metadata/_custom_type_script = "uid://bestq71s6ukfh"
 
 [node name="GameManager" type="WorldEnvironment" unique_id=691744354 node_paths=PackedStringArray("persistent_nodes")]
 environment = SubResource("Environment_i104u")
@@ -42,9 +16,7 @@ persistent_nodes = [NodePath("DebugLayer"), NodePath("ExpoLayer")]
 
 [node name="DebugLayer" parent="." unique_id=445951642 instance=ExtResource("3_oaxmt")]
 unique_name_in_owner = true
-visible = true
 expanded_on_start = false
 
 [node name="ExpoLayer" parent="." unique_id=600995833 instance=ExtResource("4_kplx8")]
 unique_name_in_owner = true
-expo_events = Array[ExtResource("4_km052")]([SubResource("Resource_ebxag")])
