@@ -27,19 +27,8 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if Input.is_action_just_pressed("toggle_Expo_timer"):
+	if I.just_pressed("toggle_Expo_timer", event):
 		set_expo_timer_enabled(not current_event.is_expo_timer_enabled)
-	
-	if     (event is InputEventJoypadButton
-		or  event is InputEventJoypadMotion
-		or (event is InputEventKey and event.pressed)
-		or  event is InputEventMouseButton
-		or  event is InputEventMouseMotion
-		or  event is InputEventScreenTouch
-		or  event is InputEventScreenDrag):
-		
-		reset_expo_timer()
-		set_booth_active()
 
 
 func _physics_process(delta: float) -> void:
@@ -84,6 +73,11 @@ func init() -> void:
 		self.queue_free()
 		return
 	
+	# On every recognized input, consider the player is still playing
+	# So reset expo timer, and declare booth active.
+	D.new_input.connect(reset_expo_timer)
+	D.new_input.connect(set_booth_active)
+	
 	set_physics_process(true)
 	
 	current_event.city_name = G.sanitize_string(current_event.city_name)
@@ -106,8 +100,10 @@ func get_archive_folder() -> String:
 var press_any_key_tween: Tween
 func tween_press_any_key_label() -> void:
 	if is_instance_valid(press_any_key_tween):
-		press_any_key_tween.stop()
+		press_any_key_tween.kill()
 	press_any_key_tween = create_tween()
+	
+	press_any_key_tween.set_loops(INF)
 	
 	press_any_key_tween.tween_property(
 		press_any_key_label,
@@ -122,9 +118,6 @@ func tween_press_any_key_label() -> void:
 		1.,
 		0.5
 	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	
-	await press_any_key_tween.finished
-	tween_press_any_key_label()
 
 
 func display_expo_timer_disabled(request_display: bool) -> void:
@@ -139,7 +132,7 @@ func display_critical_panel(request_display: bool = true) -> void:
 		tween_press_any_key_label()
 		
 		if is_instance_valid(critical_panel_tween):
-			critical_panel_tween.stop()
+			critical_panel_tween.kill()
 		critical_panel_tween = create_tween()
 		
 		critical_panel_tween.set_parallel(true)
@@ -166,11 +159,14 @@ func display_critical_panel(request_display: bool = true) -> void:
 		).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN).from(Color.WHITE)
 	
 	else:
-		if press_any_key_tween != null:
-			press_any_key_tween.stop()
+		if is_instance_valid(critical_panel_tween):
+			press_any_key_tween.kill()
 
 
 func reset_expo_timer() -> void:
+	if is_instance_valid(press_any_key_tween):
+		press_any_key_tween.kill()
+	
 	expo_timer = 0.
 	if is_expo_timer_critical:
 		is_expo_timer_critical = false

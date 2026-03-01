@@ -29,6 +29,7 @@ enum SaveType {
 	MANUAL_SAVE,
 	QUICK_SAVE,
 }
+const SAVE_TYPE_NAMES = ["Auto Save", "Manual Save", "Quick Save"]
 @export_enum("Auto Save", "Manual Save", "Quick Save") var save_type: int = 0
 
 ## The list of events logged
@@ -42,9 +43,4 @@ func _init() -> void:
 
 
 func get_save_type_name() -> String:
-	for p in self.get_property_list():
-		if p.name == "save_type":
-			if p.hint == PROPERTY_HINT_ENUM:
-				var parts = p.hint_string.split(",")
-				return parts[save_type]
-	return ""
+	return SAVE_TYPE_NAMES[save_type]

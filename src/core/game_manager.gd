@@ -3,6 +3,8 @@ extends WorldEnvironment
 @onready var debug_layer: CanvasLayer = %DebugLayer
 @onready var expo_layer: CanvasLayer = %ExpoLayer
 
+# Nodes that are not removed when changing Core Scene.
+@export var persistent_nodes : Array[Node] = []
 @export var config : ProjectConfig = preload("res://project_config.tres")
 
 var target_scene_path: String = ""
@@ -190,13 +192,8 @@ func show_loading_screen() -> void:
 	self.add_child(loading_instance)
 
 
-# Remove every scene under the Game Manager (except if mentionned in EXCEPTIONS)
-const EXCEPTIONS : Array = [
-	"DebugLayer",
-	"ExpoLayer",
-]
 func clear_game_scenes() -> void:
 	for child in self.get_children():
-		if child.name in EXCEPTIONS:
+		if child in persistent_nodes:
 			continue
 		child.queue_free()

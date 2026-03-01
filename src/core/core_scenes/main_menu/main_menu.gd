@@ -44,5 +44,5 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if I.is_action_pressed_in_event(event, "cancel"):
+	if I.just_pressed("cancel", event):
 		go_back()

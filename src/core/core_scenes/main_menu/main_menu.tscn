@@ -181,7 +181,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_vhdsm")
 script = ExtResource("9_gnsu4")
-input_context = 6
+input_context = 5
 default_focus = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn")
 metadata/_custom_type_script = "uid://rw4p3emba8ai"
 

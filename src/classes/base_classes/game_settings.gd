@@ -75,7 +75,7 @@ const RESOLUTIONS : Dictionary = {
 
 @export_group("Input Bindings", "")
 ## action name → Array[InputEvent]. Empty = use Input Map defaults.
-@export var input_bindings: Dictionary = {}
+@export var input_bindings: Array[InputBindingEntry] = []
 
 @export_group("", "")
 
