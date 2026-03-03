@@ -13,10 +13,10 @@ Its philosophy: **ship early, share confidently, work openly** — with develope
 #### Start a new project in minutes
 Open `game_manager.tscn` — the root scene — and configure everything from the inspector via its `config` export variable: which scenes to load per build profile, save paths, encryption key, and startup behaviour. No code needed to get a game booting.
 
-#### Ship to any audience, on day one
+#### Ship to any audience
 Patate has distinct build profiles baked in. Run `DEV` on your machine, hand a `PLAYTEST` build to testers, set up an `EXPO` booth at a convention, and cut a `RELEASE` — all from the same codebase, with behaviour that adapts automatically.
 
-#### Present your game anywhere, confidently
+#### Present your game anywhere
 The **Expo layer** handles idle detection and automatic session resets for public booths — no babysitting required. Pair it with the **Debug layer** to monitor performance live during playtests without shipping it to players.
 
 #### Let anyone contribute, not just programmers
