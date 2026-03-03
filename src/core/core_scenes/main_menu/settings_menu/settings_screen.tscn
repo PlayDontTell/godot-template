@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://u5o8o134h8nt"]
 
-[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/theme/default_game_theme.tres" id="1_udi7s"]
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_udi7s"]
 [ext_resource type="Script" uid="uid://m8tx7gh2ba0i" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.gd" id="2_nfavj"]
 [ext_resource type="PackedScene" uid="uid://ddpsqwc7hq0fx" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.tscn" id="3_ij1rj"]
 [ext_resource type="PackedScene" uid="uid://bui28rnd2v567" path="res://src/core/core_scenes/main_menu/settings_menu/setting_option_button.tscn" id="4_nayg6"]

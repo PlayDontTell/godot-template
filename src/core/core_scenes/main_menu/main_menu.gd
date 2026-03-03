@@ -44,5 +44,5 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if I.just_pressed("cancel", event):
+	if InputManager.just_pressed("cancel", event):
 		go_back()

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://clojvl4yjj8bt"]
 
 [ext_resource type="Script" uid="uid://41e6io2tp4ku" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_selection_screen.gd" id="1_48uyx"]
-[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/theme/default_game_theme.tres" id="1_lrawn"]
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_lrawn"]
 [ext_resource type="PackedScene" uid="uid://dotpmhbkow5vm" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_panel.tscn" id="3_7mpxm"]
 
 [node name="SaveSelectionScreen" type="Control" unique_id=1047122757]

@@ -4,7 +4,8 @@
 # Godot 4+ specific ignores
 .godot/
 .import/
-addons/
+addons/*
+!addons/patate/
 exports/
 wip/
 

@@ -24,8 +24,12 @@ config/icon="res://icon.svg"
 [autoload]
 
 G="*uid://db11cacuq7ret"
-D="*uid://djkk7nb010exe"
-I="*uid://codtkcus5e6wt"
+DeviceManager="*uid://djkk7nb010exe"
+InputManager="*uid://codtkcus5e6wt"
+LocaleManager="*uid://crud335yopsgb"
+PauseManager="*uid://p3lufouwscel"
+SaveManager="*uid://dhtxt8msos8nu"
+SettingsManager="*uid://c4q7kxmeg4ina"
 
 [display]
 

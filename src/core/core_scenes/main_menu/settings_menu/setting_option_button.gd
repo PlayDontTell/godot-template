@@ -9,7 +9,7 @@ extends HBoxContainer
 var options : Array = []
 
 func _ready() -> void:
-	for p in G.settings.get_property_list():
+	for p in SettingsManager.settings.get_property_list():
 		if p.name == setting_name:
 			if p.hint == PROPERTY_HINT_ENUM:
 				options = p.hint_string.split(",")
@@ -19,10 +19,10 @@ func _ready() -> void:
 	
 	label.set_text(tr(label_text))
 	
-	if setting_name in G.default_settings:
-		option_button._select_int(options.find(G.settings[setting_name]))
+	if setting_name in SettingsManager.default_settings:
+		option_button._select_int(options.find(SettingsManager.settings[setting_name]))
 
 
 func _on_option_button_item_selected(index: int) -> void:
-	if setting_name in G.default_settings:
-		G.adjust_setting(setting_name, options[index])
+	if setting_name in SettingsManager.default_settings:
+		SettingsManager.adjust_setting(setting_name, options[index])

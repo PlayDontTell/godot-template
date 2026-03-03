@@ -12,7 +12,7 @@ var slider_is_initiated : bool = false
 
 
 func _ready() -> void:
-	for p in G.settings.get_property_list():
+	for p in SettingsManager.settings.get_property_list():
 		if p.name == setting_name:
 			if p.hint == PROPERTY_HINT_RANGE:
 				var parts = p.hint_string.split(",")
@@ -29,26 +29,26 @@ func _ready() -> void:
 	
 	setting_label.set_text(tr(label_text))
 	
-	if setting_name in G.default_settings:
+	if setting_name in SettingsManager.default_settings:
 		set_slider()
 	
 	slider_is_initiated = true
 
 
 func _on_slider_value_changed(value: float) -> void:
-	if not slider_is_initiated or not setting_name in G.default_settings:
+	if not slider_is_initiated or not setting_name in SettingsManager.default_settings:
 		return
 	
-	G.adjust_setting(setting_name, value)
+	SettingsManager.adjust_setting(setting_name, value)
 	set_slider()
 
 
-func set_slider(new_value : float = G.settings[setting_name]) -> void:
-	reset_btn.disabled = new_value == G.default_settings[setting_name]
+func set_slider(new_value : float = SettingsManager.settings[setting_name]) -> void:
+	reset_btn.disabled = new_value == SettingsManager.default_settings[setting_name]
 	slider.set_value_no_signal(new_value)
-	value_label.set_text(G.get_setting_text(setting_name))
+	value_label.set_text(SettingsManager.get_setting_text(setting_name))
 
 
 func _on_reset_btn_pressed() -> void:
-	if setting_name in G.default_settings:
-		_on_slider_value_changed(G.default_settings[setting_name])
+	if setting_name in SettingsManager.default_settings:
+		_on_slider_value_changed(SettingsManager.default_settings[setting_name])

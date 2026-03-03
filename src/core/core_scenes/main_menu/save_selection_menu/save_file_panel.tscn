@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dotpmhbkow5vm"]
 
 [ext_resource type="Script" uid="uid://b1bw41qnjeauv" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_panel.gd" id="1_3le2h"]
-[ext_resource type="Script" uid="uid://bc6oexgxco7u0" path="res://src/classes/base_classes/save_data.gd" id="2_5pxjs"]
+[ext_resource type="Script" uid="uid://bc6oexgxco7u0" path="res://addons/patate/classes/save_data.gd" id="2_5pxjs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrawn"]
 content_margin_left = 16.0
