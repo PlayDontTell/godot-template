@@ -67,3 +67,23 @@ static func is_input_string_valid(string_to_test : String, default_string : Stri
 ## Test if a character is valid
 static func is_input_character_valid(character : String) -> bool:
 	return character in AUTHORIZED_CHARACTERS
+
+
+static func get_hint_range_info(resource: Variant, property_name: String) -> Dictionary:
+	var hint_range_info: Dictionary = {}
+	
+	for property in resource.get_property_list():
+		if property.name == property_name:
+			if property.hint == PROPERTY_HINT_RANGE:
+				var parts = property.hint_string.split(",")
+				var min_value = float(parts[0])
+				var max_value = float(parts[1])
+				var step = float(parts[2])
+				
+				# Initialize the Slider parameters
+				hint_range_info.min_value = min_value
+				hint_range_info.max_value = max_value
+				hint_range_info.step = step
+				hint_range_info.tick_count = (max_value - min_value) / step + 1
+	
+	return hint_range_info

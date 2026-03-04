@@ -12,20 +12,11 @@ var slider_is_initiated : bool = false
 
 
 func _ready() -> void:
-	for p in SettingsManager.settings.get_property_list():
-		if p.name == setting_name:
-			if p.hint == PROPERTY_HINT_RANGE:
-				var parts = p.hint_string.split(",")
-				var min_val = float(parts[0])
-				var max_val = float(parts[1])
-				var step = float(parts[2])
-				
-				# Initialize the Slider parameters
-				slider.min_value = min_val
-				slider.max_value = max_val
-				slider.step = step
-				@warning_ignore("narrowing_conversion")
-				slider.tick_count = (max_val - min_val) / step + 1
+	var slider_properties: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting_name)
+	slider.min_value = slider_properties.min_value
+	slider.max_value = slider_properties.max_value
+	slider.step = slider_properties.step
+	slider.tick_count = slider_properties.tick_count
 	
 	setting_label.set_text(tr(label_text))
 	

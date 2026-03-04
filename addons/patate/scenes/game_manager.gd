@@ -39,13 +39,16 @@ func _ready() -> void:
 	
 	init_game_manager()
 	
-	 #Load pre-existing settings file, and apply settings
-	SettingsManager.load_settings() # TODO : Move settings saving/loading to SettingsManager ?
+	# Create save settings file if it does not exists already
+	SettingsManager.save_settings()
 	
-	 #Load custom player bindings if there are any in settings file
+	# Load pre-existing settings file, and apply settings
+	SettingsManager.load_settings()
+	
+	# Load custom player bindings if there are any in settings file
 	InputManager.load_bindings()
 	
-	#If settings are loaded, apply them
+	# If settings are loaded, apply them
 	SettingsManager.apply_settings()
 	
 	restart_game()
@@ -81,16 +84,22 @@ func restart_game() -> void:
 	G.reset_variables()
 	
 	if G.config.auto_start_game:
-		match G.config.build_profile:
-			G.BuildProfile.DEV:
+		match G.config.release_mode:
+			G.ReleaseMode.DEV:
 				request_core_scene(G.config.dev_start_scene)
-			G.BuildProfile.RELEASE:
+			
+			G.ReleaseMode.PLAYTEST:
+				request_core_scene(G.config.playtest_start_scene)
+			
+			G.ReleaseMode.RELEASE:
 				request_core_scene(G.config.release_start_scene)
-			G.BuildProfile.EXPO:
-				SaveManager.create_save_file("default_name")
-				SaveManager.save_data = expo_layer.get_default_save_data()
+			
+			G.ReleaseMode.EXPO:
 				G.config.ARCHIVE_SAVE_DIR = "user://archive/" + expo_layer.get_archive_folder() + "/"
 				SaveManager.archive_save_data()
+				SaveManager.create_save_file("default_name")
+				SaveManager.save_data = expo_layer.get_default_save_data()
+				
 				request_core_scene(G.config.expo_start_scene)
 
 

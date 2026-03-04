@@ -99,9 +99,9 @@ func _input(event: InputEvent) -> void:
 
 
 func init() -> void:
-	if not G.config.build_profile in [
-		G.BuildProfile.DEV,
-		G.BuildProfile.EXPO,
+	if not G.config.release_mode in [
+		G.ReleaseMode.DEV,
+		G.ReleaseMode.EXPO,
 	]:
 		self.queue_free()
 		return
@@ -216,8 +216,8 @@ func set_mouse_position_label(mouse_position: Vector2) -> void:
 	mouse_position_value.set_text(label_text)
 
 
-func set_build_profile_label(build_profile: G.BuildProfile = G.config.build_profile) -> void:
-	var label_text : String = str(G.BuildProfile.find_key(build_profile))
+func set_build_profile_label(release_mode: G.ReleaseMode = G.config.release_mode) -> void:
+	var label_text : String = str(G.ReleaseMode.find_key(release_mode))
 	build_profile_value.set_text(label_text)
 
 

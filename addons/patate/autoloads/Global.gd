@@ -1,9 +1,8 @@
-@tool
 extends Node
 
 var config: ProjectConfig = preload("res://project_config.tres")
 
-enum BuildProfile {
+enum ReleaseMode {
 	DEV, ## For game development, testing, debugging
 	PLAYTEST, ## controlled playtesting sessions
 	EXPO, ## For game presentation booths at conventions and events
@@ -31,21 +30,7 @@ var core_scene : StringName
 
 func _ready() -> void:
 	set_process(false)
-	process_mode = Node.PROCESS_MODE_ALWAYS
-	
 	reset_variables()
-	
-	# Initialize game folders (saves, settings, etc.)
-	SaveManager.init_folders()
-	
-	# Process should only start when save_data has been initialized, so that save_data.meta exists.
-	set_process(true)
-
-
-func _process(delta: float) -> void:
-	SaveManager.save_data.time_since_start += delta
-	if not get_tree().paused:
-		SaveManager.save_data.time_played += delta
 
 
 func reset_variables() -> void:
@@ -55,19 +40,19 @@ func reset_variables() -> void:
 ## Quickly test if game is run for dev or debugging
 func is_dev() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
-	return config.build_profile == BuildProfile.DEV
+	return config.release_mode == ReleaseMode.DEV
 
 ## Quickly test if game is run for a UX/Design playtest
 func is_playtest() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
-	return config.build_profile == BuildProfile.PLAYTEST
+	return config.release_mode == ReleaseMode.PLAYTEST
 
 ## Quickly test if game is run for an expo event
 func is_expo() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
-	return config.build_profile == BuildProfile.EXPO
+	return config.release_mode == ReleaseMode.EXPO
 
 ## Quickly test if game is run as release version
 func is_release() -> bool:
 	assert(config != null, "Missing Project config file (project_config.tres).")
-	return config.build_profile == BuildProfile.RELEASE
+	return config.release_mode == ReleaseMode.RELEASE

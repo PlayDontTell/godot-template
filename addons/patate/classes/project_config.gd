@@ -11,25 +11,24 @@ func get_scene(core_scene : StringName) -> PackedScene:
 	#for entry : Dictionary in core_scenes:
 		#if entry.id == core_scene:
 			#return entry.scene
-	push_warning("ProjectConfig: no scene registered for CoreScene %s" % G.CoreScene[core_scene])
+	push_warning("ProjectConfig: no scene registered for CoreScene %s" % core_scenes[core_scene])
 	return null
 
-
-@export_group("Build")
-## The current build profile. Switch between DEV, RELEASE and EXPO before exporting.
-@export var build_profile : G.BuildProfile = G.BuildProfile.DEV
+## The current release mode. Switch between DEV, RELEASE and EXPO before exporting.
+@export var release_mode : G.ReleaseMode = G.ReleaseMode.DEV
 
 @export_group("Core Scenes")
 ## One entry per CoreScene enum value. Order does not matter.
 @export var core_scenes : Dictionary[StringName, PackedScene] = {}
-#@export var core_scenes : Array[CoreSceneEntry] = []
 
 @export_group("Start Scenes")
-## Scene to load on startup in DEV build profile.
+## Scene to load on startup in DEV release mode.
 @export var dev_start_scene : StringName = G.MAIN_MENU
-## Scene to load on startup in RELEASE build profile.
+## Scene to load on startup in PLAYTEST release mode.
+@export var playtest_start_scene : StringName = G.MAIN_MENU
+## Scene to load on startup in RELEASE release mode.
 @export var release_start_scene : StringName = G.MAIN_MENU
-## Scene to load on startup in EXPO build profile.
+## Scene to load on startup in EXPO release mode.
 @export var expo_start_scene : StringName = G.MAIN_MENU
 ## If true, the start scene loads automatically on game start and restart.
 ## If false, your code is responsible for calling request_core_scene manually.
@@ -49,3 +48,5 @@ func get_scene(core_scene : StringName) -> PackedScene:
 @export var SAVE_DIR : String = "user://saves/"
 ## Directory where archived saves are moved (e.g. on expo restart).
 @export var ARCHIVE_SAVE_DIR : String = "user://archive/"
+## The size of save file screenshots by default
+@export var SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)

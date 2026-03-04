@@ -2,6 +2,24 @@ extends Node
 
 signal data_is_ready
 
+
+func _ready() -> void:
+	set_process(false)
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	# Initialize game folders (saves, settings, etc.)
+	init_folders()
+	
+	# Process should only start when save_data has been initialized, so that save_data.meta exists.
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	save_data.time_since_start += delta
+	if not get_tree().paused:
+		save_data.time_played += delta
+
+
 func get_encrypt_key() -> String:
 	return G.config.SAVE_ENCRYPT_KEY if G.config else ""
 
@@ -15,7 +33,6 @@ func get_files_extension() -> String:
 	return G.config.FILES_EXTENSION if G.config else ".data"
 
 const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
-const SCREENSHOT_SIZE : Vector2i = Vector2i(80, 40)
 const TEMP_FILE_SUFFIX : String = ".tmp"
 
 # Cannot be a cosnt since its needs parse time to initialize
@@ -125,7 +142,7 @@ func _save_data(file_path : String) -> bool:
 		push_error("Failed to finalize save file: " + str(error))
 		delete_file(temp_path)  # Clean up temp file on rename failure
 		return false
-	prints()
+	
 	return true
 
 
@@ -156,9 +173,9 @@ func _load_data(file_path : String, set_as_current : bool = true) -> Array:
 
 
 ## List all save files in the save directory (returns full paths)
-func list_save_files() -> Array:
-	var files : Array = []
-	var dir : DirAccess = DirAccess.open(G.config.SAVE_DIR)
+func list_save_files(directory: String = G.config.SAVE_DIR) -> Array[String]:
+	var files : Array[String] = []
+	var dir : DirAccess = DirAccess.open(directory)
 	
 	if not dir:
 		push_error("Failed to access save directory")
@@ -166,7 +183,7 @@ func list_save_files() -> Array:
 	
 	for file_name in dir.get_files():
 		if file_name.ends_with(G.config.FILES_EXTENSION):
-			files.append(G.config.SAVE_DIR + file_name)
+			files.append(directory + file_name)
 	
 	return files
 
@@ -178,18 +195,35 @@ func archive_save_data() -> int:
 	
 	var moved_count : int = 0
 	
-	for file_path in list_save_files():
+	var existing_archived_save_files: Array[String] = list_save_files(G.config.ARCHIVE_SAVE_DIR)
+	
+	for file_path: String in list_save_files():
 		var file_name : String = file_path.get_file()
 		var destination : String = G.config.ARCHIVE_SAVE_DIR + file_name
 		
-		# TODO : already existing files are written over (deleted)
-		var file_already_exist
+		# If the file name already exists, find the smallest increment available
+		# add to the name
+		var incremented_destination: String = destination
+		var name_increment: int = 1
+		while incremented_destination in existing_archived_save_files:
+			name_increment += 1
+			incremented_destination = destination.trim_suffix(G.config.FILES_EXTENSION) + "_" + str(name_increment) + G.config.FILES_EXTENSION
+		destination = incremented_destination
 		
 		# Create a readable json_file of the SaveData
 		var json_destination : String = destination.trim_suffix(G.config.FILES_EXTENSION) + ".json"
 		var json_file : FileAccess = FileAccess.open(json_destination, FileAccess.WRITE)
-		assert(json_file.is_open())
-		var json_text : String = JSON.stringify(save_data, "\t")
+		if not json_file:
+			push_error("Failed to write JSON file: " + json_destination)
+			continue
+		
+		var save_data_dictionary: Dictionary = {}
+		
+		for property in save_data.get_property_list():
+			if property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
+				save_data_dictionary[property.name] = save_data.get(property.name)
+		
+		var json_text : String = JSON.stringify(save_data_dictionary, "\t")
 		json_file.store_string(json_text)
 		json_file.close()
 		
@@ -207,7 +241,6 @@ func archive_save_data() -> int:
 		
 		moved_count += 1
 		await get_tree().process_frame
-	
 	return moved_count
 
 
@@ -301,5 +334,5 @@ func _write_file(file_path : String, data_array : Array, mode : FileMode = FileM
 func _capture_screenshot() -> Image:
 	await get_tree().process_frame
 	var img : Image = get_viewport().get_texture().get_image()
-	img.resize(SCREENSHOT_SIZE.x, SCREENSHOT_SIZE.y, Image.INTERPOLATE_NEAREST)
+	img.resize(G.config.SCREENSHOT_SIZE.x, G.config.SCREENSHOT_SIZE.y, Image.INTERPOLATE_NEAREST)
 	return img
