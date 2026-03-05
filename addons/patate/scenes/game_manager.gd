@@ -3,9 +3,10 @@ extends WorldEnvironment
 @onready var debug_layer: CanvasLayer = %DevLayer
 @onready var expo_layer: CanvasLayer = %ExpoLayer
 
-# Nodes that are not removed when changing Core Scene.
-@export var persistent_nodes : Array[Node] = []
+## The configuration of the whole project
 @export var config : ProjectConfig = preload("res://project_config.tres")
+## Nodes that are not removed when changing Core Scene.
+@export var persistent_nodes : Array[Node] = []
 
 var target_scene_path: String = ""
 var loading_progress: Array = [0.0]
@@ -20,22 +21,29 @@ func _notification(what: int) -> void:
 
 
 func _ready() -> void:
+	# Defining the Intents (intent-name: [events])
+	# - Intent names should reflect concrete player actions and intents
+	# - Events are listed in Project > Project Settings > Input Map
 	InputManager.register_intents({
 		"move_up":    ["move_up", "ui_up"],
 		"move_down":  ["move_down", "ui_down"],
 		"move_left":  ["move_left", "ui_left"],
 		"move_right": ["move_right", "ui_right"],
 	})
-
-	InputManager.extend_context(InputManager.Context.GAMEPLAY, [
-		"move_up",
-		"move_down",
-		"move_left",
-		"move_right",
-		"confirm",
-		"cancel",
-		"pause",
-	])
+	# Defining the Contexts (context: [intents])
+	# List what Intents are allowed in this context.
+	InputManager.extend_context(
+		InputManager.Context.GAMEPLAY,
+		[
+			"move_up",
+			"move_down",
+			"move_left",
+			"move_right",
+			"confirm",
+			"cancel",
+			"pause",
+		],
+	)
 	
 	init_game_manager()
 	
