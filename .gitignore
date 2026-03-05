@@ -7,7 +7,8 @@
 addons/*
 !addons/patate/
 exports/
-wip/
+_private/*
+!_private/README.md
 
 # Imported translations (automatically generated from CSV files)
 # *.translation

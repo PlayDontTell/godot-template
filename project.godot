@@ -45,9 +45,11 @@ enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 [file_customization]
 
 folder_colors={
+"res://_docs/": "yellow",
+"res://_examples/": "red",
+"res://_private/": "pink",
 "res://addons/": "gray",
 "res://assets/": "green",
-"res://docs/": "yellow",
 "res://src/": "orange",
 "res://tests/": "pink",
 "res://tools/": "purple"
