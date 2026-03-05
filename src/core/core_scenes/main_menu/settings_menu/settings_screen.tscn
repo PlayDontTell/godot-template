@@ -5,8 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://ddpsqwc7hq0fx" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.tscn" id="3_ij1rj"]
 [ext_resource type="PackedScene" uid="uid://bui28rnd2v567" path="res://src/core/core_scenes/main_menu/settings_menu/setting_option_button.tscn" id="4_nayg6"]
 [ext_resource type="PackedScene" uid="uid://budao5y6u8bsd" path="res://src/core/core_scenes/main_menu/settings_menu/setting_toggle.tscn" id="4_u4k1i"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/animated_button.gd" id="6_5g82o"]
 
-[node name="SettingsScreen" type="Control" unique_id=1106432147 node_paths=PackedStringArray("default_focus")]
+[node name="SettingsScreen" type="Control" unique_id=1239688094 node_paths=PackedStringArray("default_focus")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,8 +19,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme = ExtResource("1_udi7s")
 script = ExtResource("2_nfavj")
-default_focus = NodePath("MarginContainer/VBoxContainer/BackBtn")
-metadata/_custom_type_script = "uid://rw4p3emba8ai"
+default_focus = NodePath("")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1859053213]
 layout_mode = 1
@@ -213,9 +213,11 @@ text = "SETTINGS_GAMEPAD_CONTROLS_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1344084415]
+[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1241577681]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "MAIN_MENU_BACK"
+script = ExtResource("6_5g82o")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]

@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cim5krxvie3sd" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/gear.png" id="3_v30x4"]
 [ext_resource type="Texture2D" uid="uid://7ff2e4ywplwf" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/massiveMultiplayer.png" id="4_w4enx"]
 [ext_resource type="Texture2D" uid="uid://dvnklpvnqilhn" path="res://assets/art/ui/temp/game-icons/PNG/White/2x/exit.png" id="5_6nqc7"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/animated_button.gd" id="5_nvcdi"]
 [ext_resource type="Script" uid="uid://dc6rlbabq36ay" path="res://src/core/core_scenes/main_menu/credits_screen/credits_screen.gd" id="8_o3e0e"]
 [ext_resource type="PackedScene" uid="uid://u5o8o134h8nt" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.tscn" id="8_vhdsm"]
 [ext_resource type="Script" uid="uid://b1llden7w5mln" path="res://src/core/core_scenes/main_menu/exit_dialog/exit_dialog.gd" id="9_gnsu4"]
@@ -42,7 +43,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1_vhdsm")
 script = ExtResource("2_reoha")
-default_focus = NodePath("VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn")
+default_focus = NodePath("")
 metadata/_custom_type_script = "uid://rw4p3emba8ai"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/TitleScreen" unique_id=1962882568]
@@ -84,29 +85,45 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
 
-[node name="PlayBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1803015625]
+[node name="PlayBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=946610627]
 layout_mode = 2
 text = "MAIN_MENU_PLAY"
 icon = ExtResource("2_biems")
 expand_icon = true
+script = ExtResource("5_nvcdi")
+focus_duration = 0.1
+unfocus_duration = 0.1
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="SettingsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=755038655]
+[node name="SettingsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=522842252]
 layout_mode = 2
 text = "MAIN_MENU_SETTINGS"
 icon = ExtResource("3_v30x4")
 expand_icon = true
+script = ExtResource("5_nvcdi")
+focus_duration = 0.1
+unfocus_duration = 0.1
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="CreditsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1794858106]
+[node name="CreditsBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=327674372]
 layout_mode = 2
 text = "MAIN_MENU_CREDITS"
 icon = ExtResource("4_w4enx")
 expand_icon = true
+script = ExtResource("5_nvcdi")
+focus_duration = 0.1
+unfocus_duration = 0.1
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1588680649]
+[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=32904965]
 layout_mode = 2
 text = "MAIN_MENU_EXIT"
 icon = ExtResource("5_6nqc7")
 expand_icon = true
+script = ExtResource("5_nvcdi")
+focus_duration = 0.1
+unfocus_duration = 0.1
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer" unique_id=1809673721]
 layout_mode = 2
@@ -129,7 +146,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1_vhdsm")
 script = ExtResource("8_o3e0e")
-default_focus = NodePath("VBoxContainer/BackBtn")
+default_focus = NodePath("")
 metadata/_custom_type_script = "uid://rw4p3emba8ai"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainMenuController/CreditsScreen" unique_id=385296112]
@@ -165,11 +182,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="BackBtn" type="Button" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer" unique_id=1172861249]
+[node name="BackBtn" type="Button" parent="CanvasLayer/MainMenuController/CreditsScreen/VBoxContainer" unique_id=1968874491]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "MAIN_MENU_BACK"
+script = ExtResource("5_nvcdi")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
 [node name="ExitDialog" type="Control" parent="CanvasLayer/MainMenuController" unique_id=629494935 node_paths=PackedStringArray("default_focus")]
 visible = false
@@ -182,7 +201,7 @@ grow_vertical = 2
 theme = ExtResource("1_vhdsm")
 script = ExtResource("9_gnsu4")
 input_context = 5
-default_focus = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn")
+default_focus = NodePath("")
 metadata/_custom_type_script = "uid://rw4p3emba8ai"
 
 [node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/MainMenuController/ExitDialog" unique_id=1960332894]
@@ -217,7 +236,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 40
 alignment = 1
 
-[node name="CancelBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1464007670]
+[node name="CancelBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=816721844]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath(".")
@@ -226,8 +245,10 @@ focus_neighbor_bottom = NodePath(".")
 focus_next = NodePath("../ExitBtn")
 focus_previous = NodePath(".")
 text = "EXIT_DIALOG_CANCEL_BUTTON"
+script = ExtResource("5_nvcdi")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=238410152]
+[node name="ExitBtn" type="Button" parent="CanvasLayer/MainMenuController/ExitDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=547977441]
 layout_mode = 2
 focus_neighbor_left = NodePath("../CancelBtn")
 focus_neighbor_top = NodePath(".")
@@ -236,6 +257,8 @@ focus_neighbor_bottom = NodePath(".")
 focus_next = NodePath(".")
 focus_previous = NodePath("../CancelBtn")
 text = "EXIT_DIALOG_EXIT_BUTTON"
+script = ExtResource("5_nvcdi")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
 [node name="SaveSelectionScreen" parent="CanvasLayer/MainMenuController" unique_id=194129050 instance=ExtResource("11_o3e0e")]
 visible = false
