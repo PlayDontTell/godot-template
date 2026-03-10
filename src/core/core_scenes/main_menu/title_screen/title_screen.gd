@@ -10,6 +10,7 @@ signal exit_dialog_requested
 
 func _ready() -> void:
 	title_label.set_text(ProjectSettings.get_setting("application/config/name"))
+	super._ready()
 
 
 func _on_play_btn_pressed() -> void:

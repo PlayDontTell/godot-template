@@ -2,16 +2,26 @@ extends Node
 
 signal data_is_ready
 
+signal save_file_deleted
+signal save_slot_selected
+
+# each _save_data_list key is a used save_slot
+# with its associated SaveData instances (decrypted save files)
+var save_data_list: Dictionary[int, Array]
+
+var current_save_file_path: String
+var current_save_slot: int = 0
+
 
 func _ready() -> void:
-	set_process(false)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	# Initialize game folders (saves, settings, etc.)
 	init_folders()
 	
-	# Process should only start when save_data has been initialized, so that save_data.meta exists.
-	set_process(true)
+	# Warn if no encrypt key has been defined
+	if G.config.SAVE_ENCRYPT_KEY.is_empty():
+		push_warning("No encrypt key defined in project_config.tres, files will not be fully encrypted.")
 
 
 func _process(delta: float) -> void:
@@ -20,9 +30,106 @@ func _process(delta: float) -> void:
 		save_data.time_played += delta
 
 
+func select_save_slot(save_slot_idx: int) -> void:
+	if current_save_slot != save_slot_idx:
+		current_save_slot = save_slot_idx
+		save_slot_selected.emit()
+
+
+func load_save_file(path: String) -> void:
+	_load_data(path, true)
+
+
+func unload() -> void:
+	save_data = SaveData.new()
+
+
+func create_new_save() -> void:
+	await auto_save()
+
+
+## Called by the game at checkpoints, scene changes, timers, etc.
+## Always creates a new file. Prunes oldest if over the limit.
+func auto_save() -> void:
+	var path := _build_save_path("autosave")
+	await _save_data(path, SaveData.SaveType.AUTO_SAVE)
+	_prune_saves("autosave", G.config.max_autosaves)
+
+
+## Called by the player from a menu. Creates a new file each time.
+## Prunes oldest if max_manual_saves > 0.
+func manual_save(display_name : String = "") -> void:
+	var path := _build_save_path("manual")
+	if not display_name.is_empty():
+		save_data.save_name = display_name
+	await _save_data(path, SaveData.SaveType.MANUAL_SAVE)
+	_prune_saves("manual", G.config.max_manual_saves)
+
+
+## Called by the player via a keybind (F5 typically). No UI.
+## Creates a new file. Prunes oldest if over the limit.
+func quick_save() -> void:
+	var path := _build_save_path("quicksave")
+	await _save_data(path, SaveData.SaveType.QUICK_SAVE)
+	_prune_saves("quicksave", G.config.max_quicksaves)
+
+
+## Load the most recent quicksave (F9 typically). No UI.
+func quick_load() -> void:
+	var latest := _get_latest_save("quicksave")
+	if latest.is_empty():
+		push_warning("No quicksave found.")
+		return
+	_load_data(latest, true)
+
+
+## Builds a filename like "slot0_autosave_2026-03-07_14-32.save"
+func _build_save_path(type_prefix : String) -> String:
+	var timestamp: String = Utils.format_datetime(Time.get_datetime_string_from_system(), Utils.TimeFormat.FILE_NAME_COMPATIBLE)
+	var slot_prefix := "slot%d_" % current_save_slot if G.config.has_save_slots else ""
+	var file_name := slot_prefix + type_prefix + "_" + timestamp + G.config.SAVE_FILE_EXTENSION
+	return G.config.SAVE_DIR + file_name
+
+
+## Returns all filenames matching a type prefix (and current slot if applicable)
+func _list_saves_by_type(type_prefix : String, save_slot: int = current_save_slot) -> Array[String]:
+	var dir := DirAccess.open(G.config.SAVE_DIR)
+	if not dir:
+		return []
+	
+	var slot_prefix := "slot%d_" % save_slot if G.config.has_save_slots else ""
+	var full_prefix := slot_prefix + type_prefix
+	var matching : Array[String] = []
+	
+	for file_name in dir.get_files():
+		if file_name.begins_with(full_prefix) and file_name.ends_with(G.config.SAVE_FILE_EXTENSION):
+			matching.append(G.config.SAVE_DIR + file_name)
+	
+	matching.sort()
+	return matching
+
+
+## Deletes oldest files until count is within limit
+func _prune_saves(type_prefix : String, max_count : int) -> void:
+	if max_count <= 0:
+		return
+	
+	var matching := _list_saves_by_type(type_prefix)
+	
+	while matching.size() > max_count:
+		var oldest : String = matching.pop_front()
+		delete_file(oldest)
+
+
+## Returns the full path of the most recent save of a given type
+func _get_latest_save(type_prefix : String) -> String:
+	var matching := _list_saves_by_type(type_prefix)
+	if matching.is_empty():
+		return ""
+	return matching.back()
+
+
 func get_encrypt_key() -> String:
-	if G.config.SAVE_ENCRYPT_KEY.is_empty():
-		push_warning("No encrypt key defined in project_config.tres, files will not be fully encrypted.")
 	return G.config.SAVE_ENCRYPT_KEY if G.config else ""
 
 func get_save_dir() -> String:
@@ -32,12 +139,11 @@ func get_bin_dir() -> String:
 	return G.config.BIN_DIR if G.config else "user://bin/"
 
 func get_files_extension() -> String:
-	return G.config.FILES_EXTENSION if G.config else ".data"
+	return G.config.SAVE_FILE_EXTENSION if G.config else ".data"
 
-const DEFAULT_SAVE_TEXTURE : Texture2D = preload("res://icon.svg")
 const TEMP_FILE_SUFFIX : String = ".tmp"
 
-# Cannot be a cosnt since its needs parse time to initialize
+# Cannot be a constant since its needs parse time to initialize
 # Initialized in init_folders() method
 var SCREENSHOT_DIR : String
 
@@ -65,75 +171,25 @@ func init_folders(additional_folders : PackedStringArray = []) -> void:
 
 ## Log an event to the event log (avoids duplicates)
 func log_event(event_data : Variant) -> void:
-	if not is_instance_valid(save_data):
-		push_warning("Cannot log event - save_data not initialized")
-		return
-	
 	if event_data not in save_data.event_log:
 		save_data.event_log.append(event_data)
-
-
-### Load settings from file or create defaults. Returns true if settings existed, false if created new.
-#func load_settings() -> bool:
-	#var settings_path: String = G.config.BIN_DIR + "game_settings" + G.config.FILES_EXTENSION
-	#if not FileAccess.file_exists(settings_path):
-		#return false
-	#
-	#var loaded : Array = _read_file(settings_path, FileMode.PLAIN)
-	#if not loaded.is_empty() and loaded[0] is GameSettings:
-		#SettingsManager.settings = loaded[0]
-		#return true
-	#
-	#return false
-#
-#
-### Save current settings to file
-#func save_settings() -> void:
-	#var settings_path: String = G.config.BIN_DIR + "game_settings" + G.config.FILES_EXTENSION
-	#_write_file(settings_path, [SettingsManager.settings], FileMode.PLAIN)
-
-
-## Create a new save file with given world name. Returns full file path, or empty string on failure.
-## If a save with the same name exists, auto-increments with a number suffix.
-func create_save_file(save_name : String) -> String:
-	is_data_ready = false
-	
-	save_data = SaveData.new()
-	
-	# Find unique filename if collision occurs
-	var safe_name : String = Utils.sanitize_string(save_name)
-	var file_name : String = safe_name + G.config.FILES_EXTENSION
-	var file_path : String = G.config.SAVE_DIR + file_name
-	var counter : int = 1
-	
-	while FileAccess.file_exists(file_path):
-		push_warning("Save file already exists, auto-incrementing: " + file_path)
-		file_name = safe_name + "_" + str(counter) + G.config.FILES_EXTENSION
-		file_path = G.config.SAVE_DIR + file_name
-		counter += 1
-	
-	if not _write_file(file_path, [save_data, DEFAULT_SAVE_TEXTURE], FileMode.ENCRYPTED):
-		push_error("Failed to create save file")
-		return ""
-	
-	is_data_ready = true
-	data_is_ready.emit()
-	
-	return file_path
 
 
 ## Save current game save_data with screenshot (async - must await)
 ## Uses temporary file for transaction safety to prevent corruption on crash.
 ## Returns true on success, false on failure.
-func _save_data(file_path : String) -> bool:
+func _save_data(file_path : String = current_save_file_path, save_type: SaveData.SaveType = SaveData.SaveType.AUTO_SAVE) -> bool:
+	save_data._is_empty = false
+	save_data.save_slot = current_save_slot
 	save_data.game_version = ProjectSettings.get_setting("application/config/version")
 	save_data.date_saved = Time.get_datetime_string_from_system()
-	
-	var save_img : Image = await _capture_screenshot()
+	save_data.save_type = save_type
+	var save_image : Image = await _capture_screenshot()
+	save_data.save_image = save_image
 	
 	# Write to temporary file first to prevent corruption if crash occurs during save
 	var temp_path : String = file_path + TEMP_FILE_SUFFIX
-	if not _write_file(temp_path, [save_data, save_img], FileMode.ENCRYPTED):
+	if not _write_file(temp_path, [save_data], FileMode.ENCRYPTED):
 		push_error("Failed to write temp save file")
 		delete_file(temp_path)  # Clean up failed temp file
 		return false
@@ -149,29 +205,58 @@ func _save_data(file_path : String) -> bool:
 
 
 ## Load save_data from a save file, optionally without setting it as current
-func _load_data(file_path : String, set_as_current : bool = true) -> Array:
+func _load_data(file_path : String = current_save_file_path, set_as_current : bool = true) -> Array:
 	var file_data : Array = _read_file(file_path, FileMode.ENCRYPTED)
 	
 	if file_data.is_empty():
 		#push_error("Failed to load save file: " + file_path)
-		var fallback := [SaveData.new(), DEFAULT_SAVE_TEXTURE]
+		var fallback := [SaveData.new()]
 		if set_as_current:
 			save_data = fallback[0]
 			is_data_ready = true
 			data_is_ready.emit()
 		return fallback
 	
-	if file_data.size() < 2:
-		file_data.append(DEFAULT_SAVE_TEXTURE)
-	
 	file_data[0] = update_save_data(file_data[0])
 	
 	if set_as_current:
+		current_save_file_path = file_path
 		save_data = file_data[0]
 		is_data_ready = true
 		data_is_ready.emit()
 	
 	return file_data
+
+
+func list_save_data(directory: String = G.config.SAVE_DIR) -> Dictionary[int, Array]:
+	save_data_list.clear()
+	
+	var save_data_instances: Array[Dictionary]
+	
+	# List all SaveData instances saved in directory
+	for file in list_save_files(directory):
+		for content in _read_file(file):
+			if content is SaveData:
+				save_data_instances.append(
+					{
+						"save_data": content,
+						"file_path": file,
+					}
+				)
+	
+	# Associate each SaveData instance to a save_slot
+	for save_data_element: Dictionary in save_data_instances:
+		# If a save_slot has been been assigned yet, initiate it as an empty array
+		if not save_data_list.has(save_data_element.save_data.save_slot):
+			save_data_list[save_data_element.save_data.save_slot] = []
+		
+		save_data_list[save_data_element.save_data.save_slot].append(save_data_element)
+	
+	# Sort SaveData instances from newest to oldest, in each save_slot list
+	for save_slot: int in save_data_list.keys():
+		save_data_list[save_slot].sort_custom(func(a, b): return a.save_data.date_saved > b.save_data.date_saved)
+	
+	return save_data_list
 
 
 ## List all save files in the save directory (returns full paths)
@@ -184,7 +269,7 @@ func list_save_files(directory: String = G.config.SAVE_DIR) -> Array[String]:
 		return []
 	
 	for file_name in dir.get_files():
-		if file_name.ends_with(G.config.FILES_EXTENSION):
+		if file_name.ends_with(G.config.SAVE_FILE_EXTENSION):
 			files.append(directory + file_name)
 	
 	return files
@@ -209,21 +294,23 @@ func archive_save_data() -> int:
 		var name_increment: int = 1
 		while incremented_destination in existing_archived_save_files:
 			name_increment += 1
-			incremented_destination = destination.trim_suffix(G.config.FILES_EXTENSION) + "_" + str(name_increment) + G.config.FILES_EXTENSION
+			incremented_destination = destination.trim_suffix(G.config.SAVE_FILE_EXTENSION) + "_" + str(name_increment) + G.config.SAVE_FILE_EXTENSION
 		destination = incremented_destination
 		
 		# Create a readable json_file of the SaveData
-		var json_destination : String = destination.trim_suffix(G.config.FILES_EXTENSION) + ".json"
+		var json_destination : String = destination.trim_suffix(G.config.SAVE_FILE_EXTENSION) + ".json"
 		var json_file : FileAccess = FileAccess.open(json_destination, FileAccess.WRITE)
 		if not json_file:
 			push_error("Failed to write JSON file: " + json_destination)
 			continue
 		
-		var save_data_dictionary: Dictionary = {}
+		var file_data_array: Array = _load_data(file_path, false)
+		var file_data: SaveData = file_data_array[0]
 		
-		for property in save_data.get_property_list():
+		var save_data_dictionary: Dictionary = {}
+		for property in file_data.get_property_list():
 			if property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
-				save_data_dictionary[property.name] = save_data.get(property.name)
+				save_data_dictionary[property.name] = file_data.get(property.name)
 		
 		var json_text : String = JSON.stringify(save_data_dictionary, "\t")
 		json_file.store_string(json_text)
@@ -242,7 +329,6 @@ func archive_save_data() -> int:
 			continue
 		
 		moved_count += 1
-		await get_tree().process_frame
 	return moved_count
 
 
@@ -256,6 +342,9 @@ func delete_file(file_path : String) -> bool:
 	if error != OK:
 		push_error("Failed to delete file: " + file_path + " (Error: " + str(error) + ")")
 		return false
+	
+	if file_path.ends_with(G.config.SAVE_FILE_EXTENSION):
+		save_file_deleted.emit()
 	
 	return true
 
@@ -303,12 +392,14 @@ func _read_file(file_path : String, mode : FileMode = FileMode.ENCRYPTED) -> Arr
 		file = FileAccess.open(file_path, FileAccess.READ)
 	
 	if not file:
-		#push_error("Failed to read file: " + file_path)
+		push_error("Failed to read file: " + file_path)
 		return []
 	
 	var contents : Array = []
 	while file.get_position() < file.get_length():
 		contents.append(file.get_var(true))
+	
+	file.close()
 	
 	return contents
 
@@ -328,6 +419,8 @@ func _write_file(file_path : String, data_array : Array, mode : FileMode = FileM
 	
 	for element in data_array:
 		file.store_var(element, true)
+	
+	file.close()
 	
 	return true
 

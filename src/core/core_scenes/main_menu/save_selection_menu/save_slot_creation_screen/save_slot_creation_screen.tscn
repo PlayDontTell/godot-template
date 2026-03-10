@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://dpe14ligy0gir"]
+
+[ext_resource type="Script" uid="uid://gnokjl43scdk" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_creation_screen/save_slot_creation_screen.gd" id="1_oc77o"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="2_6v3li"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="3_ocygo"]
+
+[node name="SaveSlotCreationScreen" type="Control" unique_id=46592746 node_paths=PackedStringArray("default_focus")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_oc77o")
+default_focus = NodePath("MarginContainer/VBoxContainer/BackBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=427928307]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=493771942]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SaveSlotSelectionTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=647088556]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "SAVE_SLOT_CREATION_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=65830844]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MAIN_MENU_BACK"
+script = ExtResource("2_6v3li")
+config = ExtResource("3_ocygo")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]

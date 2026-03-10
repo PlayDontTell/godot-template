@@ -27,6 +27,7 @@ vertical_alignment = 1
 
 [node name="OptionButton" type="OptionButton" parent="." unique_id=1672496900]
 unique_name_in_owner = true
+texture_filter = 3
 layout_mode = 2
 
 [connection signal="item_selected" from="OptionButton" to="." method="_on_option_button_item_selected"]

@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://sm1lek67emkb"]
+
+[ext_resource type="Texture2D" uid="uid://bji78udv4da6c" path="res://assets/art/ui/temp/game-icons/PNG/White/2x/plus.png" id="1_bjyrb"]
+[ext_resource type="Script" uid="uid://b6qbyj4fn63d4" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_selection_screen/save_slot_container.gd" id="1_j3qp1"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="2_j3qp1"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="3_w2igd"]
+
+[node name="SaveSlotContainer" type="MarginContainer" unique_id=1435484849]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_j3qp1")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1849494229]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1273695666]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1568474281]
+layout_mode = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1552019237]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SaveSlotIndexLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=413845792]
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"HeaderMedium"
+text = "SAVE_SLOT_INDEX_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SaveSlotIndexValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2135374165]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_type_variation = &"HeaderLarge"
+vertical_alignment = 1
+
+[node name="ResetBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=559837132]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "RESET_SAVE_SLOT"
+script = ExtResource("2_j3qp1")
+config = ExtResource("3_w2igd")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=393885024]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/AspectRatioContainer" unique_id=423260405]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 3
+icon = ExtResource("1_bjyrb")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("2_j3qp1")
+config = ExtResource("3_w2igd")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="SaveInfoContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1710932878]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 3
+
+[node name="DateSavedLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=618841391]
+layout_mode = 2
+text = "SAVE_FILE_DATE_SAVED_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=708345978]
+layout_mode = 2
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DateSavedValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=1698759116]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="TimePlayedLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=1111696432]
+layout_mode = 2
+text = "SAVE_FILE_TIME_PLAYED_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation2" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=625276488]
+layout_mode = 2
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimePlayedValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=1002090335]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="GameVersionLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=771117029]
+modulate = Color(1, 1, 1, 0.5019608)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "SAVE_FILE_GAME_VERSION_LABEL"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Punctuation4" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=279549682]
+modulate = Color(1, 1, 1, 0.5019608)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameVersionValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/SaveInfoContainer" unique_id=2057555332]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5019608)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+vertical_alignment = 1
+
+[connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ResetBtn" to="." method="_on_reset_btn_pressed"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/AspectRatioContainer/SelectBtn" to="." method="_on_select_btn_pressed"]

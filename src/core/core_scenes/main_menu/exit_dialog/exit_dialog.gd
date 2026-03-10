@@ -7,11 +7,12 @@ signal exit_game_requested
 
 
 func _ready() -> void:
-	exit_statement_label.set_text(
-			tr("EXIT_DIALOG_STATEMENT").format({
-				"game_name": ProjectSettings.get_setting("application/config/name"),
-			})
-		)
+	LocaleManager.bind_translation(
+		exit_statement_label,
+		"EXIT_DIALOG_STATEMENT",
+		{"game_name": ProjectSettings.get_setting("application/config/name")}
+	)
+	super._ready()
 
 
 func _on_cancel_btn_pressed() -> void:

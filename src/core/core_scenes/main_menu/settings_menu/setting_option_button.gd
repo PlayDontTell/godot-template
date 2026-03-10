@@ -14,8 +14,6 @@ func _ready() -> void:
 			if p.hint == PROPERTY_HINT_ENUM:
 				options = p.hint_string.split(",")
 	
-	add_options(options)
-	
 	label.set_text(label_text)
 
 
@@ -30,9 +28,9 @@ func add_options(requested_options: Array) -> void:
 		option_button.add_item(option)
 	
 	if setting_name in SettingsManager.default_settings:
-		option_button._select_int(options.find(SettingsManager.settings[setting_name]))
+		option_button.select(options.find(SettingsManager.settings[setting_name]))
 
 
 func _on_option_button_item_selected(index: int) -> void:
 	if setting_name in SettingsManager.default_settings:
-		SettingsManager.adjust_setting(setting_name, options[index])
+		SettingsManager.apply_setting(setting_name, options[index])

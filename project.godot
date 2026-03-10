@@ -16,7 +16,7 @@ markdown_book/docs_folder="res://docs"
 
 config/name="Patate"
 config/version="0.0.0"
-run/main_scene="uid://dsj2w2xqig3yb"
+run/main_scene="uid://bq4f6cr6mkgxd"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
@@ -40,7 +40,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/patate/plugin.cfg")
+enabled=PackedStringArray("res://addons/patate/plugin.cfg")
 
 [file_customization]
 

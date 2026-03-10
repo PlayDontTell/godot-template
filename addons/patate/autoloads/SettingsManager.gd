@@ -1,117 +1,44 @@
 extends Node
 ## To change project defaults, edit "res://addons/patate/classes/game_settings.gd"
 
-var default_settings : GameSettings = GameSettings.new()
-var settings : GameSettings = GameSettings.new()
+var default_settings: GameSettings = GameSettings.new()
+var settings: GameSettings = GameSettings.new()
 
-signal setting_adjusted(setting : String, value : Variant)
+signal setting_adjusted(setting: String, value: Variant)
 
 ## Signals to tell the WorldEnvironment node to set itself
 signal adjust_brightness(intensity : float)
 signal adjust_contrast(intensity : float)
 signal adjust_saturation(intensity : float)
 
-const AUDIO_BUSES : Dictionary = {
-	"music_volume"   : "music",
-	"sfx_volume"     : "sfx",
-	"ui_volume"      : "ui",
-	"ambient_volume" : "ambient",
-}
 
-func apply_settings(settings_to_apply : GameSettings = settings) -> void:
+func apply_setting(setting: String, value: Variant) -> void:
+	save_setting_value(
+		setting,
+		settings.adjust_setting(setting, value),
+	)
+
+
+func apply_settings(settings_to_apply: GameSettings = settings) -> void:
 	for property in settings_to_apply.get_property_list():
 		if not property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE:
 			continue
 		
 		if property.name == "input_bindings":
-			continue	# handled separately by InputService
+			continue	# handled separately by InputManager
 		
-		adjust_setting(property.name, settings_to_apply.get(property.name))
+		var validated := settings.adjust_setting(property.name, settings_to_apply.get(property.name))
+		if validated != null:
+			settings.set(property.name, validated)
+	
+	save_settings()
 
 
-func adjust_setting(setting : String, value : Variant) -> void:
-	match setting:
-		"lang":
-			if value is String:
-				var new_locale: String = value
-				if new_locale in LocaleManager.get_available_locales():
-					
-					LocaleManager.set_locale(new_locale)
-					
-					save_setting_value(setting, new_locale)
-		
-		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
-			if value is float or value is int:
-				var hint_range: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting)
-				var new_audio_volume : float = clampf(value, hint_range.min_value, hint_range.max_value)
-				
-				AudioServer.set_bus_volume_db(
-					AudioServer.get_bus_index(AUDIO_BUSES[setting]),
-					new_audio_volume
-				)
-				
-				save_setting_value(setting, new_audio_volume)
-		
-		"brightness", "contrast", "saturation":
-			if value is float or value is int:
-				
-				var intensity : float
-				if setting == "brightness":
-					var hint_range: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting)
-					intensity = clampf(value, hint_range.min_value, hint_range.max_value)
-					adjust_brightness.emit(intensity)
-				elif setting == "contrast":
-					var hint_range: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting)
-					intensity = clampf(value, hint_range.min_value, hint_range.max_value)
-					adjust_contrast.emit(intensity)
-				elif setting == "saturation":
-					var hint_range: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting)
-					intensity = clampf(value, hint_range.min_value, hint_range.max_value)
-					adjust_saturation.emit(intensity)
-				
-				save_setting_value(setting, intensity)
-		
-		"screen_resolution":
-			if value is String:
-				if SettingsManager.settings.RESOLUTIONS.keys().has(value):
-					var screen_resolution : Vector2i = SettingsManager.settings.RESOLUTIONS[value]
-					# HACK substracting Vector2i(1, 1) so that window does not go fullscreen
-					# automatically if window size is set to the screen max resolution (on
-					# Linux Mint, maybe other OS too).
-					if OS.get_name() == "Linux":
-						DisplayServer.window_set_size(screen_resolution - Vector2i(1, 1))
-					else:
-						DisplayServer.window_set_size(screen_resolution)
-					
-					@warning_ignore("integer_division")
-					var screen_center: Vector2i = DisplayServer.screen_get_position() + DisplayServer.screen_get_size() / 2
-					var window_size: Vector2i = get_window().get_size_with_decorations()
-					@warning_ignore("integer_division")
-					DisplayServer.window_set_position(screen_center - window_size / 2)
-					get_tree().root.call_deferred("propagate_notification", NOTIFICATION_WM_SIZE_CHANGED)
-					
-					save_setting_value(setting, value)
-		
-		"fullscreen":
-			if value is bool:
-				var is_fullscreen_mode : bool = value
-				if is_fullscreen_mode:
-					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-				else:
-					DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-				
-				save_setting_value(setting, is_fullscreen_mode)
-		
-		"ui_scale":
-			if value is float:
-				var hint_range: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting)
-				var scale : float = clampf(value, hint_range.min_value, hint_range.max_value)
-				get_window().call_deferred("set_content_scale_factor", scale)
-				
-				save_setting_value(setting, scale)
 
-
-func save_setting_value(setting : String, value : Variant) -> void:
+func save_setting_value(setting: String, value: Variant) -> void:
+	if value == null:
+		return
+	
 	if settings.get(setting) != value:
 		settings.set(setting, value)
 		setting_adjusted.emit(setting, value)
@@ -119,35 +46,6 @@ func save_setting_value(setting : String, value : Variant) -> void:
 	# don't save settings if in expo mode, because we don't need to save settings between games
 	if not G.is_expo():
 		save_settings()
-
-
-func get_setting_text(setting : String) -> String:
-	var value : Variant = settings.get(setting)
-	if value == null:
-		push_warning("G.get_setting_text : unknown property '%s'" % setting)
-		return ""
-	
-	match setting:
-		"music_volume", "sfx_volume", "ui_volume", "ambient_volume":
-			# -80dB is 0%, 0dB is 100% (8dB step represents 10%)
-			return "%3d" % int(value * (100. / 80.) + 100.) + "%"	
-		
-		"brightness", "contrast", "saturation":
-			return "%3d" % int(value * 100.) + "%"
-		
-		"screen_resolution":
-			return value
-		
-		"fullscreen":
-			return "Fullscreen" if value else "Windowed"
-		
-		"input_bindings":
-			push_warning("No Text can be rendered for this setting.")
-		
-		"ui_scale":
-			return str(value)
-	
-	return ""
 
 
 func load_settings() -> bool:

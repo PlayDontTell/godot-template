@@ -17,11 +17,16 @@ signal gamepad_connected(device_id: int)
 signal gamepad_disconnected(device_id: int)
 
 var last_input_method: InputMethod = InputMethod.NONE # sticky; never reset to NONE after first input
+
+var used_mouse: bool = false
 var used_keyboard: bool = false
 var used_gamepad: bool = false
+var used_touch: bool = false
 
+var _last_mouse_time: float = -1.0
 var _last_keyboard_time: float = -1.0
 var _last_gamepad_time: float = -1.0
+var _last_touch_time: float = -1.0
 
 
 func _ready() -> void:
@@ -30,7 +35,7 @@ func _ready() -> void:
 	method_changed.connect(show_cursor)
 
 
-# --- Instant, sticky switching happens on input (no polling needed) ---
+# Instant, switching happens on input (no polling needed)
 func _input(event: InputEvent) -> void:
 	# GAMEPAD
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
@@ -46,17 +51,17 @@ func _input(event: InputEvent) -> void:
 		_set_method_if_changed(InputMethod.KEYBOARD)
 		return
 
-	# MOUSE (counts as KEYBOARD here)
+	# MOUSE
 	if event is InputEventMouseButton or event is InputEventMouseMotion:
-		_last_keyboard_time = Time.get_unix_time_from_system()
-		used_keyboard = true
+		_last_mouse_time = Time.get_unix_time_from_system()
+		used_mouse = true
 		_set_method_if_changed(InputMethod.MOUSE)
 		return
 
-	# TOUCH (also counted as KEYBOARD unless you split it out)
+	# TOUCH
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		_last_keyboard_time = Time.get_unix_time_from_system()
-		used_keyboard = true
+		_last_touch_time = Time.get_unix_time_from_system()
+		used_touch = true
 		_set_method_if_changed(InputMethod.TOUCH)
 
 
@@ -68,11 +73,11 @@ func _set_method_if_changed(m: InputMethod) -> void:
 		method_changed.emit(last_input_method)
 		#print(last_input_method) # uncomment for debugging
 
-# --- Public API ---
 
-func is_gamepad_active() -> bool:
+# Public API
+func is_mouse_active() -> bool:
 	var now : float = Time.get_unix_time_from_system()
-	return _last_gamepad_time >= 0.0 and (now - _last_gamepad_time) <= ACTIVE_WINDOW
+	return _last_mouse_time >= 0.0 and (now - _last_mouse_time) <= ACTIVE_WINDOW
 
 
 func is_keyboard_active() -> bool:
@@ -80,21 +85,40 @@ func is_keyboard_active() -> bool:
 	return _last_keyboard_time >= 0.0 and (now - _last_keyboard_time) <= ACTIVE_WINDOW
 
 
+func is_gamepad_active() -> bool:
+	var now : float = Time.get_unix_time_from_system()
+	return _last_gamepad_time >= 0.0 and (now - _last_gamepad_time) <= ACTIVE_WINDOW
+
+
+func is_touch_active() -> bool:
+	var now : float = Time.get_unix_time_from_system()
+	return _last_touch_time >= 0.0 and (now - _last_touch_time) <= ACTIVE_WINDOW
+
+
 func has_used_both() -> bool:
-	return used_keyboard and used_gamepad
+	return (used_keyboard or used_mouse) and used_gamepad
 
 
 func get_current_method() -> InputMethod:
 	# Sticky: return last used method; NEVER NONE after first input
 	return last_input_method
 
+
 # Optional helpers
+func seconds_since_mouse() -> float:
+	return INF if _last_mouse_time < 0.0 else (Time.get_unix_time_from_system() - _last_mouse_time)
+
+
 func seconds_since_gamepad() -> float:
 	return INF if _last_gamepad_time < 0.0 else (Time.get_unix_time_from_system() - _last_gamepad_time)
 
 
 func seconds_since_keyboard() -> float:
 	return INF if _last_keyboard_time < 0.0 else (Time.get_unix_time_from_system() - _last_keyboard_time)
+
+
+func seconds_since_touch() -> float:
+	return INF if _last_touch_time < 0.0 else (Time.get_unix_time_from_system() - _last_touch_time)
 
 
 func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
@@ -104,7 +128,7 @@ func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
 		gamepad_disconnected.emit(device_id)
 
 
-func show_cursor(event_input_method : InputMethod):
+func show_cursor(event_input_method : InputMethod) -> void:
 	match event_input_method:
 		InputMethod.NONE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

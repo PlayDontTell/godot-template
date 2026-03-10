@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="AnimatedButtonConfig" format=3 uid="uid://bur6phiqbk2j5"]
 
-[ext_resource type="Script" uid="uid://dch446shvdfoe" path="res://addons/patate/classes/animated_button_config.gd" id="1_m1jcj"]
+[ext_resource type="Script" uid="uid://dch446shvdfoe" path="res://addons/patate/classes/AnimatedButtonConfig.gd" id="1_m1jcj"]
 
 [resource]
 script = ExtResource("1_m1jcj")

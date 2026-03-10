@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://4lw0f7528x3q"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_8ktei"]
+[ext_resource type="Script" uid="uid://dvkqvocoymhu8" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_selection_screen/save_slot_selection_screen.gd" id="2_8ktei"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="4_mywwh"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="5_vijef"]
+[ext_resource type="Script" uid="uid://dqwf8yco3ats7" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_selection_screen/save_slot_deletion_dialog.gd" id="6_1pr1j"]
+
+[node name="SaveSlotSelectionScreen" type="Control" unique_id=1047122757 node_paths=PackedStringArray("default_focus")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_8ktei")
+script = ExtResource("2_8ktei")
+default_focus = NodePath("MarginContainer/VBoxContainer/BackBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1683460454]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1898584645]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SaveSlotSelectionTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1114231958]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "SAVE_SLOT_SELECTION_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=529817794]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SaveSlotList" type="GridContainer" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=744950583]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 3
+
+[node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=885128802]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MAIN_MENU_BACK"
+script = ExtResource("4_mywwh")
+config = ExtResource("5_vijef")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="SaveSlotResetDialog" type="Control" parent="." unique_id=1755758403 node_paths=PackedStringArray("default_focus")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_1pr1j")
+input_context = 2
+default_focus = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="ColorRect" type="ColorRect" parent="SaveSlotResetDialog" unique_id=1721712967]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2509804)
+
+[node name="PanelContainer" type="PanelContainer" parent="SaveSlotResetDialog" unique_id=69034203]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -306.5
+offset_top = -82.5
+offset_right = 306.5
+offset_bottom = 82.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SaveSlotResetDialog/PanelContainer" unique_id=1246195965]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SaveSlotResetDialog/PanelContainer/MarginContainer" unique_id=679086416]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="DeletionStatementLabel" type="Label" parent="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1000293399]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DELETE_SAVE_SLOT_DIALOG_STATEMENT"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1460162042]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="CancelBtn" type="Button" parent="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=451556803]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../ResetBtn")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath("../ResetBtn")
+focus_previous = NodePath(".")
+text = "RESET_SAVE_SLOT_CANCEL"
+script = ExtResource("4_mywwh")
+config = ExtResource("5_vijef")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="ResetBtn" type="Button" parent="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=126339037]
+layout_mode = 2
+focus_neighbor_left = NodePath("../CancelBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath(".")
+focus_previous = NodePath("../CancelBtn")
+text = "RESET_SAVE_SLOT_APPLY"
+script = ExtResource("4_mywwh")
+config = ExtResource("5_vijef")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn" to="SaveSlotResetDialog" method="_on_cancel_btn_pressed"]
+[connection signal="pressed" from="SaveSlotResetDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ResetBtn" to="SaveSlotResetDialog" method="_on_reset_btn_pressed"]

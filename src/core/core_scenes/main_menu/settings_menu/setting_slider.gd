@@ -13,6 +13,10 @@ var slider_is_initiated : bool = false
 
 func _ready() -> void:
 	var slider_properties: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting_name)
+	if slider_properties.is_empty():
+		push_error("setting_slider: no range hint found for '%s'" % setting_name)
+		return
+	
 	slider.min_value = slider_properties.min_value
 	slider.max_value = slider_properties.max_value
 	slider.step = slider_properties.step
@@ -30,14 +34,14 @@ func _on_slider_value_changed(value: float) -> void:
 	if not slider_is_initiated or not setting_name in SettingsManager.default_settings:
 		return
 	
-	SettingsManager.adjust_setting(setting_name, value)
+	SettingsManager.apply_setting(setting_name, value)
 	set_slider()
 
 
 func set_slider(new_value : float = SettingsManager.settings[setting_name]) -> void:
 	reset_btn.disabled = new_value == SettingsManager.default_settings[setting_name]
 	slider.set_value_no_signal(new_value)
-	value_label.set_text(SettingsManager.get_setting_text(setting_name))
+	value_label.set_text(SettingsManager.settings.get_setting_text(setting_name))
 
 
 func _on_reset_btn_pressed() -> void:

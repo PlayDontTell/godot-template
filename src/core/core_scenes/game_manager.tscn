@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://c4g2mrbdks3sb"]
+
+[ext_resource type="PackedScene" uid="uid://bq4f6cr6mkgxd" path="res://addons/patate/scenes/game_manager.tscn" id="1_ha3o5"]
+[ext_resource type="Script" uid="uid://dhvw5iypq1yjf" path="res://src/core/core_scenes/game_manager.gd" id="1_i104u"]
+
+[node name="GameManager" unique_id=1581936618 instance=ExtResource("1_ha3o5")]
+script = ExtResource("1_i104u")

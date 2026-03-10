@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cpgckynw7ja6" path="res://assets/art/ui/temp/board-game-icons/PNG/Default (64px)/arrow_counterclockwise.png" id="1_4gm8n"]
 [ext_resource type="Script" uid="uid://biiubgs1ydnfg" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.gd" id="1_h62tr"]
-[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/animated_button.gd" id="3_m414o"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="3_m414o"]
 [ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="4_7ydtr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lpdbe"]

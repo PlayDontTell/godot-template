@@ -101,7 +101,15 @@ shadow_color = Color(0, 0, 0, 0.20392157)
 shadow_size = 4
 shadow_offset = Vector2(1, 2)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r8kes"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bmqu3"]
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0.08627451)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 5
 
 [sub_resource type="Gradient" id="Gradient_r8kes"]
 offsets = PackedFloat32Array(0, 0.30464482, 0.38114753, 0.63797814, 0.72540987, 1)
@@ -167,13 +175,19 @@ content_margin_top = 12.0
 content_margin_right = 12.0
 content_margin_bottom = 12.0
 bg_color = Color(0.16565639, 0.16565642, 0.16565636, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.13, 0.13, 0.13, 1)
+border_blend = true
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 expand_margin_top = 1.0
-shadow_color = Color(0, 0, 0, 0.20392157)
-shadow_offset = Vector2(1, 2)
+shadow_color = Color(0, 0, 0, 0.16078432)
+shadow_size = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_73lme"]
 content_margin_left = 18.0
@@ -235,7 +249,7 @@ shadow_offset = Vector2(1, 2)
 
 [resource]
 default_font = ExtResource("1_laqqx")
-BoxContainer/constants/separation = 12
+BoxContainer/constants/separation = 10
 Button/colors/icon_disabled_color = Color(1, 1, 1, 0.08627451)
 Button/font_sizes/font_size = 18
 Button/styles/disabled = SubResource("StyleBoxFlat_k528p")
@@ -245,8 +259,8 @@ Button/styles/normal = SubResource("StyleBoxFlat_4lwr2")
 Button/styles/pressed = SubResource("StyleBoxFlat_eckwq")
 GridContainer/constants/h_separation = 8
 GridContainer/constants/v_separation = 8
-HSeparator/constants/separation = 16
-HSeparator/styles/separator = SubResource("StyleBoxEmpty_r8kes")
+HSeparator/constants/separation = 32
+HSeparator/styles/separator = SubResource("StyleBoxFlat_bmqu3")
 HSlider/icons/tick = SubResource("GradientTexture2D_trfjm")
 HSlider/styles/grabber_area = SubResource("StyleBoxFlat_trfjm")
 HSlider/styles/grabber_area_highlight = SubResource("StyleBoxFlat_cqbvn")
@@ -254,6 +268,9 @@ MarginContainer/constants/margin_bottom = 16
 MarginContainer/constants/margin_left = 16
 MarginContainer/constants/margin_right = 16
 MarginContainer/constants/margin_top = 16
+OptionButton/constants/arrow_margin = 8
+OptionButton/constants/h_separation = 16
+OptionButton/font_sizes/font_size = 18
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_bbpmc")
 TabContainer/colors/font_unselected_color = Color(0.51718444, 0.5171845, 0.51718444, 1)
 TabContainer/constants/tab_separation = 10

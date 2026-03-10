@@ -1,13 +1,11 @@
 [gd_resource type="Resource" script_class="ProjectConfig" format=3 uid="uid://c16vb00e8ki3j"]
 
 [ext_resource type="PackedScene" uid="uid://b25u4t1skkerr" path="res://src/core/core_scenes/main_menu/main_menu.tscn" id="1_fo6jg"]
+[ext_resource type="Texture2D" uid="uid://cvkaf6a3mdw21" path="res://assets/art/ui/temp/cursors/Vector/Basic/line_cross.svg" id="1_q2ua5"]
 [ext_resource type="PackedScene" uid="uid://5do4yrji1jit" path="res://src/core/core_scenes/loading/loading_screen.tscn" id="2_8l1bw"]
-[ext_resource type="Script" uid="uid://b0l3ym7olemuc" path="res://addons/patate/classes/project_config.gd" id="3_q2ua5"]
+[ext_resource type="PackedScene" uid="uid://ga3caowwpyds" path="res://src/core/core_scenes/game/game.tscn" id="3_ghgqd"]
+[ext_resource type="Script" uid="uid://b0l3ym7olemuc" path="res://addons/patate/classes/ProjectConfig.gd" id="3_q2ua5"]
 
 [resource]
 script = ExtResource("3_q2ua5")
-core_scenes = Dictionary[StringName, PackedScene]({
-&"LOADING": ExtResource("2_8l1bw"),
-&"MAIN_MENU": ExtResource("1_fo6jg")
-})
 metadata/_custom_type_script = "uid://b0l3ym7olemuc"

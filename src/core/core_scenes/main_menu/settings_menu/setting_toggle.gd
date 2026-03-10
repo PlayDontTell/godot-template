@@ -16,4 +16,4 @@ func _ready() -> void:
 
 func _on_toggle_btn_toggled(toggled_on: bool) -> void:
 	if setting_name in SettingsManager.default_settings:
-		SettingsManager.adjust_setting(setting_name, toggled_on)
+		SettingsManager.apply_setting(setting_name, toggled_on)

@@ -9,15 +9,15 @@ enum ReleaseMode {
 	RELEASE, ## For public releases
 }
 
-## Emited to request a game restart
+## Emitted to request a game restart
 @warning_ignore("unused_signal")
 signal request_game_restart
 
-## Emited to request a scene change
+## Emitted to request a scene change
 @warning_ignore("unused_signal")
 signal request_core_scene(requested_core_scene : StringName)
 
-## Emited when Core Scene changed and is loaded
+## Emitted when Core Scene changed and is loaded
 @warning_ignore("unused_signal")
 signal new_core_scene_loaded(new_core_scene : StringName)
 
@@ -30,11 +30,6 @@ var core_scene : StringName
 
 func _ready() -> void:
 	set_process(false)
-	reset_variables()
-
-
-func reset_variables() -> void:
-	pass
 
 
 ## Quickly test if game is run for dev or debugging

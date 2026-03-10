@@ -3,12 +3,12 @@ extends Node
 
 
 ## Returns true is int is even (multiple of 2)
-static func is_even(x: int):
+static func is_even(x: int) -> bool:
 	return x % 2 == 0
 
 
 ## Returns true is int is odd (not a multiple of 2)
-static func is_odd(x: int):
+static func is_odd(x: int) -> bool:
 	return x % 2 != 0
 
 
@@ -18,7 +18,7 @@ static func round_to_dec(num: float, digit : int) -> float:
 
 
 ## Generate a list of points in a circle, positioned at center, with points_nbr points and offseted in angle by starting_angle (deg, not rad)
-static func generate_points_in_circle(center : Vector2 = Vector2.ZERO, rayon : float = 10., points_nbr : int = 8, starting_angle : float = 0.) -> PackedVector2Array:
+static func generate_points_in_circle(center : Vector2 = Vector2.ZERO, radius : float = 10., points_nbr : int = 8, starting_angle : float = 0.) -> PackedVector2Array:
 	var points_list : PackedVector2Array = []
 	
 	for i in range(points_nbr):
@@ -28,7 +28,7 @@ static func generate_points_in_circle(center : Vector2 = Vector2.ZERO, rayon : f
 		new_point = Vector2(
 			cos(rnd_angle),
 			sin(rnd_angle),
-		) * rayon
+		) * radius
 	
 		points_list.append(new_point + center)
 	
@@ -76,9 +76,9 @@ static func get_hint_range_info(resource: Variant, property_name: String) -> Dic
 		if property.name == property_name:
 			if property.hint == PROPERTY_HINT_RANGE:
 				var parts = property.hint_string.split(",")
-				var min_value = float(parts[0])
-				var max_value = float(parts[1])
-				var step = float(parts[2])
+				var min_value = float(parts[0]) if parts.size() > 0 else 0.
+				var max_value = float(parts[1]) if parts.size() > 1 else 1.0
+				var step = float(parts[2]) if parts.size() > 2 else 1.0
 				
 				# Initialize the Slider parameters
 				hint_range_info.min_value = min_value
@@ -87,3 +87,38 @@ static func get_hint_range_info(resource: Variant, property_name: String) -> Dic
 				hint_range_info.tick_count = (max_value - min_value) / step + 1
 	
 	return hint_range_info
+
+## Returns a human-readable duration string (days/hours/minutes).
+## Seconds are intentionally omitted.
+static func seconds_to_duration(seconds: float) -> String:
+	var total := int(seconds)
+	var d := total / 86400
+	var h := (total % 86400) / 3600
+	var m := (total % 3600) / 60
+	
+	var parts: Array[String] = []
+	if d > 0: parts.append("%dd" % d)
+	if h > 0: parts.append("%dh" % h)
+	if m > 0: parts.append("%dm" % m)
+	
+	return " ".join(parts) if parts.size() > 0 else "0m"
+
+
+static func seconds_to_hours(seconds: float) -> String:
+	return "%.1f h" % (seconds / 3600.0)
+
+
+enum TimeFormat {
+	FULL_DATE,
+	FILE_NAME_COMPATIBLE,
+}
+static func format_datetime(datetime_str: String, time_format: TimeFormat = TimeFormat.FULL_DATE) -> String:
+	var dt := Time.get_datetime_dict_from_datetime_string(datetime_str, false)
+	match time_format:
+		TimeFormat.FULL_DATE:
+			return "%02d.%02d.%d - %02d:%02d:%02d" % [dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second]
+		
+		TimeFormat.FILE_NAME_COMPATIBLE:
+			return "%02d-%02d-%d_%02dh%02dm%02ds" % [dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second]
+	
+	return ""

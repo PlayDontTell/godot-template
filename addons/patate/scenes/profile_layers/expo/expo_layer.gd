@@ -66,7 +66,7 @@ func init() -> void:
 		self.queue_free()
 		return
 	
-	current_event = expo_events[active_event_index] if not expo_events.is_empty() else null
+	current_event = expo_events[active_event_index] if active_event_index < expo_events.size() else null
 	
 	if not current_event:
 		push_error("ExpoLayer: no ExpoEventConfig assigned.")
@@ -160,7 +160,7 @@ func display_critical_panel(request_display: bool = true) -> void:
 	
 	else:
 		if is_instance_valid(critical_panel_tween):
-			press_any_key_tween.kill()
+			critical_panel_tween.kill()
 
 
 func reset_expo_timer() -> void:

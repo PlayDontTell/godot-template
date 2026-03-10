@@ -7,12 +7,14 @@
 [ext_resource type="Texture2D" uid="uid://cim5krxvie3sd" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/gear.png" id="3_v30x4"]
 [ext_resource type="Texture2D" uid="uid://7ff2e4ywplwf" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/massiveMultiplayer.png" id="4_w4enx"]
 [ext_resource type="Texture2D" uid="uid://dvnklpvnqilhn" path="res://assets/art/ui/temp/game-icons/PNG/White/2x/exit.png" id="5_6nqc7"]
-[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/animated_button.gd" id="5_nvcdi"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="5_nvcdi"]
 [ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="6_uvkbu"]
 [ext_resource type="Script" uid="uid://dc6rlbabq36ay" path="res://src/core/core_scenes/main_menu/credits_screen/credits_screen.gd" id="8_o3e0e"]
 [ext_resource type="PackedScene" uid="uid://u5o8o134h8nt" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.tscn" id="8_vhdsm"]
 [ext_resource type="Script" uid="uid://b1llden7w5mln" path="res://src/core/core_scenes/main_menu/exit_dialog/exit_dialog.gd" id="9_gnsu4"]
-[ext_resource type="PackedScene" uid="uid://clojvl4yjj8bt" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_selection_screen.tscn" id="11_o3e0e"]
+[ext_resource type="PackedScene" uid="uid://clojvl4yjj8bt" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_selection_screen/save_file_selection_screen.tscn" id="11_o3e0e"]
+[ext_resource type="PackedScene" uid="uid://4lw0f7528x3q" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_selection_screen/save_slot_selection_screen.tscn" id="14_hl08f"]
+[ext_resource type="PackedScene" uid="uid://dpe14ligy0gir" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_slot_creation_screen/save_slot_creation_screen.tscn" id="15_4e6ea"]
 
 [node name="MainMenu" type="Node2D" unique_id=557838657]
 metadata/_edit_lock_ = true
@@ -186,7 +188,7 @@ script = ExtResource("5_nvcdi")
 config = ExtResource("6_uvkbu")
 metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="ExitDialog" type="Control" parent="CanvasLayer/MainMenuController" unique_id=629494935]
+[node name="ExitDialog" type="Control" parent="CanvasLayer/MainMenuController" unique_id=629494935 node_paths=PackedStringArray("default_focus")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -197,7 +199,17 @@ grow_vertical = 2
 theme = ExtResource("1_vhdsm")
 script = ExtResource("9_gnsu4")
 input_context = 5
+default_focus = NodePath("PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn")
 metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/MainMenuController/ExitDialog" unique_id=2079729286]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2509804)
 
 [node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/MainMenuController/ExitDialog" unique_id=1960332894]
 layout_mode = 1
@@ -257,9 +269,20 @@ script = ExtResource("5_nvcdi")
 config = ExtResource("6_uvkbu")
 metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="SaveSelectionScreen" parent="CanvasLayer/MainMenuController" unique_id=194129050 instance=ExtResource("11_o3e0e")]
+[node name="SaveFileSelectionScreen" parent="CanvasLayer/MainMenuController" unique_id=194129050 instance=ExtResource("11_o3e0e")]
 visible = false
 layout_mode = 1
+
+[node name="SaveSlotSelectionScreen" parent="CanvasLayer/MainMenuController" unique_id=1047122757 instance=ExtResource("14_hl08f")]
+layout_mode = 1
+
+[node name="SaveSlotCreationScreen" parent="CanvasLayer/MainMenuController" unique_id=46592746 instance=ExtResource("15_4e6ea")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_play_btn_pressed"]
 [connection signal="pressed" from="CanvasLayer/MainMenuController/TitleScreen/VBoxContainer/ButtonsContainer/VBoxContainer/SettingsBtn" to="CanvasLayer/MainMenuController/TitleScreen" method="_on_settings_btn_pressed"]

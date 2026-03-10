@@ -9,6 +9,12 @@ extends Node
 # Core intents — never edited by game devs
 
 const _CORE_INTENTS: Dictionary = {
+	# Basic Movement
+	"move_up":    ["move_up", "ui_up"],
+	"move_down":  ["move_down", "ui_down"],
+	"move_left":  ["move_left", "ui_left"],
+	"move_right": ["move_right", "ui_right"],
+	
 	# Dev Actions
 	"toggle_Dev_layer": ["toggle_Dev_layer"],
 	"toggle_Expo_timer": ["toggle_Expo_timer"],
@@ -69,23 +75,41 @@ func just_released(intent: String, event: InputEvent = null, device_id: int = -1
 
 
 ## Returns a normalized movement vector, filtered by the active context.
-## Uses "move_up" as a proxy — if movement intents are blocked, returns ZERO.
+## Uses "move_up" as a context proxy — returns ZERO if movement is blocked or intents are unregistered.
 ## Pass device_id for gamepad — reads left stick directly.
 ## For touch, handle movement in D and pass the vector to your node.
 func get_move_vector(device_id : int = -1) -> Vector2:
 	if not _is_intent_allowed("move_up"):
 		return Vector2.ZERO
-
+	
 	if device_id >= 0:
 		return Vector2(
 			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X),
 			Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 		).normalized()
-
+	
+	if not (
+			INTENTS.has("move_right")
+		and INTENTS.has("move_left")
+		and INTENTS.has("move_down") 
+		and INTENTS.has("move_up")
+	):
+		return Vector2.ZERO
+	
 	return Vector2(
-		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
-		Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
+		_get_intent_strength("move_right") - _get_intent_strength("move_left"),
+		_get_intent_strength("move_down")  - _get_intent_strength("move_up")
 	).normalized()
+
+
+
+func _get_intent_strength(intent: String) -> float:
+	var strength := 0.0
+	for action: String in INTENTS[intent]:
+		if not InputMap.has_action(action):
+			continue
+		strength = maxf(strength, Input.get_action_strength(action))
+	return strength
 
 
 func _check_intent(intent: String, check_func: Callable, event: InputEvent, device_id: int) -> bool:
@@ -99,12 +123,17 @@ func _check_intent(intent: String, check_func: Callable, event: InputEvent, devi
 			# device_id == -1 means accept any device.
 			if device_id != -1 and event.device != device_id:
 				continue
-			# InputEvent has no "just pressed" vs "held" distinction —
-			# is_action_pressed() covers both just_pressed() and pressed().
-			# is_action_just_released() uses is_action_released() instead.
-			var matched: bool = (check_func == Input.is_action_just_released)\
-				and event.is_action_released(action)\
-				or event.is_action_pressed(action)
+			
+			# InputEvent has no "just pressed" vs "held" distinction
+			# We need a bool to connect Input and InputEvent possibilities
+			var matched: bool
+			if check_func == Input.is_action_just_released:
+				# is_action_just_released() uses is_action_released()
+				matched = event.is_action_released(action)
+			else:
+				# is_action_pressed() covers both just_pressed() and pressed()
+				matched = event.is_action_pressed(action)
+
 			if matched:
 				return true
 		else:
@@ -144,6 +173,10 @@ enum Context {
 ## Which intents are allowed per context. Empty array means allow all.
 var CONTEXT_RULES : Dictionary = {
 	Context.GAMEPLAY: [
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
 	],
 	Context.MENU: [
 		"confirm",
@@ -156,7 +189,14 @@ var CONTEXT_RULES : Dictionary = {
 		"next_tab",
 	],
 	Context.PAUSE: [
-		
+		"confirm",
+		"cancel",
+		"move_up",
+		"move_down",
+		"move_left",
+		"move_right",
+		"prev_tab",
+		"next_tab",
 	],
 	Context.DIALOGUE: [
 		"confirm",
@@ -181,7 +221,8 @@ var CONTEXT_RULES : Dictionary = {
 class ContextHandle:
 	var owner_node : Node
 	var context    : int  # stored as int to avoid inner-class enum resolution issues
-
+	var auto_release_callable: Callable
+	
 	func _init(p_owner: Node, p_context: int) -> void:
 		owner_node = p_owner
 		context    = p_context
@@ -196,15 +237,16 @@ var _active_context: ContextHandle = null  # cached — invalidated on any stack
 ## Priority is implicit: higher Context enum value always wins.
 func acquire_context(owner_node: Node, context: Context) -> void:
 	assert(is_instance_valid(owner_node), "I : Context owner must be a valid Node.")
-
+	
 	for existing: ContextHandle in _context_stack:
 		if existing.owner_node == owner_node and existing.context == context:
 			return  # already acquired
-
+	
 	var handle := ContextHandle.new(owner_node, context)
-
+	
 	# Auto-release when the owner leaves the tree — no manual cleanup needed.
-	owner_node.tree_exiting.connect(_on_context_owner_exiting.bind(handle), CONNECT_ONE_SHOT)
+	handle.auto_release_callable = _on_context_owner_exiting.bind(handle)
+	owner_node.tree_exiting.connect(handle.auto_release_callable, CONNECT_ONE_SHOT)
 
 	# Insert sorted: highest Context value first (highest priority at front).
 	var inserted := false
@@ -215,7 +257,7 @@ func acquire_context(owner_node: Node, context: Context) -> void:
 			break
 	if not inserted:
 		_context_stack.append(handle)
-
+	
 	_active_context = _context_stack[0] if not _context_stack.is_empty() else null
 
 
@@ -225,11 +267,11 @@ func release_context(owner_node: Node, context: Context) -> void:
 		var handle: ContextHandle = _context_stack[i]
 		if handle.owner_node == owner_node and handle.context == context:
 			# Disconnect auto-release if manually releasing early.
-			if owner_node.tree_exiting.is_connected(_on_context_owner_exiting):
-				owner_node.tree_exiting.disconnect(_on_context_owner_exiting)
+			if owner_node.tree_exiting.is_connected(handle.auto_release_callable):
+				owner_node.tree_exiting.disconnect(handle.auto_release_callable)
 			_context_stack.remove_at(i)
 			break
-
+	
 	_active_context = _context_stack[0] if not _context_stack.is_empty() else null
 
 

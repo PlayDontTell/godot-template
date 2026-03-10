@@ -1,21 +1,19 @@
-[gd_scene format=3 uid="uid://dsj2w2xqig3yb"]
+[gd_scene format=3 uid="uid://bq4f6cr6mkgxd"]
 
-[ext_resource type="Script" uid="uid://bjuyxayyleldj" path="res://addons/patate/scenes/game_manager.gd" id="1_g4x3p"]
-[ext_resource type="PackedScene" uid="uid://1mdrxoxx3uwp" path="res://addons/patate/scenes/profile_layers/dev/debug_layer.tscn" id="3_oaxmt"]
-[ext_resource type="PackedScene" uid="uid://2wd3hiy4v7ep" path="res://addons/patate/scenes/profile_layers/expo/expo_layer.tscn" id="4_kplx8"]
+[ext_resource type="Script" uid="uid://bjuyxayyleldj" path="res://addons/patate/classes/GameManager.gd" id="1_qvk0l"]
+[ext_resource type="PackedScene" uid="uid://1mdrxoxx3uwp" path="res://addons/patate/scenes/profile_layers/dev/debug_layer.tscn" id="2_i104u"]
+[ext_resource type="PackedScene" uid="uid://2wd3hiy4v7ep" path="res://addons/patate/scenes/profile_layers/expo/expo_layer.tscn" id="3_y2chk"]
 
-[sub_resource type="Environment" id="Environment_i104u"]
+[sub_resource type="Environment" id="Environment_ghkxf"]
 background_mode = 3
 background_canvas_max_layer = 1000
 adjustment_enabled = true
 
-[node name="GameManager" type="WorldEnvironment" unique_id=691744354 node_paths=PackedStringArray("persistent_nodes")]
-environment = SubResource("Environment_i104u")
-script = ExtResource("1_g4x3p")
-persistent_nodes = [NodePath("DevLayer"), NodePath("ExpoLayer")]
+[node name="GameManager" type="WorldEnvironment" unique_id=1581936618]
+environment = SubResource("Environment_ghkxf")
+script = ExtResource("1_qvk0l")
+metadata/_custom_type_script = "uid://bjuyxayyleldj"
 
-[node name="DevLayer" parent="." unique_id=445951642 instance=ExtResource("3_oaxmt")]
-unique_name_in_owner = true
+[node name="DevLayer" parent="." unique_id=445951642 instance=ExtResource("2_i104u")]
 
-[node name="ExpoLayer" parent="." unique_id=600995833 instance=ExtResource("4_kplx8")]
-unique_name_in_owner = true
+[node name="ExpoLayer" parent="." unique_id=600995833 instance=ExtResource("3_y2chk")]
