@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://budao5y6u8bsd" path="res://src/core/core_scenes/main_menu/settings_menu/setting_toggle.tscn" id="4_u4k1i"]
 [ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="6_5g82o"]
 [ext_resource type="Script" uid="uid://byxo4p3pf4tho" path="res://src/core/core_scenes/main_menu/settings_menu/gameplay_panel.gd" id="6_qke3a"]
+[ext_resource type="Script" uid="uid://bvd5iaoe5pgld" path="res://src/core/core_scenes/main_menu/settings_menu/video_panel.gd" id="6_t45bb"]
 [ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="8_x5ns2"]
 
 [node name="SettingsScreen" type="Control" unique_id=1239688094]
@@ -92,11 +93,13 @@ layout_mode = 2
 layout_mode = 2
 setting_name = "ui_scale"
 label_text = "SETTINGS_UI_SCALE_LABEL"
+display_type = 0
 
 [node name="VideoPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1712374163]
 visible = false
 layout_mode = 2
 horizontal_scroll_mode = 0
+script = ExtResource("6_t45bb")
 metadata/_tab_index = 1
 metadata/_tab_name = "SETTINGS_VIDEO_TAB"
 
@@ -132,16 +135,19 @@ layout_mode = 2
 layout_mode = 2
 setting_name = "contrast"
 label_text = "SETTINGS_CONTRAST_LABEL"
+display_type = 0
 
 [node name="BrightnessSlider" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1092515923 instance=ExtResource("3_ij1rj")]
 layout_mode = 2
 setting_name = "brightness"
 label_text = "SETTINGS_BRIGHTNESS_LABEL"
+display_type = 0
 
 [node name="SaturationSlider" parent="MarginContainer/VBoxContainer/TabContainer/VideoPanel/VBoxContainer" unique_id=1902147723 instance=ExtResource("3_ij1rj")]
 layout_mode = 2
 setting_name = "saturation"
 label_text = "SETTINGS_SATURATION_LABEL"
+display_type = 0
 
 [node name="AudioPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1160286676]
 visible = false
@@ -169,21 +175,25 @@ layout_mode = 2
 layout_mode = 2
 setting_name = "music_volume"
 label_text = "SETTINGS_MUSIC_VOLUME_LABEL"
+display_type = 0
 
 [node name="SFXVolumeSlider2" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=1675937554 instance=ExtResource("3_ij1rj")]
 layout_mode = 2
 setting_name = "sfx_volume"
 label_text = "SETTINGS_SFX_VOLUME_LABEL"
+display_type = 0
 
 [node name="UIVolumeSlider3" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=951166705 instance=ExtResource("3_ij1rj")]
 layout_mode = 2
 setting_name = "ui_volume"
 label_text = "SETTINGS_UI_VOLUME_LABEL"
+display_type = 0
 
 [node name="AmbientVolumeSlider" parent="MarginContainer/VBoxContainer/TabContainer/AudioPanel/VBoxContainer" unique_id=357306709 instance=ExtResource("3_ij1rj")]
 layout_mode = 2
 setting_name = "ambient_volume"
 label_text = "SETTINGS_AMBIENT_VOLUME_LABEL"
+display_type = 0
 
 [node name="KeyboardControlsPanel" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=2081868848]
 visible = false

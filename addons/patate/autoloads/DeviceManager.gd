@@ -37,32 +37,40 @@ func _ready() -> void:
 
 # Instant, switching happens on input (no polling needed)
 func _input(event: InputEvent) -> void:
-	# GAMEPAD
+	var event_input_method : InputMethod = get_input_method_from_event(event)
+	
+	match event_input_method:
+		InputMethod.GAMEPAD:
+			_last_gamepad_time = Time.get_unix_time_from_system()
+			used_gamepad = true
+			_set_method_if_changed(InputMethod.GAMEPAD)
+		
+		InputMethod.KEYBOARD:
+			_last_keyboard_time = Time.get_unix_time_from_system()
+			used_keyboard = true
+			_set_method_if_changed(InputMethod.KEYBOARD)
+		
+		InputMethod.MOUSE:
+			_last_mouse_time = Time.get_unix_time_from_system()
+			used_mouse = true
+			_set_method_if_changed(InputMethod.MOUSE)
+	
+		InputMethod.TOUCH:
+			_last_touch_time = Time.get_unix_time_from_system()
+			used_touch = true
+			_set_method_if_changed(InputMethod.TOUCH)
+
+
+func get_input_method_from_event(event: InputEvent) -> InputMethod:
+	if event is InputEventKey:
+		return InputMethod.KEYBOARD
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		_last_gamepad_time = Time.get_unix_time_from_system()
-		used_gamepad = true
-		_set_method_if_changed(InputMethod.GAMEPAD)
-		return
-
-	# KEYBOARD
-	if event is InputEventKey and event.pressed:
-		_last_keyboard_time = Time.get_unix_time_from_system()
-		used_keyboard = true
-		_set_method_if_changed(InputMethod.KEYBOARD)
-		return
-
-	# MOUSE
-	if event is InputEventMouseButton or event is InputEventMouseMotion:
-		_last_mouse_time = Time.get_unix_time_from_system()
-		used_mouse = true
-		_set_method_if_changed(InputMethod.MOUSE)
-		return
-
-	# TOUCH
+		return InputMethod.GAMEPAD
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		_last_touch_time = Time.get_unix_time_from_system()
-		used_touch = true
-		_set_method_if_changed(InputMethod.TOUCH)
+		return InputMethod.TOUCH
+	if event is InputEventMouseButton or event is InputEventMouseMotion:
+		return InputMethod.MOUSE
+	return InputMethod.NONE
 
 
 func _set_method_if_changed(m: InputMethod) -> void:

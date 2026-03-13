@@ -2,8 +2,12 @@
 
 [ext_resource type="Texture2D" uid="uid://cpgckynw7ja6" path="res://assets/art/ui/temp/board-game-icons/PNG/Default (64px)/arrow_counterclockwise.png" id="1_4gm8n"]
 [ext_resource type="Script" uid="uid://biiubgs1ydnfg" path="res://src/core/core_scenes/main_menu/settings_menu/setting_slider.gd" id="1_h62tr"]
+[ext_resource type="Texture2D" uid="uid://7enmmepqmwv4" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/backward.png" id="2_0s6jd"]
 [ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="3_m414o"]
 [ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="4_7ydtr"]
+[ext_resource type="Texture2D" uid="uid://vrok71kbmo3u" path="res://assets/art/ui/temp/game-icons/PNG/White/1x/forward.png" id="5_k8rtd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0s6jd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lpdbe"]
 bg_color = Color(1, 1, 1, 0)
@@ -78,10 +82,59 @@ value = 1.0
 tick_count = 11
 ticks_position = 3
 
+[node name="VSeparator" type="VSeparator" parent="." unique_id=297164859]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 64
+theme_override_styles/separator = SubResource("StyleBoxEmpty_0s6jd")
+
+[node name="LeftBtn" type="Button" parent="." unique_id=1235879161]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_lpdbe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_lpdbe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h62tr")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_v1x68")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_rkna8")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_kbj7d")
+icon = ExtResource("2_0s6jd")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("3_m414o")
+config = ExtResource("4_7ydtr")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
 [node name="ValueLabel" type="Label" parent="." unique_id=1388778106]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
+text = "test"
+horizontal_alignment = 1
+
+[node name="RightBtn" type="Button" parent="." unique_id=724283037]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_lpdbe")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_lpdbe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h62tr")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_v1x68")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_rkna8")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_kbj7d")
+icon = ExtResource("5_k8rtd")
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("3_m414o")
+config = ExtResource("4_7ydtr")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
 [node name="ResetBtn" type="Button" parent="." unique_id=1853354889]
 unique_name_in_owner = true

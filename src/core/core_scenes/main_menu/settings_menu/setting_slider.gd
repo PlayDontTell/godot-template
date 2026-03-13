@@ -1,14 +1,27 @@
+@tool
 extends HBoxContainer
 
 @onready var setting_label: Label = %SettingLabel
 @onready var slider: HSlider = %Slider
 @onready var value_label: Label = %ValueLabel
 @onready var reset_btn: Button = %ResetBtn
+@onready var v_separator: VSeparator = %VSeparator
+@onready var left_btn: AnimatedButton = %LeftBtn
+@onready var right_btn: AnimatedButton = %RightBtn
 
 @export var setting_name : String
 @export var label_text : String
 
 var slider_is_initiated : bool = false
+
+#enum DisplayType {
+	#CONSOLE,
+	#CLASSIC
+#}
+#@export var display_type : DisplayType = DisplayType.CLASSIC:
+	#set(value):
+		#display_type = value
+		#apply_display_type(value)
 
 
 func _ready() -> void:
@@ -28,6 +41,24 @@ func _ready() -> void:
 		set_slider()
 	
 	slider_is_initiated = true
+
+
+#func apply_display_type(new_display_type : DisplayType = display_type) -> void:
+	#slider.hide()
+	#v_separator.hide()
+	#left_btn.hide()
+	#right_btn.hide()
+	#reset_btn.hide()
+	#
+	#match new_display_type:
+		#DisplayType.CONSOLE:
+			#v_separator.show()
+			#left_btn.show()
+			#right_btn.show()
+		#
+		#DisplayType.CLASSIC:
+			#reset_btn.show()
+			#slider.show()
 
 
 func _on_slider_value_changed(value: float) -> void:

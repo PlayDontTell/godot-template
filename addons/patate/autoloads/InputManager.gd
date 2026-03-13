@@ -321,7 +321,11 @@ func rebind(intent : String, new_event : InputEvent) -> bool:
 		else:
 			push_warning("InputManager: '%s' already bound to '%s', but duplicates are allowed." % [new_event.as_text(), conflicts])
 	
-	InputMap.action_erase_events(action_to_rebind)
+	# Erase binded events that match the same Inpu t Device type (Gamepad, Keyboard, etc.)
+	#InputMap.action_erase_events(action_to_rebind)
+	for existing_event in InputMap.action_get_events(action_to_rebind):
+		if existing_event.get_class() == new_event.get_class():
+			InputMap.action_erase_event(action_to_rebind, existing_event)
 	InputMap.action_add_event(action_to_rebind, new_event)
 	_save_bindings()
 	return true
@@ -334,6 +338,7 @@ func get_conflicting_intent(new_event : InputEvent) -> Array[String]:
 		for action in INTENTS[intent]:
 			if InputMap.action_has_event(action, new_event):
 				conflicting_intents.append(intent)
+				break
 	
 	return conflicting_intents
 
