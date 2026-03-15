@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://hkmpfi1mpdkm"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_vr0qf"]
+[ext_resource type="Script" uid="uid://brdw3m4mycdt8" path="res://src/core/core_scenes/main_menu/title_screen/title_screen.gd" id="2_rb2n5"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="4_n3yke"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="5_g6b8a"]
+
+[node name="TitleScreen" type="Control" unique_id=1369281828 node_paths=PackedStringArray("default_focus")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_vr0qf")
+script = ExtResource("2_rb2n5")
+default_focus = NodePath("VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=115013958]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="TitleContainer" type="MarginContainer" parent="VBoxContainer" unique_id=2028198566]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer/TitleContainer" unique_id=1567386786]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="ButtonsContainer" type="MarginContainer" parent="VBoxContainer" unique_id=762136406]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ButtonsContainer" unique_id=1437459486]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="PlayBtn" type="Button" parent="VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1331610721]
+layout_mode = 2
+text = "MAIN_MENU_PLAY"
+expand_icon = true
+script = ExtResource("4_n3yke")
+config = ExtResource("5_g6b8a")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="SettingsBtn" type="Button" parent="VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1757971076]
+layout_mode = 2
+text = "MAIN_MENU_SETTINGS"
+expand_icon = true
+script = ExtResource("4_n3yke")
+config = ExtResource("5_g6b8a")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="CreditsBtn" type="Button" parent="VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1888193846]
+layout_mode = 2
+text = "MAIN_MENU_CREDITS"
+expand_icon = true
+script = ExtResource("4_n3yke")
+config = ExtResource("5_g6b8a")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="ExitBtn" type="Button" parent="VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1049543872]
+layout_mode = 2
+text = "MAIN_MENU_EXIT"
+expand_icon = true
+script = ExtResource("4_n3yke")
+config = ExtResource("5_g6b8a")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=1559893013]
+layout_mode = 2
+size_flags_vertical = 4
+
+[connection signal="pressed" from="VBoxContainer/ButtonsContainer/VBoxContainer/PlayBtn" to="." method="_on_play_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonsContainer/VBoxContainer/SettingsBtn" to="." method="_on_settings_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonsContainer/VBoxContainer/CreditsBtn" to="." method="_on_credits_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonsContainer/VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]

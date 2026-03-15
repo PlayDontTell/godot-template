@@ -3,18 +3,23 @@ extends BaseMenu
 const SAVE_FILE_CONTAINER = preload("uid://dotpmhbkow5vm")
 
 signal back_requested
+signal save_completed
 
 @onready var save_file_list: VBoxContainer = %SaveFileList
-@onready var save_file_deletion_dialog: Control = %SaveFileDeletionDialog
+
+@onready var create_anyway_dialog: CustomConfirmationDialog = %CreateAnywayDialog
+@onready var load_anyway_dialog: CustomConfirmationDialog = %LoadAnywayDialog
+@onready var overwrite_dialog: CustomConfirmationDialog = %OverwriteDialog
+@onready var save_file_deletion_dialog: CustomConfirmationDialog = %SaveFileDeletionDialog
+
+var mode : SaveManager.Mode = SaveManager.Mode.LOADING
 
 
 func _ready() -> void:
-	self.deactivated.connect(save_file_deletion_dialog.deactivate)
 	super._ready()
 
 
 func _on_back_btn_pressed() -> void:
-	save_file_deletion_dialog.deactivate()
 	back_requested.emit()
 
 
@@ -43,16 +48,66 @@ func update() -> void:
 		new_save_file_container.save_data = save_data_element.save_data
 		new_save_file_container.save_file_path = save_data_element.file_path
 		new_save_file_container.request_delete_save.connect(_ask_save_file_deletion)
+		new_save_file_container.request_create_save_file.connect(_ask_create_file)
+		new_save_file_container.request_load_save_file.connect(_ask_load_file)
+		new_save_file_container.mode = mode
 		save_file_list.add_child(new_save_file_container)
 
 
 func _ask_save_file_deletion(save_file_path : String, _save_name : String) -> void:
-	save_file_deletion_dialog.save_file_name_to_delete = save_file_path.get_file()
-	save_file_deletion_dialog.refresh_label()
+	save_file_deletion_dialog.format_dict = {"save_file_name": save_file_path.get_file()}
+	save_file_deletion_dialog.refresh()
 	save_file_deletion_dialog.activate()
 	
-	await save_file_deletion_dialog.save_deletion_requested
+	var confirmed: bool = await save_file_deletion_dialog.outcome_received
+	if not confirmed:
+		return
 	
 	SaveManager.delete_file(save_file_path)
-	
-	save_file_deletion_dialog.deactivate()
+
+
+func _ask_create_file() -> void:
+	match mode:
+		SaveManager.Mode.LOADING:
+			if not SaveManager.save_data._is_empty:
+				create_anyway_dialog.activate()
+				
+				var confirmed: bool = await create_anyway_dialog.outcome_received
+				if not confirmed:
+					return
+			
+			await SaveManager.create_new_save()
+			G.request_core_scene.emit(&"GAME")
+		
+		SaveManager.Mode.SAVING:
+			await SaveManager.manual_save()
+			save_completed.emit()
+
+
+func _ask_load_file(save_file_path: String, save_data: SaveData) -> void:
+	match mode:
+		SaveManager.Mode.LOADING:
+			if not SaveManager.save_data._is_empty:
+				load_anyway_dialog.format_dict = {"save_file_name": save_file_path}
+				load_anyway_dialog.refresh()
+				load_anyway_dialog.activate()
+				
+				var confirmed: bool = await load_anyway_dialog.outcome_received
+				if not confirmed:
+					return
+			
+			SaveManager.load_save_file(save_file_path)
+			G.request_core_scene.emit(&"GAME")
+		
+		SaveManager.Mode.SAVING:
+			if save_data != null and not save_data._is_empty:
+				overwrite_dialog.format_dict = {"save_file_name": save_file_path}
+				overwrite_dialog.refresh()
+				overwrite_dialog.activate()
+				
+				var confirmed: bool = await overwrite_dialog.outcome_received
+				if not confirmed:
+					return
+			
+			await SaveManager.overwrite_save(save_file_path)
+			save_completed.emit()

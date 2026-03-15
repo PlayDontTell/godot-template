@@ -12,6 +12,7 @@ enum InputMethod {
 }
 
 signal new_input
+signal input_prompts_changed
 signal method_changed(new_method: InputMethod)
 signal gamepad_connected(device_id: int)
 signal gamepad_disconnected(device_id: int)
@@ -75,6 +76,7 @@ func get_input_method_from_event(event: InputEvent) -> InputMethod:
 
 func _set_method_if_changed(m: InputMethod) -> void:
 	new_input.emit()
+	input_prompts_changed.emit()
 	
 	if m != last_input_method:
 		last_input_method = m
@@ -130,6 +132,8 @@ func seconds_since_touch() -> float:
 
 
 func _on_joy_connection_changed(device_id: int, connected: bool) -> void:
+	input_prompts_changed.emit()
+	
 	if connected:
 		gamepad_connected.emit(device_id)
 	else:

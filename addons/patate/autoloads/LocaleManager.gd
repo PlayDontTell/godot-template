@@ -141,7 +141,7 @@ func bind_translation(object: Object, key: String, format_dict: Dictionary = {})
 	_bindings[object] = [key, format_dict]
 	_apply_translation_to(object)
 
-func _apply_translation_to(object: Object) -> void:
+func _apply_translation_to(object) -> void:
 	if not is_instance_valid(object):
 		_bindings.erase(object)
 		return

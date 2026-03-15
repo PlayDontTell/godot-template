@@ -1,7 +1,8 @@
 extends PanelContainer
 
 signal request_delete_save(save_file_path : String, save_name : String)
-
+signal request_create_save_file
+signal request_load_save_file(save_file_path: String, save_data: SaveData)
 
 @onready var continue_btn: Button = %ContinueBtn
 @onready var create_save_btn: Button = %CreateSaveBtn
@@ -19,10 +20,18 @@ signal request_delete_save(save_file_path : String, save_name : String)
 @export var save_data : SaveData
 var save_file_path : String
 
+var mode : SaveManager.Mode = SaveManager.Mode.LOADING
+
 
 func _ready() -> void: # TODO improve global style
 	var is_save_file_empty: bool = save_data and save_data._is_empty
 	var is_new_save_file: bool = is_save_file_empty or not save_data
+	
+	match mode:
+		SaveManager.Mode.LOADING:
+			continue_btn.set_text("SAVE_FILE_CONTINUE_BUTTON")
+		SaveManager.Mode.SAVING:
+			continue_btn.set_text("SAVE_FILE_OVERWRITE_BUTTON")
 	
 	if is_new_save_file:
 		save_info.modulate.a = 0.
@@ -54,11 +63,8 @@ func _on_delete_btn_pressed() -> void:
 
 
 func _on_create_save_btn_pressed() -> void:
-	# Create save file and play
-	await SaveManager.create_new_save()
-	G.request_core_scene.emit(&"GAME")
+	request_create_save_file.emit()
 
 
 func _on_continue_btn_pressed() -> void:
-	SaveManager.load_save_file(save_file_path)
-	G.request_core_scene.emit(&"GAME")
+	request_load_save_file.emit(save_file_path, save_data)

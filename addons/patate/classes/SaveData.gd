@@ -5,6 +5,7 @@ class_name SaveData
 extends Resource
 
 @export_storage var _is_empty: bool = true
+@export_storage var game_name : String = ""
 
 ## Save slot index
 @export_storage var save_slot: int = 0

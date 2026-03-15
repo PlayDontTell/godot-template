@@ -1,4 +1,4 @@
-extends BaseMenu
+extends CustomConfirmationDialog
 
 signal cancel_requested
 signal exit_game_requested

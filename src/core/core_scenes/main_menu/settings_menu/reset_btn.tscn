@@ -44,6 +44,7 @@ expand_margin_bottom = 2.0
 
 [node name="ResetBtn" type="Button" unique_id=927814898]
 custom_minimum_size = Vector2(24, 24)
+pivot_offset = Vector2(12, 12)
 size_flags_horizontal = 0
 size_flags_vertical = 4
 theme_override_styles/normal = SubResource("StyleBoxFlat_y7fj3")

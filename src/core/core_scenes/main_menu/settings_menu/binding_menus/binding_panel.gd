@@ -11,6 +11,8 @@ var _listening_action: StringName = ""
 func _ready() -> void:
 	set_process_input(false)
 	update()
+	
+	DeviceManager.input_prompts_changed.connect(_refresh_all)
 
 
 func _input(event: InputEvent) -> void:
@@ -26,8 +28,19 @@ func _input(event: InputEvent) -> void:
 		_cancel_listening()
 		return
 	
+	
+	var new_method : DeviceManager.InputMethod = DeviceManager.get_input_method_from_event(event)
+	for method in input_methods:
+		if method != new_method:
+			InputManager.unbind(_listening_action, method)
+	
 	InputManager.rebind(_listening_action, event)
 	_cancel_listening()
+
+
+func _refresh_all() -> void:
+	for binding_row in self.get_children():
+		binding_row.refresh()
 
 
 func _cancel_listening() -> void:

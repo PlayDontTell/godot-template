@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://bbp85w8tho4wl"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_ymxy8"]
+[ext_resource type="Script" uid="uid://dc6rlbabq36ay" path="res://src/core/core_scenes/main_menu/credits_screen/credits_screen.gd" id="2_qwwq6"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="3_exsa6"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="4_5ciuh"]
+
+[node name="CreditsScreen" type="Control" unique_id=232951889 node_paths=PackedStringArray("default_focus")]
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_ymxy8")
+script = ExtResource("2_qwwq6")
+default_focus = NodePath("VBoxContainer/BackBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=688473088]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="ButtonsContainer" type="MarginContainer" parent="VBoxContainer" unique_id=989569103]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ButtonsContainer" unique_id=1010569436]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="CreditsTitle" type="Label" parent="VBoxContainer/ButtonsContainer/VBoxContainer" unique_id=1258317397]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "CREDITS_TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="BackBtn" type="Button" parent="VBoxContainer" unique_id=261378362]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "MAIN_MENU_BACK"
+script = ExtResource("3_exsa6")
+config = ExtResource("4_5ciuh")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[connection signal="pressed" from="VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]

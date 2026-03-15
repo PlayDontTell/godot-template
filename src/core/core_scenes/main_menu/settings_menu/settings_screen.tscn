@@ -43,7 +43,7 @@ expand_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1pdr"]
 
-[node name="SettingsScreen" type="Control" unique_id=1239688094]
+[node name="SettingsScreen" type="Control" unique_id=1239688094 node_paths=PackedStringArray("default_focus")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,6 +55,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme = ExtResource("1_udi7s")
 script = ExtResource("2_nfavj")
+default_focus = NodePath("MarginContainer/VBoxContainer/BackBtn")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1859053213]
 layout_mode = 1
@@ -89,7 +90,7 @@ clip_tabs = false
 tab_0/title = "SETTINGS_GAME_TAB"
 tab_1/title = "SETTINGS_VIDEO_TAB"
 tab_2/title = "SETTINGS_AUDIO_TAB"
-tab_3/title = "SETTINGS_KEYBOARD_CONTROLS_TAB"
+tab_3/title = "SETTINGS_MOUSE_AND_KEYBOARD_CONTROLS_TAB"
 tab_4/title = "SETTINGS_GAMEPAD_CONTROLS_TAB"
 
 [node name="GeneralPanel" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1658745271]
@@ -327,34 +328,34 @@ layout_mode = 2
 setting_name = "ambient_volume"
 label_text = "SETTINGS_AMBIENT_VOLUME_LABEL"
 
-[node name="KeyboardControlsPanel" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1509463863]
+[node name="MouseAndKeyboardControlsPanel" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1509463863]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 3
-metadata/_tab_name = "SETTINGS_KEYBOARD_CONTROLS_TAB"
+metadata/_tab_name = "SETTINGS_MOUSE_AND_KEYBOARD_CONTROLS_TAB"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel" unique_id=2032776957]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel" unique_id=2032776957]
 layout_mode = 2
 alignment = 1
 
-[node name="ControlsTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer" unique_id=74294722]
+[node name="ControlsTitle" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer" unique_id=74294722]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = &"HeaderSmall"
 theme_override_styles/normal = SubResource("StyleBoxFlat_m1pdr")
-text = "SETTINGS_KEYBOARD_CONTROLS_TITLE"
+text = "SETTINGS_MOUSE_AND_KEYBOARD_CONTROLS_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer" unique_id=929880146]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer" unique_id=929880146]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer/MarginContainer" unique_id=1907212150]
+[node name="Panel" type="Panel" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer/MarginContainer" unique_id=1907212150]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_oon2e")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer/MarginContainer" unique_id=159693541]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer/MarginContainer" unique_id=159693541]
 layout_mode = 2
 size_flags_vertical = 3
 follow_focus = true
@@ -363,17 +364,16 @@ horizontal_scroll_mode = 0
 metadata/_tab_index = 3
 metadata/_tab_name = "SETTINGS_KEYBOARD_CONTROLS_TAB"
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer/MarginContainer/ScrollContainer" unique_id=1591409217]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer/MarginContainer/ScrollContainer" unique_id=1591409217]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="BindingPanel" parent="MarginContainer/VBoxContainer/TabContainer/KeyboardControlsPanel/VBoxContainer/MarginContainer/ScrollContainer/MarginContainer" unique_id=1884498314 instance=ExtResource("8_oon2e")]
+[node name="BindingPanel" parent="MarginContainer/VBoxContainer/TabContainer/MouseAndKeyboardControlsPanel/VBoxContainer/MarginContainer/ScrollContainer/MarginContainer" unique_id=1884498314 instance=ExtResource("8_oon2e")]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 alignment = 1
-default_input_method = 2
 input_methods = Array[int]([2, 1])
 
 [node name="GamepadControlsPanel" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer" unique_id=1555791834]
@@ -424,7 +424,6 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
 alignment = 1
-default_input_method = 3
 input_methods = Array[int]([3])
 
 [node name="BackBtn" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1241577681]

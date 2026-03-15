@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dotpmhbkow5vm" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_selection_screen/save_file_container.tscn" id="3_rpwyv"]
 [ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="4_sqi1v"]
 [ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="5_8gqs1"]
-[ext_resource type="Script" uid="uid://d0trgtt6w8hcm" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_selection_screen/save_file_deletion_dialog.gd" id="6_snap1"]
+[ext_resource type="PackedScene" uid="uid://ddc8hb0ksl0dw" path="res://addons/patate/scenes/custom_confirmation_dialog.tscn" id="6_lk581"]
 
 [node name="SaveFileSelectionScreen" type="Control" unique_id=1047122757 node_paths=PackedStringArray("default_focus")]
 layout_mode = 3
@@ -78,90 +78,35 @@ script = ExtResource("4_sqi1v")
 config = ExtResource("5_8gqs1")
 metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
 
-[node name="SaveFileDeletionDialog" type="Control" parent="." unique_id=733321729]
+[node name="CreateAnywayDialog" parent="." unique_id=748535725 instance=ExtResource("6_lk581")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("6_snap1")
-metadata/_custom_type_script = "uid://rw4p3emba8ai"
+theme = null
+statement_key = "LOADING_WARNING_DIALOG_CREATE_ANYWAY_STATEMENT"
+confirm_btn_key = "LOADING_WARNING_DIALOG_LOAD_BUTTON"
+cancel_btn_key = "EXIT_DIALOG_CANCEL_BUTTON"
 
-[node name="ColorRect" type="ColorRect" parent="SaveFileDeletionDialog" unique_id=713046095]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.2509804)
-
-[node name="PanelContainer" type="PanelContainer" parent="SaveFileDeletionDialog" unique_id=598383125]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -316.0
-offset_top = -82.5
-offset_right = 316.0
-offset_bottom = 82.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="SaveFileDeletionDialog/PanelContainer" unique_id=1122257147]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SaveFileDeletionDialog/PanelContainer/MarginContainer" unique_id=1248727636]
-layout_mode = 2
-theme_override_constants/separation = 30
-alignment = 1
-
-[node name="DeletionStatementLabel" type="Label" parent="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1040192343]
+[node name="LoadAnywayDialog" parent="." unique_id=1493332920 instance=ExtResource("6_lk581")]
 unique_name_in_owner = true
-layout_mode = 2
-text = "SAVE_DELETION_DIALOG_STATEMENT"
-horizontal_alignment = 1
+layout_mode = 1
+theme = null
+statement_key = "LOADING_WARNING_DIALOG_LOADING_ANYWAY_STATEMENT"
+confirm_btn_key = "LOADING_WARNING_DIALOG_LOAD_BUTTON"
+cancel_btn_key = "EXIT_DIALOG_CANCEL_BUTTON"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer" unique_id=1170351351]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 40
-alignment = 1
+[node name="OverwriteDialog" parent="." unique_id=543906930 instance=ExtResource("6_lk581")]
+unique_name_in_owner = true
+layout_mode = 1
+theme = null
+statement_key = "LOADING_WARNING_DIALOG_OVERWRITE_ANYWAY_STATEMENT"
+confirm_btn_key = "SAVE_FILE_OVERWRITE_BUTTON"
+cancel_btn_key = "EXIT_DIALOG_CANCEL_BUTTON"
 
-[node name="CancelBtn" type="Button" parent="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=285589044]
-layout_mode = 2
-focus_neighbor_left = NodePath(".")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../DeleteBtn")
-focus_neighbor_bottom = NodePath(".")
-focus_next = NodePath("../DeleteBtn")
-focus_previous = NodePath(".")
-text = "SAVE_FILE_DELETION_DIALOG_CANCEL"
-script = ExtResource("4_sqi1v")
-config = ExtResource("5_8gqs1")
-metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
-
-[node name="DeleteBtn" type="Button" parent="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1144621256]
-layout_mode = 2
-focus_neighbor_left = NodePath("../CancelBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath(".")
-focus_neighbor_bottom = NodePath(".")
-focus_next = NodePath(".")
-focus_previous = NodePath("../CancelBtn")
-text = "SAVE_FILE_DELETION_DIALOG_APPLY"
-script = ExtResource("4_sqi1v")
-config = ExtResource("5_8gqs1")
-metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+[node name="SaveFileDeletionDialog" parent="." unique_id=523348475 instance=ExtResource("6_lk581")]
+unique_name_in_owner = true
+layout_mode = 1
+theme = null
+statement_key = "SAVE_FILE_DELETION_DIALOG_STATEMENT"
+confirm_btn_key = "SAVE_FILE_DELETION_DIALOG_APPLY"
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/BackBtn" to="." method="_on_back_btn_pressed"]
-[connection signal="pressed" from="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CancelBtn" to="SaveFileDeletionDialog" method="_on_cancel_btn_pressed"]
-[connection signal="pressed" from="SaveFileDeletionDialog/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/DeleteBtn" to="SaveFileDeletionDialog" method="_on_delete_btn_pressed"]

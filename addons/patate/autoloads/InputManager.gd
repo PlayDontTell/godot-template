@@ -403,5 +403,7 @@ func _save_bindings() -> void:
 	var data : InputBindingsData = InputBindingsData.new()
 	data.entries = bindings
 	ResourceSaver.save(data, G.config.BIN_DIR + "input_bindings.tres")
+	
+	DeviceManager.input_prompts_changed.emit()     
 
 #endregion

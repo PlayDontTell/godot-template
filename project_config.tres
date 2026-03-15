@@ -8,5 +8,7 @@
 
 [resource]
 script = ExtResource("3_q2ua5")
+manual_saving_enabled = true
+has_save_slots = true
 block_duplicate_bindings = false
 metadata/_custom_type_script = "uid://b0l3ym7olemuc"

@@ -25,22 +25,23 @@ var slider_is_initiated : bool = false
 
 
 func _ready() -> void:
-	var slider_properties: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting_name)
-	if slider_properties.is_empty():
-		push_error("setting_slider: no range hint found for '%s'" % setting_name)
-		return
-	
-	slider.min_value = slider_properties.min_value
-	slider.max_value = slider_properties.max_value
-	slider.step = slider_properties.step
-	slider.tick_count = slider_properties.tick_count
-	
-	setting_label.set_text(label_text)
-	
-	if setting_name in SettingsManager.default_settings:
-		set_slider()
-	
-	slider_is_initiated = true
+	if not Engine.is_editor_hint():
+		var slider_properties: Dictionary = Utils.get_hint_range_info(SettingsManager.settings, setting_name)
+		if slider_properties.is_empty():
+			push_error("setting_slider: no range hint found for '%s'" % setting_name)
+			return
+		
+		slider.min_value = slider_properties.min_value
+		slider.max_value = slider_properties.max_value
+		slider.step = slider_properties.step
+		slider.tick_count = slider_properties.tick_count
+		
+		setting_label.set_text(label_text)
+		
+		if setting_name in SettingsManager.default_settings:
+			set_slider()
+		
+		slider_is_initiated = true
 
 
 #func apply_display_type(new_display_type : DisplayType = display_type) -> void:

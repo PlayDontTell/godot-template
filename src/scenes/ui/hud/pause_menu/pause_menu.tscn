@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://cfmvs4ijai7r8"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_8thms"]
+[ext_resource type="Script" uid="uid://b4hsjmv6wtryy" path="res://src/scenes/ui/hud/pause_menu/pause_menu_controller.gd" id="2_y8f3s"]
+[ext_resource type="PackedScene" uid="uid://beuq7hw2u0tov" path="res://src/scenes/ui/hud/pause_menu/pause_screen/pause_screen.tscn" id="3_y8f3s"]
+[ext_resource type="PackedScene" uid="uid://u5o8o134h8nt" path="res://src/core/core_scenes/main_menu/settings_menu/settings_screen.tscn" id="4_sw6co"]
+[ext_resource type="PackedScene" uid="uid://ddc8hb0ksl0dw" path="res://addons/patate/scenes/custom_confirmation_dialog.tscn" id="5_y8f3s"]
+[ext_resource type="PackedScene" uid="uid://clojvl4yjj8bt" path="res://src/core/core_scenes/main_menu/save_selection_menu/save_file_selection_screen/save_file_selection_screen.tscn" id="7_ubglf"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=415372991]
+
+[node name="PauseMenuController" type="Control" parent="." unique_id=928127401]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_8thms")
+script = ExtResource("2_y8f3s")
+metadata/_custom_type_script = "uid://ctxwyoqy5g335"
+metadata/_edit_lock_ = true
+
+[node name="ColorRect" type="ColorRect" parent="PauseMenuController" unique_id=1666978695]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2509804)
+
+[node name="PauseScreen" parent="PauseMenuController" unique_id=1369281828 instance=ExtResource("3_y8f3s")]
+layout_mode = 1
+
+[node name="SettingsScreen" parent="PauseMenuController" unique_id=1239688094 instance=ExtResource("4_sw6co")]
+visible = false
+layout_mode = 1
+
+[node name="ReturnToMainMenuDialog" parent="PauseMenuController" unique_id=748535725 instance=ExtResource("5_y8f3s")]
+layout_mode = 1
+statement_key = "RETURN_TO_MAIN_MENU_STATEMENT"
+confirm_btn_key = "RETURN_TO_MAIN_MENU_RETURN_BUTTON"
+cancel_btn_key = "EXIT_DIALOG_CANCEL_BUTTON"
+
+[node name="SaveAndExitDialog" parent="PauseMenuController" unique_id=114939881 instance=ExtResource("5_y8f3s")]
+layout_mode = 1
+statement_key = "RETURN_TO_MAIN_MENU_STATEMENT"
+confirm_btn_key = "RETURN_TO_MAIN_MENU_RETURN_BUTTON"
+cancel_btn_key = "EXIT_DIALOG_CANCEL_BUTTON"
+
+[node name="SaveFileSelectionScreen" parent="PauseMenuController" unique_id=1047122757 instance=ExtResource("7_ubglf")]
+layout_mode = 1

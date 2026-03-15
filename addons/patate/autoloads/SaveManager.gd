@@ -5,6 +5,9 @@ signal data_is_ready
 signal save_file_deleted
 signal save_slot_selected
 
+signal before_screenshot
+signal after_screenshot
+
 # each _save_data_list key is a used save_slot
 # with its associated SaveData instances (decrypted save files)
 var save_data_list: Dictionary[int, Array]
@@ -12,6 +15,11 @@ var save_data_list: Dictionary[int, Array]
 var current_save_file_path: String
 var current_save_slot: int = 0
 
+
+enum Mode {
+	SAVING,
+	LOADING,
+}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -45,7 +53,11 @@ func unload() -> void:
 
 
 func create_new_save() -> void:
-	await auto_save()
+	await manual_save()
+
+
+func overwrite_save(path: String) -> void:                                                                                                                                                                                                  
+	await _save_data(path, SaveData.SaveType.MANUAL_SAVE)
 
 
 ## Called by the game at checkpoints, scene changes, timers, etc.
@@ -118,7 +130,7 @@ func _prune_saves(type_prefix : String, max_count : int) -> void:
 	
 	while matching.size() > max_count:
 		var oldest : String = matching.pop_front()
-		delete_file(oldest)
+		delete_file(oldest, true)
 
 
 ## Returns the full path of the most recent save of a given type
@@ -179,6 +191,7 @@ func log_event(event_data : Variant) -> void:
 ## Uses temporary file for transaction safety to prevent corruption on crash.
 ## Returns true on success, false on failure.
 func _save_data(file_path : String = current_save_file_path, save_type: SaveData.SaveType = SaveData.SaveType.AUTO_SAVE) -> bool:
+	save_data.game_name = ProjectSettings.get_setting("application/config/name")
 	save_data._is_empty = false
 	save_data.save_slot = current_save_slot
 	save_data.game_version = ProjectSettings.get_setting("application/config/version")
@@ -216,6 +229,10 @@ func _load_data(file_path : String = current_save_file_path, set_as_current : bo
 			is_data_ready = true
 			data_is_ready.emit()
 		return fallback
+	
+	if file_data[0].game_name != ProjectSettings.get_setting("application/config/name"):
+		push_warning("Save file '%s' belongs to a different game, skipping." % file_path)
+		return []
 	
 	file_data[0] = update_save_data(file_data[0])
 	
@@ -333,7 +350,7 @@ func archive_save_data() -> int:
 
 
 ## Delete a file at the given path. Returns true on success.
-func delete_file(file_path : String) -> bool:
+func delete_file(file_path : String, silent: bool = false) -> bool:
 	if not FileAccess.file_exists(file_path):
 		push_warning("Attempted to delete non-existent file: " + file_path)
 		return false
@@ -343,7 +360,7 @@ func delete_file(file_path : String) -> bool:
 		push_error("Failed to delete file: " + file_path + " (Error: " + str(error) + ")")
 		return false
 	
-	if file_path.ends_with(G.config.SAVE_FILE_EXTENSION):
+	if file_path.ends_with(G.config.SAVE_FILE_EXTENSION) and not silent:
 		save_file_deleted.emit()
 	
 	return true
@@ -427,7 +444,16 @@ func _write_file(file_path : String, data_array : Array, mode : FileMode = FileM
 
 ## Capture a screenshot and resize it for save files
 func _capture_screenshot() -> Image:
+	before_screenshot.emit()
+	
+	# Waiting 2 frames for elements to hide themselves during screenshot
+	# Like the pause menu
 	await get_tree().process_frame
+	await get_tree().process_frame
+	
 	var img : Image = get_viewport().get_texture().get_image()
 	img.resize(G.config.SCREENSHOT_SIZE.x, G.config.SCREENSHOT_SIZE.y, Image.INTERPOLATE_NEAREST)
+	
+	after_screenshot.emit()
+	
 	return img

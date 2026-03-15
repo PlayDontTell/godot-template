@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://beuq7hw2u0tov"]
+
+[ext_resource type="Theme" uid="uid://7ulrlyfv85ax" path="res://assets/themes/default_game_theme/default_game_theme.tres" id="1_tq8fr"]
+[ext_resource type="Script" uid="uid://c8yr7um1sean6" path="res://src/scenes/ui/hud/pause_menu/pause_screen/pause_screen.gd" id="2_7a1d3"]
+[ext_resource type="Script" uid="uid://dvjgopdw7ubc1" path="res://addons/patate/classes/AnimatedButton.gd" id="4_xqpmf"]
+[ext_resource type="Resource" uid="uid://bur6phiqbk2j5" path="res://assets/themes/default_game_theme/default_animated_button_config.tres" id="5_xhc8x"]
+
+[node name="PauseScreen" type="Control" unique_id=1369281828 node_paths=PackedStringArray("default_focus")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_tq8fr")
+script = ExtResource("2_7a1d3")
+default_focus = NodePath("VBoxContainer/ResumeBtn")
+metadata/_custom_type_script = "uid://rw4p3emba8ai"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1437459486]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.5
+offset_top = -187.0
+offset_right = 136.5
+offset_bottom = 187.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="ResumeBtn" type="Button" parent="VBoxContainer" unique_id=1331610721]
+layout_mode = 2
+text = "PAUSE_MENU_RESUME"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="SaveBtn" type="Button" parent="VBoxContainer" unique_id=1401026003]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PAUSE_MENU_SAVE_BUTTON"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="LoadBtn" type="Button" parent="VBoxContainer" unique_id=1205393892]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PAUSE_MENU_LOAD_BUTTON"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="SettingsBtn" type="Button" parent="VBoxContainer" unique_id=1757971076]
+layout_mode = 2
+text = "MAIN_MENU_SETTINGS"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="MainMenuBtn" type="Button" parent="VBoxContainer" unique_id=1888193846]
+layout_mode = 2
+text = "PAUSE_MENU_MAIN_MENU"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[node name="ExitBtn" type="Button" parent="VBoxContainer" unique_id=1049543872]
+layout_mode = 2
+text = "PAUSE_MENU_EXIT"
+script = ExtResource("4_xqpmf")
+config = ExtResource("5_xhc8x")
+metadata/_custom_type_script = "uid://dvjgopdw7ubc1"
+
+[connection signal="pressed" from="VBoxContainer/ResumeBtn" to="." method="_on_resume_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/SaveBtn" to="." method="_on_save_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/LoadBtn" to="." method="_on_load_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/SettingsBtn" to="." method="_on_settings_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/MainMenuBtn" to="." method="_on_main_menu_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]

@@ -27,6 +27,7 @@
 class_name BaseMenuController
 extends Control
 
+signal close_requested
 
 # To set before super._ready()
 ## Maps State enum values (int) to BaseMenu nodes.
@@ -57,6 +58,24 @@ func _exit_tree() -> void:
 
 # Public API
 
+## activates the current panel and shows the controller:
+func open() -> void:
+	show()
+	_panels[_current].activate()
+	_grab_focus(_current)
+
+
+## deactivates the current panel, hides the controller, emits the signal:
+func close() -> void:
+	if _current != -1:
+		_panels[_current].deactivate()
+	_history.clear()
+	_current = _initial_state
+	hide()
+	close_requested.emit()
+
+
+
 ## Navigate to a new state, pushing the current one onto the history stack.
 func go_to(state: int) -> void:
 	var previous := _current
@@ -75,7 +94,9 @@ func go_to(state: int) -> void:
 ## Return to the previous state. Does nothing if history is empty.
 func go_back() -> void:
 	if _history.is_empty():
+		close()
 		return
+	
 	var previous := _current
 	_save_focus(previous)
 	_current = _history.pop_back()

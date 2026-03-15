@@ -46,11 +46,15 @@ func get_scene(core_scene : StringName) -> PackedScene:
 
 @export_group("Save System")
 @export_subgroup("Save System Configuration", "")
+## When enabled, the player can load saves manually (e.g. from a menu button).
+## When disabled, the game handles loading automatically —
+## no load button is shown, and the player never chooses a save file.
+@export var manual_loading_enabled : bool = false
 ## When enabled, the player can trigger saves manually (e.g. from a menu button).
 ## When disabled, the game handles saving entirely through autosaves —
 ## no save button is shown, and the player never chooses when to save.
 ## Both modes can coexist: a game with manual saving can also autosave.
-@export var has_manual_saving : bool = false
+@export var manual_saving_enabled : bool = false
 ## When enabled, the player picks a slot (profile) before playing.
 ## Each slot can contain one or more save files depending on your design.
 ## When disabled, saves are stored in a flat list — no slot selection screen.

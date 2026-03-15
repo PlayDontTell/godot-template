@@ -60,9 +60,17 @@ func _ready() -> void:
 	panel_save_slot_creation.back_requested.connect(go_back)
 	
 	panel_credits.back_requested.connect(go_back)
-	panel_exit_dialog.cancel_requested.connect(go_back)
-	panel_exit_dialog.exit_game_requested.connect(get_tree().quit)
-
+	panel_exit_dialog.outcome_received.connect(
+		func(confirmed: bool):
+			if confirmed:
+				get_tree().quit()
+			else:
+				go_back()
+	)
+	
+	panel_exit_dialog.format_dict = {"game_name": ProjectSettings.get_setting("application/config/name")}
+	panel_exit_dialog.refresh()
+	
 	super._ready()  # always last — triggers go_to(_initial_state)
 
 
@@ -89,7 +97,7 @@ func update_save_lists() -> void:
 ##   - Create a new save and start the game (if the slot is empty and needs no setup)
 func _on_save_slot_selected() -> void:
 	var has_save_slots : bool = G.config.has_save_slots
-	var has_manual_saving : bool = G.config.has_manual_saving
+	var manual_loading_enabled : bool = G.config.manual_loading_enabled
 	var save_slots_need_setup : bool = G.config.save_slots_need_setup
 	var has_saves_in_slot : bool = false
 	if SaveManager.save_data_list.has(SaveManager.current_save_slot):
@@ -105,7 +113,7 @@ func _on_save_slot_selected() -> void:
 		# - a save is already loaded (the player is resuming, not starting fresh)
 		var player_can_create_new_files : bool = not has_save_slots or a_save_is_loaded
 		
-		if has_manual_saving and (not has_only_one_save_available or player_can_create_new_files):
+		if manual_loading_enabled and (not has_only_one_save_available or player_can_create_new_files):
 			# Multiple saves to choose from, or the player can create new ones.
 			# Show the file selection screen so they can pick, delete, or create saves.
 			go_to(State.SAVE_FILE_SELECTION)
